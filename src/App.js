@@ -32,7 +32,7 @@ class App extends Component {
             loadingBalance: false,
             connectedNetwork: undefined,
             notify:{
-                    message: "welcome to binkd",
+                    message: "",
                     level: "success"
                 }
         }
@@ -50,12 +50,11 @@ class App extends Component {
             console.log('checking network version...')
             const network = await web3.version.getNetworkAsync();
             let networkId;
-            let message;
+            let message = "";
             let level = "warning";
             switch (network) {
                 case "1":
-                    message = 'You are on mainnet';
-                    level = 'success';
+                    console.log("You are on Mainnet");
                     networkId = 'Mainnet';
                     break
                 case "2":
@@ -78,14 +77,26 @@ class App extends Component {
                     networkId = "Unknown"
                     message = 'You are on unknown network.';
             }
-            if(networkId != "Mainnet") {
-                message +=" Please switch to the Mainnet network.";
+            if(networkId !== "Mainnet") {
+                if(message != "") {
+                    message +=" Please switch to the Mainnet network.";
+                    this.setState({ connectedNetwork: networkId,
+                        notify: {
+                            message: message,
+                            level: level
+                        } 
+                    });
+                }
+            } else { 
+                if(this.state.accounts[0]) {
+                    this.setState({ notify: {
+                        message: `You are on ${networkId}. Selected account is ${this.state.accounts[0]}`,
+                        level: 'success'
+                        } 
+                    });
+                }
             }
-            this.setState({ connectedNetwork: networkId,
-                            notify: {
-                                message: message,
-                                level: level
-                            } 
+            this.setState({ connectedNetwork: networkId
                         });
         }, ARTIFICIAL_DELAY_IN_MS)
     }
@@ -111,11 +122,10 @@ class App extends Component {
             //const instance = instancePromisifier(abi.at(SMART_CONTRACT_INSTANCE))
 
             //console.log('Interface', ABIInterfaceArray)
-
+            this.getNetworkVersion(web3);
             this.setState({ web3: web3, isWeb3synced: true }, () => {
                 this.setState({ loadingAccounts: true })
                 setTimeout(async () => {
-                    this.getNetworkVersion(web3);
                     console.log('Loading accounts...')
                     const accounts = await web3.eth.getAccountsAsync();
                     if (accounts.length === 0) {
@@ -125,7 +135,7 @@ class App extends Component {
                                 level: 'error'
                             } 
                         });
-                    }   
+                    }  
                     console.log(accounts);
                     this.setState({ loadingAccounts: false, accounts: accounts, loadedAccounts: true })
                 }, ARTIFICIAL_DELAY_IN_MS)

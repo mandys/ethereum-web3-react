@@ -9,11 +9,10 @@ class Notify extends Component {
         this.state = {
             uid : 0
         }
-        
     }
     _addNotification() {
         console.log(this.props);
-        if(this._notificationSystem) {
+        if(this._notificationSystem && this.props.message != "") {
             let notification = this._notificationSystem.addNotification(this.props);
             console.log(notification);
             this.setState({uid: notification.uid});
@@ -29,10 +28,10 @@ class Notify extends Component {
     componentDidUpdate(prevProps) {
         console.log("componentDidUpdate")
         console.log(this.props);
-        if(prevProps.message != this.props.message) {
-            this._notificationSystem.addNotification(this.props);
+        let notifySettings = this.props;
+        if(prevProps.message !== this.props.message) {
+            this._addNotification();
         }
-       
     }
 
     render() {
