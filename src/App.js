@@ -17,117 +17,152 @@ const parseEtherFromBalance = (web3, balance) => web3.fromWei(balance.toNumber()
 
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      web3: null,
-      instance: null,
-      isWeb3synced: false,
-      accounts: [],
-      accountsMap: {},
-      loadingAccounts: false,
-      loadingBalance: false
-    }
-    this.loadBalance = this.loadBalance.bind(this)
-    this.callInterface = this.callInterface.bind(this)
-    this.getNetworkVersion = this.getNetworkVersion.bind(this)
-  }
-  async callInterface(interfaceName) {
-    const { instance } = this.state;
-    const response = await instance[`${interfaceName}Async`]();
-    alert(`The result from calling ${interfaceName} is ${response}`);
-  }
-  async getNetworkVersion(web3) {
-    console.log('getNetworkVersion')
-    setTimeout(async () => {
-      console.log('checking network version...')
-      const network = await web3.version.getNetworkAsync();
-      console.log(network);
-    }, ARTIFICIAL_DELAY_IN_MS)
-  }
-  async loadBalance(account) {
-    this.setState({ loadingBalance: true })
-    setTimeout(async () => {
-      const balance = await parseEtherFromBalance(this.state.web3, await this.state.web3.eth.getBalanceAsync(account))
-      const { accountsMap } = this.state;
-      console.log('Balance for account', account, balance)
-      this.setState({ loadingBalance: false, accountsMap: Object.assign(accountsMap, { [account]: balance } ) })
-    }, ARTIFICIAL_DELAY_IN_MS)
-  }
-  async componentDidMount() {
-    const web3 = await getWeb3Async()
-    if(web3.isConnected()) {
-      
-      //const abi = await web3.eth.contract(ABIInterfaceArray)
-      //const instance = instancePromisifier(abi.at(SMART_CONTRACT_INSTANCE))
-      
-      //console.log('Interface', ABIInterfaceArray)
-      
-      this.setState({ web3: web3, isWeb3synced: true }, () => {
-        this.setState({ loadingAccounts: true })
-        setTimeout(async () => {
-          this.getNetworkVersion(web3);
-          console.log('Loading accounts...')
-          const accounts = await web3.eth.getAccountsAsync();
-          if ( accounts.length === 0 ) {
-            console.log('no accounts found');
-          }
-          console.log('Accounts loaded.')
-          console.log(accounts);
-          this.setState({ loadingAccounts: false, accounts: accounts })
-        }, ARTIFICIAL_DELAY_IN_MS)
-      })
-      
-    }
-  }
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">Web3.js React Integration Example</h1>
-        </header>
-        { 
-          this.state.isWeb3synced ?
-          <div className="App-wrapper">
-            <p className="App-intro">
-              MetaMask was loaded properly.
-            </p>
-            { this.state.loadingAccounts && <span>We are loading your accounts...</span> }
-            { 
-              this.state.accounts.length > 0 && 
-                <div>
-                  <span>Your accounts are: </span>
-                  { 
-                    this.state.accounts.map( account => 
-                      (
-                      <pre key={account}> 
-                        Account: { account }
-                        <br/>
-                        Balance: 
-                        {
-                          this.state.loadingBalance ? ' Loading your balance ' :
-                          this.state.accountsMap[account] ?
-                          ` ${this.state.accountsMap[account]} ETH ` : ' N/A ETH '
-                        }
-                        <button onClick={() => this.loadBalance(account)}>Get Balance</button>
-                      </pre>
-                      )
-                    )
-                  }
-                </div>
-            }
-            {
-              !this.state.loadingAccounts && <div>You dont seem to have any accounts</div>
-            }
-          </div>
-          :
-          <p className="App-intro">
-            To get started, connect to your MetaMask account
-          </p>
+    constructor(props) {
+        super(props);
+        this.state = {
+            web3: null,
+            instance: null,
+            isWeb3synced: false,
+            accounts: [],
+            accountsMap: {},
+            loadingAccounts: false,
+            loadedAccounts: false,
+            loadingBalance: false,
+            connectedNetwork: undefined
         }
-      </div>
-    );
-  }
+        this.loadBalance = this.loadBalance.bind(this)
+        this.callInterface = this.callInterface.bind(this)
+        this.getNetworkVersion = this.getNetworkVersion.bind(this)
+    }
+    async callInterface(interfaceName) {
+        const { instance } = this.state;
+        const response = await instance[`${interfaceName}Async`]();
+        alert(`The result from calling ${interfaceName} is ${response}`);
+    }
+    async getNetworkVersion(web3) {
+        setTimeout(async () => {
+            console.log('checking network version...')
+            const network = await web3.version.getNetworkAsync();
+            let networkId;
+            switch (network) {
+                case "1":
+                    console.log('This is mainnet')
+                    networkId = 'Mainnet';
+                    break
+                case "2":
+                    console.log('This is the deprecated Morden test network.')
+                    networkId = "Morden";
+                    break
+                case "3":
+                    console.log('This is the ropsten test network.')
+                    networkId = "Ropsten";
+                    break
+                case "4":
+                    console.log('This is the Rinkeby test network.')
+                    networkId = 'Rinkeby';
+                    break
+                case "42":
+                    console.log('This is the Kovan test network.')
+                    networkId = "Kovan";
+                    break
+                default:
+                    networkId = "Unknown"
+                    console.log('This is an unknown network.')
+            }
+            this.setState({ connectedNetwork: networkId })
+        }, ARTIFICIAL_DELAY_IN_MS)
+    }
+    async loadBalance(account) {
+        this.setState({ loadingBalance: true })
+        setTimeout(async () => {
+            const balance = await parseEtherFromBalance(this.state.web3, await this.state.web3.eth.getBalanceAsync(account))
+            const { accountsMap } = this.state;
+            console.log('Balance for account', account, balance)
+            this.setState({ loadingBalance: false, accountsMap: Object.assign(accountsMap, { [account]: balance }) })
+        }, ARTIFICIAL_DELAY_IN_MS)
+    }
+    async componentDidMount() {
+        const web3 = await getWeb3Async()
+        if (web3.isConnected()) {
+
+            //const abi = await web3.eth.contract(ABIInterfaceArray)
+            //const instance = instancePromisifier(abi.at(SMART_CONTRACT_INSTANCE))
+
+            //console.log('Interface', ABIInterfaceArray)
+
+            this.setState({ web3: web3, isWeb3synced: true }, () => {
+                this.setState({ loadingAccounts: true })
+                setTimeout(async () => {
+                    this.getNetworkVersion(web3);
+                    console.log('Loading accounts...')
+                    const accounts = await web3.eth.getAccountsAsync();
+                    if (accounts.length === 0) {
+                        console.log('no accounts found');
+                    }
+
+                    console.log(accounts);
+                    this.setState({ loadingAccounts: false, accounts: accounts, loadedAccounts: true })
+                }, ARTIFICIAL_DELAY_IN_MS)
+            })
+
+        }
+    }
+    render() {
+        return (
+            <div className="App">
+                <header className="App-header">
+                    <h1 className="App-title">Web3.js React Integration Example</h1>
+                </header>
+                {
+                    this.state.isWeb3synced ?
+                        <div className="App-wrapper">
+                            <p className="App-intro">
+                                MetaMask was loaded properly.
+            </p>
+                            {this.state.loadingAccounts && <span>We are loading your accounts...</span>}
+                            {
+                                this.state.accounts.length > 0 &&
+                                <div>
+                                    <span>Your accounts are: </span>
+                                    {
+                                        this.state.accounts.map(account =>
+                                            (
+                                                <pre key={account}>
+                                                    Account: {account}
+                                                    <br />
+                                                    Balance:
+                        {
+                                                        this.state.loadingBalance ? ' Loading your balance ' :
+                                                            this.state.accountsMap[account] ?
+                                                                ` ${this.state.accountsMap[account]} ETH ` : ' N/A ETH '
+                                                    }
+                                                    <button onClick={() => this.loadBalance(account)}>Get Balance</button>
+                                                </pre>
+                                            )
+                                        )
+                                    }
+                                </div>
+                            }
+                            <div>
+                                {
+                                    !this.state.loadedAccounts && <div>You dont seem to have any accounts</div>
+                                }
+                                <div>
+
+                                    {
+                                        this.state.connectedNetwork ? <p>You are connected to the {this.state.connectedNetwork}</p> : <p>Checking network...</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        :
+                        <p className="App-intro">
+                            To get started, connect to your MetaMask account
+          </p>
+                }
+            </div>
+        );
+    }
 }
 
 export default App;
