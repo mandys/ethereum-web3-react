@@ -4,6 +4,8 @@ import React, { Component } from 'react';
 import { getWeb3Async } from './util/web3'
 //import ABIInterfaceArray from './util/ABI.json'
 
+import Notify from './notification';
+
 import './App.css';
 
 //const SMART_CONTRACT_INSTANCE = '0xb3b18AfbE291E50E652ba5e3faFAbf0b566b804B'
@@ -28,7 +30,11 @@ class App extends Component {
             loadingAccounts: false,
             loadedAccounts: false,
             loadingBalance: false,
-            connectedNetwork: undefined
+            connectedNetwork: undefined,
+            notify:{
+                    message: "welcome to binkd",
+                    level: "success"
+                }
         }
         this.loadBalance = this.loadBalance.bind(this)
         this.callInterface = this.callInterface.bind(this)
@@ -44,32 +50,43 @@ class App extends Component {
             console.log('checking network version...')
             const network = await web3.version.getNetworkAsync();
             let networkId;
+            let message;
+            let level = "warning";
             switch (network) {
                 case "1":
-                    console.log('This is mainnet')
+                    message = 'You are on mainnet';
+                    level = 'success';
                     networkId = 'Mainnet';
                     break
                 case "2":
-                    console.log('This is the deprecated Morden test network.')
+                    message = 'You are on deprecated Morden test network.';
                     networkId = "Morden";
                     break
                 case "3":
-                    console.log('This is the ropsten test network.')
+                    message = 'You are on ropsten test network.';
                     networkId = "Ropsten";
                     break
                 case "4":
-                    console.log('This is the Rinkeby test network.')
+                    message = 'You are on Rinkeby test network.';
                     networkId = 'Rinkeby';
                     break
                 case "42":
-                    console.log('This is the Kovan test network.')
+                    message = 'You are on Kovan test network.';
                     networkId = "Kovan";
                     break
                 default:
                     networkId = "Unknown"
-                    console.log('This is an unknown network.')
+                    message = 'You are on unknown network.';
             }
-            this.setState({ connectedNetwork: networkId })
+            if(networkId != "Mainnet") {
+                message +=" Please switch to the Mainnet network.";
+            }
+            this.setState({ connectedNetwork: networkId,
+                            notify: {
+                                message: message,
+                                level: level
+                            } 
+                        });
         }, ARTIFICIAL_DELAY_IN_MS)
     }
     async loadBalance(account) {
@@ -78,8 +95,13 @@ class App extends Component {
             const balance = await parseEtherFromBalance(this.state.web3, await this.state.web3.eth.getBalanceAsync(account))
             const { accountsMap } = this.state;
             console.log('Balance for account', account, balance)
-            this.setState({ loadingBalance: false, accountsMap: Object.assign(accountsMap, { [account]: balance }) })
-        }, ARTIFICIAL_DELAY_IN_MS)
+            this.setState({ loadingBalance: false, accountsMap: Object.assign(accountsMap, { [account]: balance }),
+            notify: {
+                message: "You are account balance "+balance,
+                level: 'success'
+            } 
+            })
+            }, ARTIFICIAL_DELAY_IN_MS)
     }
     async componentDidMount() {
         const web3 = await getWeb3Async()
@@ -98,8 +120,12 @@ class App extends Component {
                     const accounts = await web3.eth.getAccountsAsync();
                     if (accounts.length === 0) {
                         console.log('no accounts found');
-                    }
-
+                        this.setState({ notify: {
+                                message: "Please unlock your Metamask ",
+                                level: 'error'
+                            } 
+                        });
+                    }   
                     console.log(accounts);
                     this.setState({ loadingAccounts: false, accounts: accounts, loadedAccounts: true })
                 }, ARTIFICIAL_DELAY_IN_MS)
@@ -112,6 +138,10 @@ class App extends Component {
             <div className="App">
                 <header className="App-header">
                     <h1 className="App-title">Web3.js React Integration Example</h1>
+                    <Notify 
+                        message={this.state.notify.message} 
+                        level={this.state.notify.level}
+                    />
                 </header>
                 {
                     this.state.isWeb3synced ?
