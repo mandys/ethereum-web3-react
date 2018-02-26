@@ -6,6 +6,9 @@ import { getWeb3Async } from './util/web3'
 
 import Notify from './notification';
 
+import 'semantic-ui-css/semantic.min.css'
+import BnkGrid from './bnkgrid'
+
 import './App.css';
 
 //const SMART_CONTRACT_INSTANCE = '0xb3b18AfbE291E50E652ba5e3faFAbf0b566b804B'
@@ -146,13 +149,13 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-                <header className="App-header">
-                    <h1 className="App-title">Web3.js React Integration Example</h1>
-                    <Notify 
+                    {
+                    this.state.notify.message && 
+                    <BnkGrid 
                         message={this.state.notify.message} 
                         level={this.state.notify.level}
                     />
-                </header>
+                    }
                 {
                     this.state.isWeb3synced ?
                         <div className="App-wrapper">
