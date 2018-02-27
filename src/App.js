@@ -7,7 +7,7 @@ import { getWeb3Async } from './util/web3'
 import Notify from './notification';
 
 import 'semantic-ui-css/semantic.min.css'
-import BnkGrid from './bnkgrid'
+import BnkGrid from './Bnkgrid'
 
 import './App.css';
 
@@ -36,7 +36,7 @@ class App extends Component {
             connectedNetwork: undefined,
             notify:{
                     message: "",
-                    level: "success"
+                    level: "greeen"
                 }
         }
         this.loadBalance = this.loadBalance.bind(this)
@@ -54,7 +54,7 @@ class App extends Component {
             const network = await web3.version.getNetworkAsync();
             let networkId;
             let message = "";
-            let level = "warning";
+            let level = "orange";
             switch (network) {
                 case "1":
                     console.log("You are on Mainnet");
@@ -94,9 +94,11 @@ class App extends Component {
                 if(this.state.accounts[0]) {
                     this.setState({ notify: {
                         message: `You are on ${networkId}. Selected account is ${this.state.accounts[0]}`,
-                        level: 'success'
+                        level: 'green'
                         } 
+                        
                     });
+                    this.loadBalance(this.state.accounts[0]);
                 }
             }
             this.setState({ connectedNetwork: networkId
@@ -108,11 +110,12 @@ class App extends Component {
         setTimeout(async () => {
             const balance = await parseEtherFromBalance(this.state.web3, await this.state.web3.eth.getBalanceAsync(account))
             const { accountsMap } = this.state;
+            console.log('accountsMap', accountsMap);
             console.log('Balance for account', account, balance)
             this.setState({ loadingBalance: false, accountsMap: Object.assign(accountsMap, { [account]: balance }),
             notify: {
                 message: "You are account balance "+balance,
-                level: 'success'
+                level: 'green'
             } 
             })
             }, ARTIFICIAL_DELAY_IN_MS)
@@ -135,7 +138,7 @@ class App extends Component {
                         console.log('no accounts found');
                         this.setState({ notify: {
                                 message: "Please unlock your Metamask ",
-                                level: 'error'
+                                level: 'red'
                             } 
                         });
                     }  
@@ -154,9 +157,11 @@ class App extends Component {
                     <BnkGrid 
                         message={this.state.notify.message} 
                         level={this.state.notify.level}
+                        accountsMap={this.state.accountsMap}
+                        account={this.state.accounts}
                     />
                     }
-                {
+                {/* {
                     this.state.isWeb3synced ?
                         <div className="App-wrapper">
                             <p className="App-intro">
@@ -202,7 +207,7 @@ class App extends Component {
                         <p className="App-intro">
                             To get started, connect to your MetaMask account
           </p>
-                }
+                } */}
             </div>
         );
     }
