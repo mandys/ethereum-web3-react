@@ -4,8 +4,11 @@ import React, { Component } from 'react';
 import { getWeb3Async } from './util/web3'
 //import ABIInterfaceArray from './util/ABI.json'
 
-import BnkGrid from './Bnkgrid'
+// import BnkGrid from './Bnkgrid'
 import DisclaimerOverlay from './DisclaimerOverlay';
+import { Grid, Container, Message } from 'semantic-ui-react'
+// import BnkMessage from './Bnkmessage'
+import Wallet from './Wallet';
 
 //const SMART_CONTRACT_INSTANCE = '0xb3b18AfbE291E50E652ba5e3faFAbf0b566b804B'
 const ARTIFICIAL_DELAY_IN_MS = 1000
@@ -15,6 +18,8 @@ const parseEtherFromBalance = (web3, balance) => web3.fromWei(balance.toNumber()
 
 //const constantsFromInterface = ABIInterfaceArray.filter( ABIinterface => ABIinterface.constant )
 //const methodsFromInterface = ABIInterfaceArray.filter( ABIinterface => !ABIinterface.constant )
+
+
 
 
 class App extends Component {
@@ -102,6 +107,7 @@ class App extends Component {
                         });
         }, ARTIFICIAL_DELAY_IN_MS)
     }
+
     async loadBalance(account) {
         this.setState({ loadingBalance: true })
         setTimeout(async () => {
@@ -168,13 +174,38 @@ class App extends Component {
                 <DisclaimerOverlay />
                     {
                     this.state.notify.message && 
-                    <BnkGrid 
-                        message={this.state.notify.message} 
-                        level={this.state.notify.level}
-                        showMetamaskLink={this.state.notify.showMetamaskLink}
-                        accountsMap={this.state.accountsMap}
-                        account={this.state.accounts}
-                    />
+                    <Container>
+                        <Grid >
+                            <Grid.Row className='left aligned'>
+                                <Grid.Column width={10}>
+                                    <Wallet 
+                                        fromAddress={this.state.accounts[0]} 
+                                        balance={this.state.accountsMap[this.state.accounts[0]]} 
+                                        web3={this.state.web3} 
+                                    />
+                                </Grid.Column>
+                                <Grid.Column width={6} >
+                                    <Message color={this.state.notify.level}>
+                                        {this.state.notify.message}
+                                        {
+                                            this.state.notify.showMetamaskLink && 
+                                                <span>To install Metamask <a rel="noopener noreferrer" href="https://metamask.io/" target="_blank">click here</a>.</span>
+                                        }
+                                    </Message>
+                                    {
+                                        !this.state.showMetamaskLink &&
+                                            <div>
+                                                <h5>Account Address</h5>
+                                                    {this.state.accounts[0]}
+                                                <h5>Account Balance</h5>
+                                                    {this.state.accountsMap[this.state.accounts[0]]} ETH
+                                                <h5>Transaction History</h5>
+                                            </div>
+                                    }
+                                </Grid.Column>
+                            </Grid.Row>
+                        </Grid>
+                    </Container>
                     }
             </div>
         );

@@ -8,7 +8,7 @@ const BnkGrid = (props) => (
         <Grid >
             <Grid.Row className='left aligned'>
                 <Grid.Column width={10}>
-                    <Wallet />
+                    <Wallet fromAddress={props.account} balance={props.accountsMap[props.account]} validateEthereAddress={props.validateEthereAddress} />
                 </Grid.Column>
                 <Grid.Column width={6} >
                     <BnkMessage

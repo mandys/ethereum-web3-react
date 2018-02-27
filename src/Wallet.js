@@ -1,106 +1,82 @@
 import React, { Component } from 'react';
-//import { promisifyAll } from 'bluebird'
-
-import { getWeb3Async } from './util/web3'
-//import ABIInterfaceArray from './util/ABI.json'
-import { Container, Header, Button, Form } from 'semantic-ui-react'
-
-//const SMART_CONTRACT_INSTANCE = '0xb3b18AfbE291E50E652ba5e3faFAbf0b566b804B'
-const ARTIFICIAL_DELAY_IN_MS = 1000
-
-//const instancePromisifier = (instance) => promisifyAll(instance, { suffix: 'Async'})
-const parseEtherFromBalance = (web3, balance) => web3.fromWei(balance.toNumber(), 'ether')
-
-//const constantsFromInterface = ABIInterfaceArray.filter( ABIinterface => ABIinterface.constant )
-//const methodsFromInterface = ABIInterfaceArray.filter( ABIinterface => !ABIinterface.constant )
-
+import { Container, Header, Button, Form, Message } from 'semantic-ui-react'
 
 class Wallet extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            web3: null,
-            isWeb3synced: false,
-            accounts: [],
-            loadedAccounts: false,
-            loadingBalance: false,
-            fromAddress: ''
-        }
-        this.generateTransaction = this.generateTransaction.bind(this);
-    }
-    async generateTransaction(e) {
+    state = {
+        toAddressError: false,
+        amountToSendError: false
+    } 
+    generateTransaction = async(e) => {
         e.preventDefault();
         console.log('generateTransaction called');
         const fromAddress = e.target.fromAddress.value;
         const toAddress = e.target.toAddress.value;
         const amountToSend = e.target.amountToSend.value;
         console.log(amountToSend);
-        const tx = await this.state.web3.eth.sendTransactionAsync({
-            from: fromAddress,
-            to: toAddress,
-            value: amountToSend
-        });
-        console.log(tx);
-    }
-    async loadBalance(account) {
-        this.setState({ loadingBalance: true })
-        setTimeout(async () => {
-            const balance = await parseEtherFromBalance(this.state.web3, await this.state.web3.eth.getBalanceAsync(account))
-            const { accountsMap } = this.state;
-            console.log('Balance for account here');
-            console.log('Balance for account', account, balance)
-            this.setState({ loadingBalance: false, accountsMap: Object.assign(accountsMap, { [account]: balance }),
-            })
-            }, ARTIFICIAL_DELAY_IN_MS)
+        console.log(this.props.web3);
+        try {
+            const tx = await this.props.web3.eth.sendTransactionAsync({
+                from: fromAddress,
+                to: toAddress,
+                value: amountToSend
+            });
+            console.log(tx);
+        } catch(error) {
+            console.log(error);
+        }
+
     }
     handleChange(event) {
         this.setState({fromAddress: event.target.value});
-      }
-    async componentDidMount() {
-        console.log("+++++++++++++++++++++++++++=====");
-        const web3 = await getWeb3Async()
-        console.log(web3.isConnected());
-        console.log("+++++++++++++++++++++++++++=====");
-        if (web3.isConnected()) {
-            alert('here');
-            this.setState({ web3: web3, isWeb3synced: true }, () => {
-                setTimeout(async () => {
-                    console.log('Loading accounts... sdsadasdsa')
-                    const accounts = await web3.eth.getAccountsAsync();
-                    if (accounts.length === 0) {
-                        console.log('no accounts found');
-                    }  
-                    console.log(accounts);
-                    this.setState({ loadingAccounts: false, accounts: accounts, loadedAccounts: true, fromAddress: accounts[0] })
-                }, ARTIFICIAL_DELAY_IN_MS)
+    }
+    validateEthereAddress = (e) => {
+        const ethRecipientAddress = e.target.value;
+        console.log('ethRecipientAddress', ethRecipientAddress);
+        this.setState({
+            toAddressError: !this.props.web3.isAddress(ethRecipientAddress)
+        })
+    }
+    amountToSend = (e) => {
+        console.log('amount', e.target.value);
+        let amountToSend = parseInt(e.target.value, 10);
+        if (!isNaN(amountToSend)) {
+            console.log('amountToTransfer', amountToSend);
+            amountToSend = this.props.web3.fromWei(amountToSend, 'ether');
+            console.log(amountToSend)
+        } else {
+            this.setState({
+                amountToSendError: true
             })
-
         }
+;
     }
     render() {
         return (
             <Container>
-                {/* <Menu>
-                    <Menu.Item
-                        name='editorials'
-                    >
-                    Editorials
-                    </Menu.Item>
-                </Menu> */}
                 <Header as='h1'>Send Ether & Tokens</Header>
                 <Form onSubmit={this.generateTransaction}>
-                    <Form.Field>
+                    <Form.Field disabled={true}>
                         <label>From Address</label>
-                        <input placeholder='From Address' value={this.state.fromAddress} name="fromAddress" onChange={this.handleChange} />
+                        <input placeholder='From Address' value={this.props.fromAddress} name="fromAddress" onChange={this.handleChange} />
                     </Form.Field>
-                    <Form.Field>
+                    <Form.Field error={this.state.toAddressError} required={true}>
                         <label>To Address</label>
-                        <input placeholder='To Address' name="toAddress" />
+                        <input placeholder='To Address' name="toAddress" onBlur={this.validateEthereAddress}/>
                     </Form.Field>
-                    <Form.Field>
+                    { this.state.toAddressError && 
+                        <Message color='red'>
+                            Not a valid transaction address.
+                        </Message>
+                    }
+                    <Form.Field required={true} error={this.state.amountToSendError}>
                         <label>Amount to Send</label>
-                        <input placeholder='Enter the amount' name="amountToSend" />
+                        <input placeholder='Enter the amount' name="amountToSend" onBlur={this.amountToSend} />
                     </Form.Field>
+                    { this.state.amountToSendError && 
+                        <Message color='red'>
+                            Please enter valid amount to transfer.
+                        </Message>
+                    }
                     <Button type='submit'>Generate Transaction</Button>
             </Form>
             </Container>
