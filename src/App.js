@@ -127,8 +127,9 @@ class App extends Component {
             //console.log('Interface', ABIInterfaceArray)
             if(web3.currentProvider.isMetaMask !== true) {
                 this.setState({ notify: {
-                        message: "You dont have Metamask installed in your browser. Please install it.",
-                        level: 'red'
+                        message: "Metamask is required to use this site.",
+                        level: 'red',
+                        showMetamaskLink: true
                     } 
                 });
             } else {
