@@ -32,7 +32,8 @@ class App extends Component {
             connectedNetwork: undefined,
             notify:{
                     message: "",
-                    level: "greeen"
+                    level: "greeen",
+                    showMetamaskLink: false
                 }
         }
         this.loadBalance = this.loadBalance.bind(this)
@@ -77,7 +78,7 @@ class App extends Component {
                     message = 'You are on unknown network.';
             }
             if(networkId !== "Mainnet") {
-                if(message != "") {
+                if(message !== "") {
                     message +=" Please switch to the Mainnet network.";
                     this.setState({ connectedNetwork: networkId,
                         notify: {
@@ -124,7 +125,7 @@ class App extends Component {
             //const instance = instancePromisifier(abi.at(SMART_CONTRACT_INSTANCE))
 
             //console.log('Interface', ABIInterfaceArray)
-            if(web3.currentProvider.isMetaMask != true) {
+            if(web3.currentProvider.isMetaMask !== true) {
                 this.setState({ notify: {
                         message: "You dont have Metamask installed in your browser. Please install it.",
                         level: 'red'
@@ -140,7 +141,7 @@ class App extends Component {
                         if (accounts.length === 0) {
                             console.log('no accounts found');
                             this.setState({ notify: {
-                                    message: "Please unlock your Metamask ",
+                                    message: "Unlock your Metamask wallet to continue using Binkd!",
                                     level: 'red'
                                 } 
                             });
@@ -152,8 +153,9 @@ class App extends Component {
             }
         } else {
             this.setState({ notify: {
-                    message: "Unable to connect to provider. Try again!",
-                    level: 'red'
+                    message: "Metamask is required to use this site.",
+                    level: 'red',
+                    showMetamaskLink: true
                 } 
             });
         }
@@ -168,6 +170,7 @@ class App extends Component {
                     <BnkGrid 
                         message={this.state.notify.message} 
                         level={this.state.notify.level}
+                        showMetamaskLink={this.state.notify.showMetamaskLink}
                         accountsMap={this.state.accountsMap}
                         account={this.state.accounts}
                     />

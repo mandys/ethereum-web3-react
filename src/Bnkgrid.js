@@ -14,6 +14,7 @@ const BnkGrid = (props) => (
           <BnkMessage 
               message={props.message} 
               level={props.level}
+              showMetamaskLink={props.showMetamaskLink}
           />
         
           <h5>Account Address</h5>
