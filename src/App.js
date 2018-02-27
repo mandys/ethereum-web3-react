@@ -150,6 +150,12 @@ class App extends Component {
                     }, ARTIFICIAL_DELAY_IN_MS)
                 })
             }
+        } else {
+            this.setState({ notify: {
+                    message: "Unable to connect to provider. Try again!",
+                    level: 'red'
+                } 
+            });
         }
     }
 
@@ -166,53 +172,6 @@ class App extends Component {
                         account={this.state.accounts}
                     />
                     }
-                {/* {
-                    this.state.isWeb3synced ?
-                        <div className="App-wrapper">
-                            <p className="App-intro">
-                                MetaMask was loaded properly.
-            </p>
-                            {this.state.loadingAccounts && <span>We are loading your accounts...</span>}
-                            {
-                                this.state.accounts.length > 0 &&
-                                <div>
-                                    <span>Your accounts are: </span>
-                                    {
-                                        this.state.accounts.map(account =>
-                                            (
-                                                <pre key={account}>
-                                                    Account: {account}
-                                                    <br />
-                                                    Balance:
-                        {
-                                                        this.state.loadingBalance ? ' Loading your balance ' :
-                                                            this.state.accountsMap[account] ?
-                                                                ` ${this.state.accountsMap[account]} ETH ` : ' N/A ETH '
-                                                    }
-                                                    <button onClick={() => this.loadBalance(account)}>Get Balance</button>
-                                                </pre>
-                                            )
-                                        )
-                                    }
-                                </div>
-                            }
-                            <div>
-                                {
-                                    !this.state.loadedAccounts && <div>You dont seem to have any accounts</div>
-                                }
-                                <div>
-
-                                    {
-                                        this.state.connectedNetwork ? <p>You are connected to the {this.state.connectedNetwork}</p> : <p>Checking network...</p>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        :
-                        <p className="App-intro">
-                            To get started, connect to your MetaMask account
-          </p>
-                } */}
             </div>
         );
     }
