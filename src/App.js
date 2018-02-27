@@ -4,8 +4,6 @@ import React, { Component } from 'react';
 import { getWeb3Async } from './util/web3'
 //import ABIInterfaceArray from './util/ABI.json'
 
-import Notify from './notification';
-
 import 'semantic-ui-css/semantic.min.css'
 import BnkGrid from './Bnkgrid'
 
@@ -128,27 +126,35 @@ class App extends Component {
             //const instance = instancePromisifier(abi.at(SMART_CONTRACT_INSTANCE))
 
             //console.log('Interface', ABIInterfaceArray)
-            this.getNetworkVersion(web3);
-            this.setState({ web3: web3, isWeb3synced: true }, () => {
-                this.setState({ loadingAccounts: true })
-                setTimeout(async () => {
-                    console.log('Loading accounts...')
-                    const accounts = await web3.eth.getAccountsAsync();
-                    if (accounts.length === 0) {
-                        console.log('no accounts found');
-                        this.setState({ notify: {
-                                message: "Please unlock your Metamask ",
-                                level: 'red'
-                            } 
-                        });
-                    }  
-                    console.log(accounts);
-                    this.setState({ loadingAccounts: false, accounts: accounts, loadedAccounts: true })
-                }, ARTIFICIAL_DELAY_IN_MS)
-            })
-
+            if(web3.currentProvider.isMetaMask != true) {
+                this.setState({ notify: {
+                        message: "You dont have Metamask installed in your browser. Please install it.",
+                        level: 'red'
+                    } 
+                });
+            } else {
+                this.getNetworkVersion(web3);
+                this.setState({ web3: web3, isWeb3synced: true }, () => {
+                    this.setState({ loadingAccounts: true })
+                    setTimeout(async () => {
+                        console.log('Loading accounts...')
+                        const accounts = await web3.eth.getAccountsAsync();
+                        if (accounts.length === 0) {
+                            console.log('no accounts found');
+                            this.setState({ notify: {
+                                    message: "Please unlock your Metamask ",
+                                    level: 'red'
+                                } 
+                            });
+                        }  
+                        console.log(accounts);
+                        this.setState({ loadingAccounts: false, accounts: accounts, loadedAccounts: true })
+                    }, ARTIFICIAL_DELAY_IN_MS)
+                })
+            }
         }
     }
+
     render() {
         return (
             <div className="App">

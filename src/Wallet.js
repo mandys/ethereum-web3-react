@@ -58,7 +58,7 @@ class Wallet extends Component {
         this.setState({fromAddress: event.target.value});
       }
     async componentDidMount() {
-        
+        console.log("+++++++++++++++++++++++++++=====");
         const web3 = await getWeb3Async()
         console.log(web3.isConnected());
         console.log("+++++++++++++++++++++++++++=====");
