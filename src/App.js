@@ -4,10 +4,8 @@ import React, { Component } from 'react';
 import { getWeb3Async } from './util/web3'
 //import ABIInterfaceArray from './util/ABI.json'
 
-import 'semantic-ui-css/semantic.min.css'
 import BnkGrid from './Bnkgrid'
-
-import './App.css';
+import DisclaimerOverlay from './DisclaimerOverlay';
 
 //const SMART_CONTRACT_INSTANCE = '0xb3b18AfbE291E50E652ba5e3faFAbf0b566b804B'
 const ARTIFICIAL_DELAY_IN_MS = 1000
@@ -158,6 +156,7 @@ class App extends Component {
     render() {
         return (
             <div className="App">
+                <DisclaimerOverlay />
                     {
                     this.state.notify.message && 
                     <BnkGrid 

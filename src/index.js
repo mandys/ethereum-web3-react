@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import Wallet from './Wallet';
+
+import DisclaimerOverlay from './DisclaimerOverlay';
 
 function getUrlVars() {
     var vars = [],
@@ -30,7 +31,10 @@ switch (urlParams["page"]) {
         ReactDOM.render(
             <Wallet />, document.getElementById('root'));
         break;
-
+        case "DisclaimerOverlay":
+        ReactDOM.render(
+            <DisclaimerOverlay />, document.getElementById('root'));
+        break;
     case undefined:
     default:
         ReactDOM.render(

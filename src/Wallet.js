@@ -3,8 +3,7 @@ import React, { Component } from 'react';
 
 import { getWeb3Async } from './util/web3'
 //import ABIInterfaceArray from './util/ABI.json'
-import { Container, Menu, Header, Button, Form } from 'semantic-ui-react'
-import './App.css';
+import { Container, Header, Button, Form } from 'semantic-ui-react'
 
 //const SMART_CONTRACT_INSTANCE = '0xb3b18AfbE291E50E652ba5e3faFAbf0b566b804B'
 const ARTIFICIAL_DELAY_IN_MS = 1000
