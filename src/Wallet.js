@@ -41,8 +41,11 @@ class Wallet extends Component {
         let amountToSend = parseInt(e.target.value, 10);
         if (!isNaN(amountToSend)) {
             console.log('amountToTransfer', amountToSend);
-            amountToSend = this.props.web3.fromWei(amountToSend, 'ether');
-            console.log(amountToSend)
+            amountToSend = this.props.web3.toWei(amountToSend, 'ether');
+            console.log(amountToSend);
+            this.setState({
+                amountToSendError: false
+            })
         } else {
             this.setState({
                 amountToSendError: true
