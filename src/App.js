@@ -148,7 +148,7 @@ class App extends Component {
                         if (accounts.length === 0) {
                             console.log('no accounts found');
                             this.setState({ notify: {
-                                    message: "Unlock your Metamask wallet to continue using Binkd!",
+                                    message: "Unlock your Metamask wallet to continue using Binkd! To unlock Metamask, select the fox icon in your Chrome browser bar and login.",
                                     level: 'red'
                                 } 
                             });

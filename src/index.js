@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import registerServiceWorker from './registerServiceWorker';
+// import registerServiceWorker from './registerServiceWorker';
 import Wallet from './Wallet';
 
 import DisclaimerOverlay from './DisclaimerOverlay';
@@ -42,4 +42,4 @@ switch (urlParams["page"]) {
         break;
 }
 
-registerServiceWorker();
+// registerServiceWorker();

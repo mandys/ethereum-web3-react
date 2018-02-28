@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "blockies-identicon": "^0.1.0",
     "bluebird": "^3.5.1",
+    "identicon.js": "^2.3.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-notification-system": "^0.2.17",

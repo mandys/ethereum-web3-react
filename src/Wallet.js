@@ -1,17 +1,24 @@
 import React, { Component } from 'react';
-import { Container, Header, Button, Form, Message } from 'semantic-ui-react'
+import { Container, Header, Button, Form, Message,Modal } from 'semantic-ui-react'
+import TransactionOverlay from './TransactionOverlay'
 
 class Wallet extends Component {
     state = {
         toAddressError: false,
-        amountToSendError: false
-    } 
-    generateTransaction = async(e) => {
-        e.preventDefault();
+        amountToSendError: false,
+        showTransactionOverlay: false,
+        from: "",
+        to: "",
+        amount: "",
+        transactionError:false
+    }
+    generateTransaction = async() => {
+        this.setState({showTransactionOverlay: false});
         console.log('generateTransaction called');
-        const fromAddress = e.target.fromAddress.value;
-        const toAddress = e.target.toAddress.value;
-        const amountToSend = e.target.amountToSend.value;
+        const fromAddress = this.refs.fromAddress.value;
+        const toAddress = this.refs.toAddress.value;
+        const eherToSend = this.refs.amountToSend.value;
+        const amountToSend = this.props.web3.toWei(eherToSend, 'ether')
         console.log(amountToSend);
         console.log(this.props.web3);
         try {
@@ -21,24 +28,35 @@ class Wallet extends Component {
                 value: amountToSend
             });
             console.log(tx);
+            this.checkTransation(tx);
         } catch(error) {
-            console.log(error);
+            this.setState({
+                transactionError: true
+            });
+            console.log(error); 
         }
 
     }
+    
+     checkTransation = async(tx) => {
+        // const tx= "0x9627c4c528ebaaa0746072c9141e1aafe8a8ec2ec1631e8bd0b3cfe678dac296";
+        const status =  await this.props.web3.eth.getTransactionReceiptAsync(tx);
+        console.log(status);
+    }
+    
     handleChange(event) {
         this.setState({fromAddress: event.target.value});
     }
-    validateEthereAddress = (e) => {
-        const ethRecipientAddress = e.target.value;
-        console.log('ethRecipientAddress', ethRecipientAddress);
+    validateEthereAddress = () => {
+        const ethRecipientAddress = this.refs.toAddress.value;
+        let addressError = this.props.web3.isAddress(ethRecipientAddress)
         this.setState({
-            toAddressError: !this.props.web3.isAddress(ethRecipientAddress)
+            toAddressError: !addressError
         })
+        return addressError;
     }
-    amountToSend = (e) => {
-        console.log('amount', e.target.value);
-        let amountToSend = parseInt(e.target.value, 10);
+    amountToSend = () => {
+        let amountToSend = parseInt(this.refs.amountToSend.value, 10);
         if (!isNaN(amountToSend)) {
             console.log('amountToTransfer', amountToSend);
             amountToSend = this.props.web3.toWei(amountToSend, 'ether');
@@ -46,25 +64,51 @@ class Wallet extends Component {
             this.setState({
                 amountToSendError: false
             })
+            return true;
         } else {
             this.setState({
                 amountToSendError: true
             })
+            return false;
         }
-;
     }
+    validateData = (e) => {
+        e.preventDefault();
+        console.log('generateTransaction called');
+        if(this.validateEthereAddress() && this.amountToSend()){
+            try {
+                this.setState({
+                    from: e.target.fromAddress.value,
+                    to: e.target.toAddress.value,
+                    amount: e.target.amountToSend.value,
+                    showTransactionOverlay: true
+                });
+            } catch(error) {
+                console.log(error); 
+            }
+        }
+    }
+    handleClose = (e) => {
+        this.setState({
+            showTransactionOverlay: false,
+            transactionError: false
+        });
+    }
+
+
+
     render() {
         return (
             <Container>
                 <Header as='h1'>Send Ether & Tokens</Header>
-                <Form onSubmit={this.generateTransaction}>
+                <Form onSubmit={this.validateData}>
                     <Form.Field disabled={true}>
                         <label>From Address</label>
-                        <input placeholder='From Address' value={this.props.fromAddress} name="fromAddress" onChange={this.handleChange} />
+                        <input placeholder='From Address' value={this.props.fromAddress} name="fromAddress" ref="fromAddress" onChange={this.handleChange} />
                     </Form.Field>
                     <Form.Field error={this.state.toAddressError} required={true}>
                         <label>To Address</label>
-                        <input placeholder='To Address' name="toAddress" onBlur={this.validateEthereAddress}/>
+                        <input placeholder='To Address' name="toAddress" onBlur={this.validateEthereAddress} ref="toAddress"/>
                     </Form.Field>
                     { this.state.toAddressError && 
                         <Message color='red'>
@@ -73,7 +117,7 @@ class Wallet extends Component {
                     }
                     <Form.Field required={true} error={this.state.amountToSendError}>
                         <label>Amount to Send</label>
-                        <input placeholder='Enter the amount' name="amountToSend" onBlur={this.amountToSend} />
+                        <input placeholder='Enter the amount' name="amountToSend" onBlur={this.amountToSend}  ref="amountToSend"/>
                     </Form.Field>
                     { this.state.amountToSendError && 
                         <Message color='red'>
@@ -82,6 +126,28 @@ class Wallet extends Component {
                     }
                     <Button type='submit'>Generate Transaction</Button>
             </Form>
+                { 
+                    this.state.showTransactionOverlay && 
+                    <TransactionOverlay 
+                        fromAddress={this.state.from} 
+                        toAddress={this.state.to}
+                        amount={this.state.amount}
+                        generateTransaction={this.generateTransaction}
+                        handleClose={this.handleClose}
+                    />
+                }
+                { 
+                    this.state.transactionError && 
+                    <Modal open={true} size='small'>
+                        <Modal.Header>Error</Modal.Header>
+                        <Modal.Content>
+                            There is an error in signing your transaction! please refresh your page and try again.
+                        </Modal.Content>
+                        <Modal.Actions>
+                            <Button color='red' onClick={this.handleClose}>Close</Button>
+                        </Modal.Actions>
+                    </Modal>
+                }
             </Container>
         );
     }
