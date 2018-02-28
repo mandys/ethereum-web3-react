@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import Wallet from './Wallet';
+import TokenBalance from './TokenBalance';
 
 import DisclaimerOverlay from './DisclaimerOverlay';
 
@@ -31,6 +32,10 @@ switch (urlParams["page"]) {
         ReactDOM.render(
             <Wallet />, document.getElementById('root'));
         break;
+        case "tokenbalance":
+        ReactDOM.render(
+            <TokenBalance />, document.getElementById('root'));
+        break;        
         case "DisclaimerOverlay":
         ReactDOM.render(
             <DisclaimerOverlay />, document.getElementById('root'));

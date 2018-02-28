@@ -9,6 +9,7 @@ import DisclaimerOverlay from './DisclaimerOverlay';
 import { Grid, Container, Message } from 'semantic-ui-react'
 // import BnkMessage from './Bnkmessage'
 import Wallet from './Wallet';
+import TokenBalance from './TokenBalance';
 
 //const SMART_CONTRACT_INSTANCE = '0xb3b18AfbE291E50E652ba5e3faFAbf0b566b804B'
 const ARTIFICIAL_DELAY_IN_MS = 1000
@@ -203,6 +204,11 @@ class App extends Component {
                                             </div>
                                     }
                                 </Grid.Column>
+                            </Grid.Row>
+                            <Grid.Row>
+                                    <Grid.Column width={16}>
+                                        <TokenBalance />
+                                    </Grid.Column>
                             </Grid.Row>
                         </Grid>
                     </Container>
