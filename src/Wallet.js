@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Header, Button, Form, Message,Modal } from 'semantic-ui-react'
+import { Container, Header, Button, Form, Message, Modal, Segment } from 'semantic-ui-react'
 import TransactionOverlay from './TransactionOverlay'
 import WithWeb3 from './WithWeb3';
 
@@ -11,7 +11,9 @@ class Wallet extends Component {
         from: "",
         to: "",
         amount: "",
-        transactionError:false
+        transactionError:false,
+        transactionSuccess:false,
+        txHash:''
     }
     componentDidMount = () => {
         console.log("COMPONENT MOUNTED WITH FOLLOWING PROPS");
@@ -53,8 +55,11 @@ class Wallet extends Component {
 
     checkTransation = async(tx) => {
         // const tx= "0x9627c4c528ebaaa0746072c9141e1aafe8a8ec2ec1631e8bd0b3cfe678dac296";
-        let status =  await this.props.web3.eth.getTransactionReceiptAsync(tx);
-        console.log(status);
+        let status =  await this.props.web3.eth.getTransactionAsync(tx);
+        this.setState({
+            txHash: status.hash,
+            transactionSuccess: true
+        });
     }
     
     handleChange(event) {
@@ -69,7 +74,7 @@ class Wallet extends Component {
         return addressError;
     }
     amountToSend = () => {
-        let amountToSend = parseInt(this.refs.amountToSend.value, 10);
+        let amountToSend = parseFloat(this.refs.amountToSend.value, 10);
         if (!isNaN(amountToSend)) {
             console.log('amountToTransfer', amountToSend);
             amountToSend = this.props.web3.toWei(amountToSend, 'ether');
@@ -85,7 +90,7 @@ class Wallet extends Component {
             return false;
         }
     }
-    validateData = (e) => {
+    validateData = async(e) => {
         e.preventDefault();
         console.log('generateTransaction called');
         if(this.validateEthereAddress() && this.amountToSend()){
@@ -104,7 +109,8 @@ class Wallet extends Component {
     handleClose = (e) => {
         this.setState({
             showTransactionOverlay: false,
-            transactionError: false
+            transactionError: false,
+            transactionSuccess: false
         });
     }
 
@@ -160,6 +166,21 @@ class Wallet extends Component {
                             <Button color='red' onClick={this.handleClose}>Close</Button>
                         </Modal.Actions>
                     </Modal>
+                }
+                { 
+                    this.state.transactionSuccess && 
+                    <Segment color='green' clearing>
+                        <p>Your TX has been broadcast to the network. This does not mean it has been mined & sent. 
+                        During times of extreme volume, it may take 3+ hours to send.
+                        </p>
+                        <p>1) Check your TX below.</p>
+                        <p>2) If it is pending for hours or disappears, use the Check TX Status Page to replace.</p>
+                        <p>3) Use ETH Gas Station to see what gas price is optimal.</p>
+                        <p>4) Save your TX Hash in case you need it later: {this.state.txHash}</p>
+                        <Button floated='right' color='green' onClick={this.handleClose}>
+                            Close
+                        </Button>
+                    </Segment>
                 }
             </Container>
         );
