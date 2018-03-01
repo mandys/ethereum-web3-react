@@ -52,7 +52,7 @@ class TokenBalance extends Component {
         console.log(`contractAddr is ${contractAddress} `);
         const contractABI = human_standard_token_abi;
         const tokenContract = this.props.web3.eth.contract(contractABI);
-        const tokenContractInstance = tokenContract.at('0x9c8579dab8cdd2d66ec0fd7fa34457684bfd977f');
+        const tokenContractInstance = tokenContract.at(contractAddress);
         let tokenBalance = await this.getBalance(tokenContractInstance, address);
         let tokenDecimals = await this.getDecimals(tokenContractInstance, address);
         let tokenSymbol = await this.getSymbol(tokenContractInstance, address);

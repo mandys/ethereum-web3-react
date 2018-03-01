@@ -33,7 +33,7 @@ class TransactionOverlay extends Component {
                 </Modal.Content>
                 <Modal.Actions>
                     <Button onClick={this.props.handleClose}>No, get me out of here!</Button>
-                    <Button primary onClick={this.props.generateTransaction} >Yes, I am sure! Make transaction.</Button>
+                    <Button primary onClick={this.props.generateTransaction} >Ok launch metmask and submit</Button>
                 </Modal.Actions>
             </Modal>
         );
