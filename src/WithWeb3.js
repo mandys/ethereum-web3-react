@@ -1,22 +1,24 @@
-import React, { Component } from 'react';
-import Web3 from './Web3';
 
-class WithWeb3 extends Component {
-    state = {  }
-    render() {
-        return (
-            <div>
-                <h1>WithWeb3</h1>
-                <Web3 render={web3global => (
-                    <div>
-                        {
-                            web3global.web3 ? <div>Web3 has loaded Gentlemen!</div> : <div>Loading...</div>
-                        }
-                    </div>
-                )} />
-            </div>
-        );
+import React from 'react'
+import getWeb3 from './util/getWeb3'
+
+const WithWeb3 = PassedComponent => class extends React.Component {
+  state = { web3: null }
+
+  async componentDidMount () {
+    try {
+      const web3 = await getWeb3()
+      this.setState({ web3 })
+    } catch (error) {
+      alert(`Failed to load web3.`)
+      console.log(error)
     }
+  }
+
+  render () {
+    const { web3 } = this.state
+    return web3 ? <PassedComponent web3={web3} /> : <div>Loading Web3</div>
+  }
 }
 
-export default WithWeb3;
+export default WithWeb3
