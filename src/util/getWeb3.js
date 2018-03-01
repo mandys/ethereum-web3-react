@@ -1,4 +1,5 @@
 import Web3 from 'web3'
+import Promise, { promisifyAll } from 'bluebird'
 
 const resolveWeb3 = (resolve) => {
     let {web3} = window
@@ -13,7 +14,10 @@ const resolveWeb3 = (resolve) => {
         const provider = new Web3.providers.HttpProvider(localProvider)
         web3 = new Web3(provider)
     }
-
+    // wrap callback functions with promises
+    promisifyAll(web3.eth, {suffix: 'Async'})
+    promisifyAll(web3.net, {suffix: 'Async'})
+    promisifyAll(web3.version, {suffix: 'Async'})
     resolve(web3)
 }
 

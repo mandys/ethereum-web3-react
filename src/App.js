@@ -180,9 +180,7 @@ class App extends Component {
                             <Grid.Row className='left aligned'>
                                 <Grid.Column width={10}>
                                     <Wallet 
-                                        fromAddress={this.state.accounts[0]} 
                                         balance={this.state.accountsMap[this.state.accounts[0]]} 
-                                        web3={this.state.web3} 
                                     />
                                 </Grid.Column>
                                 <Grid.Column width={6} >

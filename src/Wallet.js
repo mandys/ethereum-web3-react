@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Container, Header, Button, Form, Message,Modal } from 'semantic-ui-react'
 import TransactionOverlay from './TransactionOverlay'
+import WithWeb3 from './WithWeb3';
 
 class Wallet extends Component {
     state = {
@@ -12,13 +13,25 @@ class Wallet extends Component {
         amount: "",
         transactionError:false
     }
+    componentDidMount = () => {
+        console.log("COMPONENT MOUNTED WITH FOLLOWING PROPS");
+        console.log(this.props);
+    }
+
     generateTransaction = async() => {
         this.setState({showTransactionOverlay: false});
-        console.log('generateTransaction called');
+        console.log('GENERATE TRANSACTION CALLED, LETS SEE PROPS');
+        console.log(this.props.web3);
         const fromAddress = this.refs.fromAddress.value;
         const toAddress = this.refs.toAddress.value;
         const eherToSend = this.refs.amountToSend.value;
-        const amountToSend = this.props.web3.toWei(eherToSend, 'ether')
+        let amountToSend;
+        try {
+            amountToSend = this.props.web3.toWei(eherToSend, 'ether');
+        } catch(err) {
+            console.log(err);
+        }
+        
         console.log(amountToSend);
         console.log(this.props.web3);
         try {
@@ -37,15 +50,15 @@ class Wallet extends Component {
         }
 
     }
-    
-     checkTransation = async(tx) => {
+
+    checkTransation = async(tx) => {
         // const tx= "0x9627c4c528ebaaa0746072c9141e1aafe8a8ec2ec1631e8bd0b3cfe678dac296";
         const status =  await this.props.web3.eth.getTransactionReceiptAsync(tx);
         console.log(status);
     }
     
     handleChange(event) {
-        this.setState({fromAddress: event.target.value});
+        this.setState({value: event.target.value});
     }
     validateEthereAddress = () => {
         const ethRecipientAddress = this.refs.toAddress.value;
@@ -153,4 +166,4 @@ class Wallet extends Component {
     }
 }
 
-export default Wallet;
+export default WithWeb3(Wallet);
