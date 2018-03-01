@@ -53,7 +53,7 @@ class Wallet extends Component {
 
     checkTransation = async(tx) => {
         // const tx= "0x9627c4c528ebaaa0746072c9141e1aafe8a8ec2ec1631e8bd0b3cfe678dac296";
-        const status =  await this.props.web3.eth.getTransactionReceiptAsync(tx);
+        let status =  await this.props.web3.eth.getTransactionReceiptAsync(tx);
         console.log(status);
     }
     
