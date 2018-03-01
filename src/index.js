@@ -4,7 +4,7 @@ import App from './App';
 // import registerServiceWorker from './registerServiceWorker';
 import Wallet from './Wallet';
 import TokenBalance from './TokenBalance';
-
+import WithWeb3 from './WithWeb3';
 import DisclaimerOverlay from './DisclaimerOverlay';
 
 function getUrlVars() {
@@ -31,6 +31,10 @@ switch (urlParams["page"]) {
     case "wallet":
         ReactDOM.render(
             <Wallet />, document.getElementById('root'));
+        break;
+        case "web3":
+        ReactDOM.render(
+            <WithWeb3 />, document.getElementById('root'));
         break;
         case "tokenbalance":
         ReactDOM.render(

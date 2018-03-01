@@ -1,32 +1,13 @@
 import React, { Component } from 'react';
 import { Container, Header, Button, Form } from 'semantic-ui-react'
-import { getWeb3Async } from './util/web3'
 import {human_standard_token_abi} from './util/human_standard_token_abi';
-
+import Web3 from './Web3';
 class TokenBalance extends Component {
     state = {
-        web3: null,
-        isWeb3synced: false,
-        tokenContractAddress: undefined,
         tB: undefined,
         tS: undefined,
         tD: undefined
     } 
-    async componentDidMount() {
-        const web3 = await getWeb3Async()
-        if (web3.isConnected()) {
-            if(web3.currentProvider.isMetaMask !== true) {
-                console.error('Metamask is required');
-            } else {
-                this.setState({ web3: web3, isWeb3synced: true }, () => {
-                    console.info('State updated for web3');
-                })
-            }
-        } else {
-            console.error('Metamask is required');
-        }
-    }   
-     
     getBalance = async (tokenContractInstance, address) => {
         return new Promise (function (resolve, reject) {
             tokenContractInstance.balanceOf(address, function (error, result) {
@@ -62,13 +43,12 @@ class TokenBalance extends Component {
             })
         })
     }
-    saveTokenContractAddress = async (e) => {
-        console.log(e);
+    saveTokenContractAddress = async (e, myWeb3) => {
         const address = '0x17014e6c188315da868fbc380e144b6c77036b45';
         const contractAddress = e.target.tokenContractAddress.value;
         console.log(`contractAddr is ${contractAddress} `);
         const contractABI = human_standard_token_abi;
-        const tokenContract = this.state.web3.eth.contract(contractABI);
+        const tokenContract = myWeb3.eth.contract(contractABI);
         const tokenContractInstance = tokenContract.at('0x9c8579dab8cdd2d66ec0fd7fa34457684bfd977f');
         let tokenBalance = await this.getBalance(tokenContractInstance, address);
         let tokenDecimals = await this.getDecimals(tokenContractInstance, address);
@@ -95,38 +75,42 @@ class TokenBalance extends Component {
     }
     render() {
         return (
-            <Container>
-                <Header as='h2'>Token Balances</Header>
-                <Form onSubmit={this.saveTokenContractAddress}>
-                    <Form.Field required={true}>
-                        <label>Token Contract Address</label>
-                        <input placeholder='Token Contract Address' value="0x9C8579DaB8cdd2d66eC0fd7FA34457684Bfd977F" name="tokenContractAddress" onChange={this.handleInputChange} />
-                    </Form.Field>
-                    {
-                        !this.state.tB && <Button color='blue'>Fetch Details</Button>
-                    }
-                    
-                    {
-                        this.state.tB && 
-                            <div>
-                                <Form.Field required={true}>
-                                    <label>Token Symbol</label>
-                                    <input placeholder='Token Symbol' name="tokenSymbol" onChange={this.handleInputChange} value={this.state.tS} />
-                                </Form.Field>
-                                <Form.Field required={true}>
-                                    <label>Decimals</label>
-                                    <input placeholder='Decimals' name="tokenDecimals" onChange={this.handleInputChange} value={this.state.tD} />
-                                </Form.Field>
-                                <Form.Field required={true}>
-                                    <label>Tokens</label>
-                                    <input placeholder='Tokens' name="tokenBalance" onChange={this.handleInputChange} value={this.state.tB} />
-                                </Form.Field>
-                                <Button type='submit'>Save</Button>
-                            </div>
-                    }
-            </Form>
-            </Container>
-        );
+            <Web3> 
+                {web3global => (
+                    <Container>
+                        <Header as='h2'>Token Balances</Header>
+                        <Form onSubmit={(e) => {this.saveTokenContractAddress(e, web3global.web3)}}>
+                            <Form.Field required={true}>
+                                <label>Token Contract Address</label>
+                                <input placeholder='Token Contract Address' value="0x9C8579DaB8cdd2d66eC0fd7FA34457684Bfd977F" name="tokenContractAddress" onChange={this.handleInputChange} />
+                            </Form.Field>
+                            {
+                                !this.state.tB && <Button color='blue'>Fetch Details</Button>
+                            }
+                            
+                            {
+                                this.state.tB && 
+                                    <div>
+                                        <Form.Field required={true}>
+                                            <label>Token Symbol</label>
+                                            <input placeholder='Token Symbol' name="tokenSymbol" onChange={this.handleInputChange} value={this.state.tS} />
+                                        </Form.Field>
+                                        <Form.Field required={true}>
+                                            <label>Decimals</label>
+                                            <input placeholder='Decimals' name="tokenDecimals" onChange={this.handleInputChange} value={this.state.tD} />
+                                        </Form.Field>
+                                        <Form.Field required={true}>
+                                            <label>Tokens</label>
+                                            <input placeholder='Tokens' name="tokenBalance" onChange={this.handleInputChange} value={this.state.tB} />
+                                        </Form.Field>
+                                        <Button type='submit'>Save</Button>
+                                    </div>
+                            }
+                        </Form>
+                    </Container>
+                )} 
+            </Web3>
+        )
     }
 }
 
