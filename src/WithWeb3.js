@@ -134,7 +134,7 @@ const WithWeb3 = (PassedComponent) => class extends React.Component {
             this.setState({
                 notify: {
                     message: `Your account balance is ${balance}`,
-                    level: 'success'
+                    level: 'green'
                 } 
             });
         }

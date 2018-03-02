@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "axios": "^0.18.0",
     "blockies-identicon": "^0.1.0",
     "bluebird": "^3.5.1",
     "identicon.js": "^2.3.1",
