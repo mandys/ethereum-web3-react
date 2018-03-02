@@ -150,8 +150,8 @@ class TokenBalance extends Component {
                             <Divider hidden />
                             {
                                 (this.state.showCustomFrom === false) ? 
-                                <div>
-                                    <select className='field' onChange={this.getSelectedTokenBalance}>
+                                <div  className='field'>
+                                    <select className='ui selection dropdown' onChange={this.getSelectedTokenBalance}>
                                         <option value="" key='null'>Select a token</option>
                                         {
                                             this.state.tokenOpts.map((token,i) => {
