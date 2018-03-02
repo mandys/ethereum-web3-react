@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Header, Button, Form, Segment, Grid, Divider, List } from 'semantic-ui-react'
+import { Modal, Header, Button, Form, Segment, Grid, Divider, List } from 'semantic-ui-react'
 import {human_standard_token_abi} from './util/human_standard_token_abi';
 import WithWeb3 from './WithWeb3';
 var axios = require('axios');
@@ -14,6 +14,7 @@ class TokenBalance extends Component {
         stB: undefined,
         stS: undefined,
         stD: undefined,
+        errorModal:false
     } 
     getBalance = async (tokenContractInstance, address) => {
         return new Promise (function (resolve, reject) {
@@ -70,48 +71,56 @@ class TokenBalance extends Component {
         })
     }
     saveTokenContractAddress = async (e) => {
-        const address = '0x17014e6c188315da868fbc380e144b6c77036b45';
-        const contractAddress = e.target.tokenContractAddress.value;
-        console.log(`contractAddr is ${contractAddress} `);
-        const contractABI = human_standard_token_abi;
-        const tokenContract = this.props.web3.eth.contract(contractABI);
-        const tokenContractInstance = tokenContract.at(contractAddress);
-        let tokenBalance = await this.getBalance(tokenContractInstance, address);
-        let tokenDecimals = await this.getDecimals(tokenContractInstance, address);
-        let tokenSymbol = await this.getSymbol(tokenContractInstance, address);
-        tokenBalance = tokenBalance/Math.pow(10, tokenDecimals);
-        this.setState({
-            tB: tokenBalance,
-            tD: tokenDecimals,
-            tS: tokenSymbol,
-        });
-        console.log(`tokenBalance is ${tokenBalance}`);
-        console.log(`tokenDecimals are ${tokenDecimals}`);
-        console.log(`tokenSymbol is ${tokenSymbol}`);
+        try{
+            const address = '0x17014e6c188315da868fbc380e144b6c77036b45';
+            const contractAddress = e.target.tokenContractAddress.value;
+            console.log(`contractAddr is ${contractAddress} `);
+            const contractABI = human_standard_token_abi;
+            const tokenContract = this.props.web3.eth.contract(contractABI);
+            const tokenContractInstance = tokenContract.at(contractAddress);
+            let tokenBalance = await this.getBalance(tokenContractInstance, address);
+            let tokenDecimals = await this.getDecimals(tokenContractInstance, address);
+            let tokenSymbol = await this.getSymbol(tokenContractInstance, address);
+            tokenBalance = tokenBalance/Math.pow(10, tokenDecimals);
+            this.setState({
+                tB: tokenBalance,
+                tD: tokenDecimals,
+                tS: tokenSymbol,
+            });
+            console.log(`tokenBalance is ${tokenBalance}`);
+            console.log(`tokenDecimals are ${tokenDecimals}`);
+            console.log(`tokenSymbol is ${tokenSymbol}`);
+        } catch (e) {
+            this.setState({errorModal: true});
+        }
     }
 
     getSelectedTokenBalance = async (e) => {
-        if(e.target.value != "") {
-        console.log(this.props);
-        const address = this.props.fromAddress;
-        const contractAddress = e.target.value;
-        console.log(`contractAddr is ${contractAddress} `);
-        const contractABI = human_standard_token_abi;
-        const tokenContract = this.props.web3.eth.contract(contractABI);
-        const tokenContractInstance = tokenContract.at(contractAddress);
-        let tokenBalance = await this.getBalance(tokenContractInstance, address);
-        let tokenDecimals = await this.getDecimals(tokenContractInstance, address);
-        let tokenSymbol = await this.getSymbol(tokenContractInstance, address);
-        tokenBalance = tokenBalance/Math.pow(10, tokenDecimals);
-        this.setState({
-            stB: tokenBalance,
-            stD: tokenDecimals,
-            stS: tokenSymbol,
-        });
-        console.log(`tokenBalance is ${tokenBalance}`);
-        console.log(`tokenDecimals are ${tokenDecimals}`);
-        console.log(`tokenSymbol is ${tokenSymbol}`);
-        }
+        try{
+            if(e.target.value != "") {
+                console.log(this.props);
+                const address = this.props.fromAddress;
+                const contractAddress = e.target.value;
+                console.log(`contractAddr is ${contractAddress} `);
+                const contractABI = human_standard_token_abi;
+                const tokenContract = this.props.web3.eth.contract(contractABI);
+                const tokenContractInstance = tokenContract.at(contractAddress);
+                let tokenBalance = await this.getBalance(tokenContractInstance, address);
+                let tokenDecimals = await this.getDecimals(tokenContractInstance, address);
+                let tokenSymbol = await this.getSymbol(tokenContractInstance, address);
+                tokenBalance = tokenBalance/Math.pow(10, tokenDecimals);
+                this.setState({
+                    stB: tokenBalance,
+                    stD: tokenDecimals,
+                    stS: tokenSymbol,
+                });
+                console.log(`tokenBalance is ${tokenBalance}`);
+                console.log(`tokenDecimals are ${tokenDecimals}`);
+                console.log(`tokenSymbol is ${tokenSymbol}`);
+            }
+        } catch(e) {
+            this.setState({errorModal: true});
+        }  
     }
 
     handleInputChange = (event) => {
@@ -135,6 +144,13 @@ class TokenBalance extends Component {
             showCustomFrom: false
         });
     }
+
+    handleClose = (e) => {
+        this.setState({
+            errorModal: false
+        });
+    }
+
     render() {
         return (
             <Grid>
@@ -200,7 +216,20 @@ class TokenBalance extends Component {
                         </Segment>
                     </Grid.Column>
                 </Grid.Row>
+                { 
+                    this.state.errorModal && 
+                    <Modal open={true} size='small'>
+                        <Modal.Header>Error</Modal.Header>
+                        <Modal.Content>
+                            There is an error in fetch your details, Please try again after some time.
+                        </Modal.Content>
+                        <Modal.Actions>
+                            <Button color='red' onClick={this.handleClose}>Close</Button>
+                        </Modal.Actions>
+                    </Modal>
+                }
             </Grid>
+                
         )
     }
 }
