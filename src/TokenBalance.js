@@ -28,24 +28,32 @@ class TokenBalance extends Component {
         })
     }
     componentDidMount = () => {
+        let tokenOpts = []; 
         console.log("TOKEN BALANCE COMPONENT DID MOUNT");
-        axios.get('https://api.ethplorer.io/getTop?apiKey=freekey&limit=100')
-        .then((response) => {
-            let tokens = [];
-            response.data.tokens.map((tokenData) => {
-                tokens[tokenData.name] = tokenData;
-            });
-            tokens.sort();
-            let tokenOpts = [];
-            for(let i in tokens) {
-                tokenOpts.push({text: tokens[i].name, value: tokens[i].address, key: tokens[i].symbol});
+        if (typeof(Storage) !== "undefined") { 
+            if(localStorage.getItem("tokenOpts")) {
+                tokenOpts = JSON.parse(localStorage.getItem("tokenOpts"));
             }
-
+        }
+        if(!tokenOpts.length) {
+            axios.get('https://api.ethplorer.io/getTop?apiKey=freekey&limit=100')
+            .then((response) => {
+                let tokens = [];
+                tokens = response.data.tokens.map((tokenData) => {
+                    return {text: tokenData['name'], value: tokenData['address'], key: tokenData['symbol']};
+                });
+                if (typeof(Storage) !== "undefined") {
+                    localStorage.setItem("tokenOpts", JSON.stringify(tokens));
+                }
+                this.setState({tokenOpts: tokens});
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        } else {
             this.setState({tokenOpts: tokenOpts});
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+        }   
+        
     }
     getDecimals = async (tokenContractInstance, address) => {
         return new Promise (function (resolve, reject) {
@@ -97,7 +105,7 @@ class TokenBalance extends Component {
 
     getSelectedTokenBalance = async (e) => {
         try{
-            if(e.target.value != "") {
+            if(e.target.value !== "") {
                 console.log(this.props);
                 const address = this.props.fromAddress;
                 const contractAddress = e.target.value;
@@ -176,7 +184,7 @@ class TokenBalance extends Component {
                                         }
                                     </select>
                                     {
-                                        (this.state.stB != undefined) && 
+                                        (this.state.stB !== undefined) && 
                                         <List>
                                             <List.Item>Token Symbol: {this.state.stS}</List.Item>
                                             <List.Item>Token Balance: {this.state.stB}</List.Item>
