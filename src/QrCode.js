@@ -35,5 +35,5 @@ class QrCode extends Component {
         )
     }
 }
-
+ 
 export default QrCode;

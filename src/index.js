@@ -7,6 +7,8 @@ import TokenBalance from './TokenBalance';
 import WithWeb3 from './WithWeb3';
 import DisclaimerOverlay from './DisclaimerOverlay';
 import QrCode from './QrCode';
+import Presale from './Presale';
+
 const url = require("url");
 
 function getUrlVars() {
@@ -37,6 +39,10 @@ switch (urlParams["pathname"]) {
         case "/QrCode":
         ReactDOM.render(
             <QrCode />, document.getElementById('root'));
+        break;
+        case "/Presale":
+        ReactDOM.render(
+            <Presale />, document.getElementById('root'));
         break;
     case undefined:
     default:

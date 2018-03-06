@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Segment} from 'semantic-ui-react'
+import {Divider, Button, Label, Form, Segment} from 'semantic-ui-react'
 
 
 class Calculate extends Component {
@@ -13,7 +13,21 @@ class Calculate extends Component {
     render() {
         return (
             <Segment >
-                Calculate div
+                <Form size="small">
+                    <Form.Group inline>
+                        <Label pointing='right'>You Pay</Label> 
+                        <Form.Field label='' placeholder="" control='input' type='number'/>
+                        <Label pointing='left'>ETH</Label>
+                    </Form.Group>   
+                    <Form.Group inline>
+                        <Label pointing='right'>You Buy</Label>
+                        <Form.Field label='' placeholder="" control='input' type='number' />
+                        <Label pointing='left'>BINK</Label>
+                    </Form.Group> 
+                    <Form.Group inline>
+                        <Button>Buy Token</Button>                   
+                    </Form.Group>     
+                </Form>
             </Segment>
         )
     }
