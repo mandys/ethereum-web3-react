@@ -6,43 +6,37 @@ import Wallet from './Wallet';
 import TokenBalance from './TokenBalance';
 import WithWeb3 from './WithWeb3';
 import DisclaimerOverlay from './DisclaimerOverlay';
+import QrCode from './QrCode';
+const url = require("url");
 
 function getUrlVars() {
-    var vars = [],
-        hash;
-    var hashes = window
-        .location
-        .href
-        .slice(window.location.href.indexOf('?') + 1)
-        .split('&');
-    for (var i = 0; i < hashes.length; i++) {
-        hash = hashes[i].split('=');
-        vars.push(hash[0]);
-        vars[hash[0]] = hash[1];
-    }
-    return vars;
+    return url.parse(window.location.href);
 }
 
 let urlParams = getUrlVars();
 
 console.log(urlParams);
 
-switch (urlParams["page"]) {
-    case "wallet":
+switch (urlParams["pathname"]) {
+    case "/wallet":
         ReactDOM.render(
             <Wallet />, document.getElementById('root'));
         break;
-        case "web3":
+        case "/web3":
         ReactDOM.render(
             <WithWeb3 />, document.getElementById('root'));
         break;
-        case "tokenbalance":
+        case "/tokenbalance":
         ReactDOM.render(
             <TokenBalance />, document.getElementById('root'));
         break;        
-        case "DisclaimerOverlay":
+        case "/DisclaimerOverlay":
         ReactDOM.render(
             <DisclaimerOverlay />, document.getElementById('root'));
+        break;
+        case "/QrCode":
+        ReactDOM.render(
+            <QrCode />, document.getElementById('root'));
         break;
     case undefined:
     default:
