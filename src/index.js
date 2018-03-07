@@ -6,7 +6,6 @@ import Wallet from './Wallet';
 import TokenBalance from './TokenBalance';
 import WithWeb3 from './WithWeb3';
 import DisclaimerOverlay from './DisclaimerOverlay';
-import QrCode from './QrCode';
 import Presale from './Presale';
 
 const url = require("url");
@@ -35,10 +34,6 @@ switch (urlParams["pathname"]) {
         case "/DisclaimerOverlay":
         ReactDOM.render(
             <DisclaimerOverlay />, document.getElementById('root'));
-        break;
-        case "/QrCode":
-        ReactDOM.render(
-            <QrCode />, document.getElementById('root'));
         break;
         case "/Presale":
         ReactDOM.render(
