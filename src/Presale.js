@@ -16,15 +16,19 @@ class Presale extends Component {
         return (
             <Container>
                 <Grid>
-                    <Grid.Row>
-                        <Grid.Column width="6">
+                    <Grid.Row stretched>
+                        <Grid.Column>
+                            <Countdown/>       
+                        </Grid.Column>
+                    </Grid.Row>
+                    <Grid.Row stretched>
+                        <Grid.Column width="6">                            
                             <Calculate />
                             <Referral />
                         </Grid.Column>
                         <Grid.Column width="10">
-                            <Countdown />
-                            <PriceBox />
-                            <Transactions />
+                            <PriceBox />                            
+                            <Transactions/>
                         </Grid.Column>
                     </Grid.Row>
                 </Grid>

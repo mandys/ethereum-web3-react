@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import {Segment} from 'semantic-ui-react'
+import {Label,Segment,} from 'semantic-ui-react';
 
 class Countdown extends Component {
     state = {
@@ -34,19 +34,17 @@ class Countdown extends Component {
    
     render() {
         return (
-            <Segment >
-                <div className="vtg-container">
-                    <div id="tsTimer">
-                        <div className="dpinline align-middle"><h4>BINK token pre-sale starts in</h4></div>
-                        <div className="dpinline align-middle">
-                            <div className="dpinline  text-center">{this.state.days}</div>d<span>:</span>
-                            <div className="dpinline colhrs text-center">{this.state.hours}</div>h<span>:</span>
-                            <div className="dpinline colmins text-center">{this.state.minutes}</div>m<span>:</span>
-                            <div className="dpinline colsec text-center">{this.state.seconds}</div>s                    
-                        </div>
-                    </div>
+            <div className="vtg-container">
+                <div id="tsTimer">                   
+                    <Label.Group size='small'>   
+                        <Label>BINK token pre-sale starts in</Label>                     
+                        <Label>{this.state.days} d</Label>
+                        <Label>{this.state.hours} h</Label>
+                        <Label>{this.state.minutes} m</Label>
+                        <Label>{this.state.seconds} s</Label>
+                    </Label.Group>       
                 </div>
-            </Segment>
+            </div>
         )
     }
 }
