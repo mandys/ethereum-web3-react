@@ -17,9 +17,6 @@ import TokenBalance from './TokenBalance';
 //const methodsFromInterface = ABIInterfaceArray.filter( ABIinterface => !ABIinterface.constant )
 
 class App extends Component {
-    constructor(props) {
-        super(props);
-    }
 
     render() {
         return (

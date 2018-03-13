@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Modal, Header, Button, Form, Segment, Grid, Divider, List } from 'semantic-ui-react'
-import {human_standard_token_abi} from './util/human_standard_token_abi';
+import {human_standard_token_abi} from './util/contracts/human_standard_token_abi';
 import WithWeb3 from './WithWeb3';
 var axios = require('axios');
 

@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import {Label,Segment,} from 'semantic-ui-react';
+import {Label} from 'semantic-ui-react';
 
 class Countdown extends Component {
     state = {

@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
-import {Grid, Segment, Container} from 'semantic-ui-react'
+import {Grid, Container} from 'semantic-ui-react'
 import WithWeb3 from './WithWeb3'
-import Calculate from './util/presale/Calculate'
-import PriceBox from './util/presale/PriceBox'
-import Referral from './util/presale/Referral'
-import Transactions from './util/presale/Transactions'
-import Countdown from './util/presale/Countdown'
+import Calculate from './presale/Calculate'
+import PriceBox from './presale/PriceBox'
+import Referral from './presale/Referral'
+import Transactions from './presale/Transactions'
+import Countdown from './presale/Countdown'
+import BinkToken from './presale/BinkToken'
 
 class Presale extends Component {
-    constructor(props) {
-        super(props);
-    }
 
     render() {
         return (
@@ -22,7 +20,8 @@ class Presale extends Component {
                         </Grid.Column>
                     </Grid.Row>
                     <Grid.Row stretched>
-                        <Grid.Column width="6">                            
+                        <Grid.Column width="6">
+                            <BinkToken />                        
                             <Calculate />
                             <Referral />
                         </Grid.Column>
