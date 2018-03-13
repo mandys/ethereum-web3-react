@@ -7,6 +7,7 @@ import TokenBalance from './TokenBalance';
 import WithWeb3 from './WithWeb3';
 import DisclaimerOverlay from './DisclaimerOverlay';
 import Presale from './Presale';
+import Exchange from './exchange/Exchange';
 
 const url = require("url");
 
@@ -38,6 +39,10 @@ switch (urlParams["pathname"]) {
         case "/Presale":
         ReactDOM.render(
             <Presale />, document.getElementById('root'));
+        break;
+        case "/Exchange":
+        ReactDOM.render(
+            <Exchange />, document.getElementById('root'));
         break;
     case undefined:
     default:
