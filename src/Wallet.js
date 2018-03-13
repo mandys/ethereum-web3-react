@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Container, Header, Button, Form, Message, Modal, Segment } from 'semantic-ui-react'
-import TransactionOverlay from './TransactionOverlay'
+import TransactionOverlay from './overlays/TransactionOverlay'
 import WithWeb3 from './WithWeb3';
 
 class Wallet extends Component {

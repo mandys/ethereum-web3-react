@@ -5,7 +5,7 @@ import WithWeb3 from './WithWeb3';
 //import ABIInterfaceArray from './util/ABI.json'
 
 // import BnkGrid from './Bnkgrid'
-import DisclaimerOverlay from './DisclaimerOverlay';
+import DisclaimerOverlay from './overlays/DisclaimerOverlay';
 import { Grid, Container, Message } from 'semantic-ui-react'
 // import BnkMessage from './Bnkmessage'
 import Wallet from './Wallet';

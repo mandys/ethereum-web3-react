@@ -17,7 +17,7 @@ class BlockiesIdenticon extends Component {
   componentDidMount() {
     this.draw();
   }
-  draw() {
+  draw() { 
     blockies.render(this.getOpts(), this.canvas);
   }
   render() {

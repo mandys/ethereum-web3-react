@@ -4,9 +4,9 @@
   "private": true,
   "dependencies": {
     "0x.js": "^0.33.1",
-    "@0xproject/connect": "^0.6.3",
     "@0xproject/subproviders": "^0.7.0",
     "axios": "^0.18.0",
+    "bignumber.js": "^6.0.0",
     "blockies-identicon": "^0.1.0",
     "bluebird": "^3.5.1",
     "identicon.js": "^2.3.1",
@@ -18,7 +18,7 @@
     "react-scripts": "1.1.1",
     "semantic-ui-css": "^2.3.0",
     "semantic-ui-react": "^0.78.3",
-    "web3": "^0.18.2",
+    "web3": "0.20.4",
     "web3-provider-engine": "^13.6.5"
   },
   "scripts": {

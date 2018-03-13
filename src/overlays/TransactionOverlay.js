@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import  { Button, Header, Modal, Grid, Icon } from 'semantic-ui-react'
-import BlockiesIdenticon from "./BlockiesIdenticon"
+import BlockiesIdenticon from "../util/BlockiesIdenticon"
 // var Identification = require('identicon');
 
 class TransactionOverlay extends Component {

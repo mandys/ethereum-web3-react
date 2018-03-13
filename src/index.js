@@ -1,13 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import registerServiceWorker from './registerServiceWorker';
+// import registerServiceWorker from './registerServiceWorker';
 import Wallet from './Wallet';
 import TokenBalance from './TokenBalance';
 import WithWeb3 from './WithWeb3';
-import DisclaimerOverlay from './DisclaimerOverlay';
 import Presale from './Presale';
-import WrapEther from './wrapether/WrapEther'
 import Exchange from './exchange/Exchange';
 
 const url = require("url");
@@ -21,7 +19,7 @@ let urlParams = getUrlVars();
 console.log(urlParams);
 
 switch (urlParams["pathname"]) {
-        case "/wallet":
+    case "/wallet":
         ReactDOM.render(
             <Wallet />, document.getElementById('root'));
         break;
@@ -33,17 +31,9 @@ switch (urlParams["pathname"]) {
         ReactDOM.render(
             <TokenBalance />, document.getElementById('root'));
         break;        
-        case "/DisclaimerOverlay":
-        ReactDOM.render(
-            <DisclaimerOverlay />, document.getElementById('root'));
-        break;
         case "/Presale":
         ReactDOM.render(
             <Presale />, document.getElementById('root'));
-        break;
-        case "/WrapEther":
-        ReactDOM.render(
-            <WrapEther />, document.getElementById('root'));
         break;
         case "/Exchange":
         ReactDOM.render(
@@ -52,7 +42,7 @@ switch (urlParams["pathname"]) {
     case undefined:
     default:
         ReactDOM.render(
-            <Exchange/>, document.getElementById('root'));
+            <App/>, document.getElementById('root'));
         break;
 }
 
