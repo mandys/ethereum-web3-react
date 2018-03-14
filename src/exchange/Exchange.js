@@ -41,9 +41,9 @@ const Exchange = (PassedComponent) => class extends Component {
                 tokenContractAddresses :{
                     WETH: WETH_ADDRESS,
                     ZRX: ZRX_ADDRESS,
-                    EXCHANGE_ADDRESS: EXCHANGE_ADDRESS,
                     BINK: '0xabc24cbf6b214764b91c2386479afd83c983d6d7',
                 },
+                exchangeAddress: EXCHANGE_ADDRESS,
                 ownerAddress: address
             }
         }, () => {

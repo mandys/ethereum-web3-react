@@ -7,6 +7,7 @@ import TokenBalance from './TokenBalance';
 import WithWeb3 from './WithWeb3';
 import Presale from './Presale';
 import WalletBalance from './exchange/components/WalletBalances';
+import BuySellToken from './exchange/components/BuySellToken';
 
 const url = require("url");
 
@@ -38,6 +39,10 @@ switch (urlParams["pathname"]) {
         case "/WalletBalance":
         ReactDOM.render(
             <WalletBalance />, document.getElementById('root'));
+        break;
+        case "/BuySellToken":
+        ReactDOM.render(
+            <BuySellToken />, document.getElementById('root'));
         break;
     case undefined:
     default:
