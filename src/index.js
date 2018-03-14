@@ -6,7 +6,7 @@ import Wallet from './Wallet';
 import TokenBalance from './TokenBalance';
 import WithWeb3 from './WithWeb3';
 import Presale from './Presale';
-import Exchange from './exchange/Exchange';
+import WalletBalance from './exchange/components/WalletBalances';
 
 const url = require("url");
 
@@ -35,9 +35,9 @@ switch (urlParams["pathname"]) {
         ReactDOM.render(
             <Presale />, document.getElementById('root'));
         break;
-        case "/Exchange":
+        case "/WalletBalance":
         ReactDOM.render(
-            <Exchange />, document.getElementById('root'));
+            <WalletBalance />, document.getElementById('root'));
         break;
     case undefined:
     default:

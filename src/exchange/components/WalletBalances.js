@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Table,Container,Checkbox, Button } from 'semantic-ui-react'
-import 'semantic-ui-css/semantic.min.css';
-import { BigNumber } from '@0xproject/utils';
-import { ZeroEx } from '0x.js';
+import { Table,Container,Checkbox } from 'semantic-ui-react'
+import Exchange from '../Exchange';
+import WrapUnWrapEther from './WrapUnWrapEther';
 
 class WalletBalance extends Component {
     state = {
@@ -14,9 +13,10 @@ class WalletBalance extends Component {
             disabled:true
         })
         console.log('inside getAllowanceFromMaker');
-        const setMakerAllowTxHash = await this.props.zeroEx.token.setUnlimitedProxyAllowanceAsync(this.props.tokenContractAddresses[token], this.props.ownerAddress);
-        console.log('setMakerAllowTxHash', setMakerAllowTxHash);
-        try{
+        console.log(this.props.tokenContractAddresses[token]);
+        try {
+            const setMakerAllowTxHash = await this.props.zeroEx.token.setUnlimitedProxyAllowanceAsync(this.props.tokenContractAddresses[token], this.props.ownerAddress);
+            console.log('setMakerAllowTxHash', setMakerAllowTxHash);
             await this.props.zeroEx.awaitTransactionMinedAsync(setMakerAllowTxHash);
             this.setState({
                 disabled:false
@@ -26,15 +26,6 @@ class WalletBalance extends Component {
                 disabled:false
             })
         }
-    }
-
-    wrapEther = async (e, token) => {
-        const ethAmount = new BigNumber(0.1);
-        const ethToConvert = ZeroEx.toBaseUnitAmount(ethAmount, 18); // Number of ETH to convert to WETH
-        console.log('ethToCovert', ethToConvert);
-        const convertEthTxHash = await this.props.zeroEx.etherToken.depositAsync(this.props.tokenContractAddresses[token], ethToConvert, this.props.ownerAddress);
-        console.log('convertEthTxHash', convertEthTxHash);
-        await this.props.zeroEx.awaitTransactionMinedAsync(convertEthTxHash);
     }
 
     render() {
@@ -55,9 +46,7 @@ class WalletBalance extends Component {
                     <Table.Row>
                         <Table.Cell>
                             ETH &emsp;
-                            <Button size='mini' onClick={(e) => this.wrapEther(e, 'WETH')} >
-                                Wrap
-                            </Button>
+                            <WrapUnWrapEther from="ETH" to="WETH" />
                         </Table.Cell>
                         <Table.Cell>Ether</Table.Cell>
                         <Table.Cell>—</Table.Cell>
@@ -67,9 +56,7 @@ class WalletBalance extends Component {
                     <Table.Row>
                         <Table.Cell>
                             WETH &emsp;
-                            <Button size='mini' >
-                                UnWrap
-                            </Button>
+                            <WrapUnWrapEther from="WETH" to="ETH"/>
                         </Table.Cell>
                         <Table.Cell>Wrapped Ether</Table.Cell>
                         <Table.Cell>
@@ -104,4 +91,4 @@ class WalletBalance extends Component {
     }
 }
 
-export default WalletBalance;
+export default Exchange(WalletBalance);
