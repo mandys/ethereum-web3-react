@@ -100,7 +100,7 @@ class BuySellToken extends Component {
         };
         console.log('signedOrder', signedOrder);
         try {
-            const isOrderValid = await this.props.exchange.validateOrderFillableOrThrowAsync(signedOrder);
+            const isOrderValid = await this.props.zeroEx.exchange.validateOrderFillableOrThrowAsync(signedOrder);
             console.log('isOrderValid', isOrderValid);
         } catch(e) {
             console.log(e);
