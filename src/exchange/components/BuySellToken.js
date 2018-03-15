@@ -29,13 +29,24 @@ class BuySellToken extends Component {
         this.state = {
             tradingCoin: 'BINK',
             exchangeCoin: 'WETH',
-            orderType: 'buy'
+            orderType: 'buy',
+            tradingBalance:0
         }
     }
 
-    tradingCoin = async(e) => {
+    componentDidMount = async() => {
+        const balance = await this.getTokenBalance(this.props.tokenContractAddresses[this.state.tradingCoin]);
         this.setState({
-            tradingCoin: e.target.innerText
+            tradingBalance: balance
+        })
+    }
+
+    tradingCoin = async(e) => {
+        const coin = e.target.innerText;
+        const balance = await this.getTokenBalance(this.props.tokenContractAddresses[coin]);
+        this.setState({
+            tradingCoin: coin,
+            tradingBalance: balance
         })
     }
 
@@ -49,6 +60,12 @@ class BuySellToken extends Component {
         this.setState((prevState) => {
             return { orderType: (prevState.orderType === 'buy')?'sell':'buy' }
         })
+    }
+
+    getTokenBalance = async(tokenAddress) => {
+        var balance = await this.props.zeroEx.token.getBalanceAsync(tokenAddress, this.props.ownerAddress);
+        var tokenBalance = balance/Math.pow(10, this.DECIMALS)
+        return tokenBalance;
     }
 
     createOrder = async () => {
@@ -120,7 +137,7 @@ class BuySellToken extends Component {
                     />
                     </Button>
                 </Segment>   
-                <label>TRADING TOKEN</label>
+                <label>Exchange TOKEN</label>
                 <Dropdown 
                     fluid search selection 
                     options={this.coins} 
@@ -137,6 +154,7 @@ class BuySellToken extends Component {
                     <Form.Field>
                         <label>AMOUNT {this.state.tradingCoin}</label>
                         <input placeholder='0' type='text' ref='tradingCoin'/>
+                        <label>Balace {this.state.tradingBalance}</label>
                     </Form.Field>
                     <Form.Field>
                         <label>PRICE {this.state.exchangeCoin}</label>
