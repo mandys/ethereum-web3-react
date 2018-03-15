@@ -3,6 +3,7 @@ import { Table,Container,Checkbox } from 'semantic-ui-react'
 import Exchange from '../Exchange';
 import WrapUnWrapEther from './WrapUnWrapEther';
 
+
 class WalletBalance extends Component {
     state = {
         disabled: false
@@ -86,6 +87,7 @@ class WalletBalance extends Component {
                     
                     </Table.Body>
                 </Table>
+                
             </Container>
         );
     }
