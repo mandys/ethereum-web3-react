@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table,Header } from 'semantic-ui-react'
-import Exchange from '../Exchange';
+var store = require('store')
 
 class OrderBook extends Component {
     state = {
@@ -8,11 +8,9 @@ class OrderBook extends Component {
     }
     componentDidMount = async() => {
         let orders = {}
-        if (typeof(Storage) !== "undefined") { 
-            if(localStorage.getItem("orders")) {
-                orders = JSON.parse(localStorage.getItem("orders"));
-            }
-        }
+
+        orders = store.get("orders");
+
         if(orders[`${this.props.from}:${this.props.to}`]) {
             this.setState({
                 orders: orders[`${this.props.from}:${this.props.to}`]
@@ -21,6 +19,26 @@ class OrderBook extends Component {
             this.setState({
                 orders: []
             })
+        }
+    }
+
+    componentDidUpdate = async(prevProps, prevState) => {
+        console.log(this.props);
+        console.log(prevProps);
+        if(prevProps.from !== this.props.from) {
+            let orders = {}
+            if (typeof(Storage) !== "undefined") { 
+                orders = store.get("orders");
+            }
+            if(orders[`${this.props.from}:${this.props.to}`]) {
+                this.setState({
+                    orders: orders[`${this.props.from}:${this.props.to}`]
+                })
+            } else {
+                this.setState({
+                    orders: []
+                })
+            }
         }
     }
     
@@ -58,4 +76,4 @@ class OrderBook extends Component {
     }
 }
 
-export default Exchange(OrderBook);
+export default OrderBook;

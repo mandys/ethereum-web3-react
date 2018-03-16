@@ -18,6 +18,7 @@
     "react-scripts": "1.1.1",
     "semantic-ui-css": "^2.3.0",
     "semantic-ui-react": "^0.78.3",
+    "store": "^2.0.12",
     "web3": "0.20.4",
     "web3-provider-engine": "^13.6.5"
   },

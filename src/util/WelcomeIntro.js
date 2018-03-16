@@ -1,11 +1,25 @@
 import React, { Component } from 'react';
 import { Header, Container, Label, Table, Modal, Divider,Button, Icon } from 'semantic-ui-react'
-
+var store = require('store')
+var expirePlugin = require('store/plugins/expire')
+store.addPlugin(expirePlugin)
 
 class WelcomeIntro extends Component {
-    state = { modalOpen: true }
+    state = { modalOpen: false }
 
-    handleClose = () => this.setState({ modalOpen: false })
+    componentDidMount = () => {
+        const modalShown = store.get('modalShown')
+        console.log('modalShown',modalShown, new Date().getTime() + 24*60*60);
+        if(modalShown != 1) {
+            this.setState({ modalOpen: true })
+        }
+    }
+
+    handleClose = () => {
+        store.set('modalShown', 1)
+        this.setState({ modalOpen: false });
+        
+    } 
     render() {
         return (
             <Modal open={this.state.modalOpen} >

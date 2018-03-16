@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import {Container, Dropdown,Form, Button,Segment,Divider,Grid } from 'semantic-ui-react'
+import {Container, Dropdown,Form, Button,Segment,Divider,Grid,Label } from 'semantic-ui-react'
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
 import Exchange from '../Exchange';
 import OrderBook from './OrderBook';
+var store = require('store')
 
 class BuySellToken extends Component {
     constructor(props) {
@@ -25,6 +26,16 @@ class BuySellToken extends Component {
                 image: { avatar: true, src: '/src/icons/zrx.png' },
             }
         ]
+        this.marketOptions = [
+            {
+                text: 'BUY',
+                value: 'buy',
+            },
+            {
+                text: 'SELL',
+                value: 'sell',
+            }
+        ]
         this.DECIMALS = 18;
         this.state = {
             tradingCoin: 'BINK',
@@ -41,12 +52,13 @@ class BuySellToken extends Component {
         })
     }
 
-    tradingCoin = async(e) => {
-        const coin = e.target.innerText;
-        const balance = await this.getTokenBalance(this.props.tokenContractAddresses[coin]);
+    setTradingExchangeCoin = async(e) => {
+        const coins = e.target.innerText.split(" -> ");
+        const balance = await this.getTokenBalance(this.props.tokenContractAddresses[coins[1]]);
         this.setState({
-            tradingCoin: coin,
-            tradingBalance: balance
+            tradingCoin: coins[0],
+            tradingBalance: balance,
+            exchangeCoin: coins[1]
         })
     }
 
@@ -56,9 +68,10 @@ class BuySellToken extends Component {
         })
     }
 
-    toggleBuySell = async() => {
-        this.setState((prevState) => {
-            return { orderType: (prevState.orderType === 'buy')?'sell':'buy' }
+    toggleBuySell = async(e) => {
+        console.log('here')
+        this.setState({
+             orderType: e.target.innerText.toLowerCase()
         })
     }
 
@@ -73,8 +86,8 @@ class BuySellToken extends Component {
             maker: this.props.ownerAddress,
             taker: ZeroEx.NULL_ADDRESS,
             feeRecipient: ZeroEx.NULL_ADDRESS,
-            makerTokenAddress: this.props.tokenContractAddresses[this.state.tradingCoin],
-            takerTokenAddress: this.props.tokenContractAddresses[this.state.exchangeCoin],
+            makerTokenAddress: this.props.tokenContractAddresses[this.state.exchangeCoin],
+            takerTokenAddress: this.props.tokenContractAddresses[this.state.tradingCoin],
             exchangeContractAddress: this.props.exchangeAddress,
             salt: ZeroEx.generatePseudoRandomSalt(),
             makerFee: new BigNumber(0),
@@ -86,11 +99,10 @@ class BuySellToken extends Component {
         const orderHash = ZeroEx.getOrderHashHex(order);
         console.log('orderHash', orderHash);
         let orders = {};
-        if (typeof(Storage) !== "undefined") { 
-            if(localStorage.getItem("orders")) {
-                orders = JSON.parse(localStorage.getItem("orders"));
-            }
+        if(store.get("orders")) {
+            orders = store.get("orders");
         }
+
         if(typeof orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`] === 'undefined') {
             orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`] = [];
         }
@@ -100,7 +112,7 @@ class BuySellToken extends Component {
             toToken: this.refs.exchangeCoin.value
         }
         orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`].push(newOrder);
-        localStorage.setItem("orders", JSON.stringify(orders))
+        store.set("orders", orders)
         const shouldAddPersonalMessagePrefix = true;
         let ecSignature = '';
         try {
@@ -130,57 +142,57 @@ class BuySellToken extends Component {
                 <Grid>
                     <Grid.Row>
                         <Grid.Column width={6}>
-                            <Segment clearing>
+                            <Segment>
                                 MARKETPLACE
-                                <Button floated='right'>
-                                <Dropdown inline 
-                                    options={this.coins}  
-                                    defaultValue={this.coins[0].value} 
-                                    onChange={this.tradingCoin}
-                                />
-                                </Button>
-                            </Segment>   
-                            <label>Exchange TOKEN</label>
-                            <Dropdown 
-                                fluid search selection 
-                                options={this.coins} 
-                                defaultValue={this.coins[1].value}
-                                onChange={this.exchangeCoin}
-                            />
-                            <Divider />
-                            <Button.Group>
-                                <Button color='green' onClick={this.toggleBuySell}>BUY</Button>
-                                <Button.Or />
-                                <Button color='orange' onClick={this.toggleBuySell}>SELL</Button>
-                            </Button.Group>
-                            <Form>
-                                <Form.Field>
-                                    <label>AMOUNT {this.state.tradingCoin}</label>
-                                    <input placeholder='0' type='text' ref='tradingCoin'/>
-                                    <label>Balace {this.state.tradingBalance}</label>
-                                </Form.Field>
-                                <Form.Field>
-                                    <label>PRICE {this.state.exchangeCoin}</label>
-                                    <input placeholder='0' type='text' ref='exchangeCoin'/>
-                                </Form.Field>
-                                <Form.Field>
-                                    <label>0.00% FEE</label>
-                                    <p>0 ZRX</p>
-                                    <p>$ 0 USD</p>
-                                </Form.Field>
-                                <Form.Field>
-                                    <label>TOTAL</label>
-                                    <p>0 WETH</p>
-                                    <p>$ 0 USD</p>
-                                </Form.Field>
-                                {
-                                    (this.state.orderType === 'buy') ?
-                                    <Button type='submit' color='green' onClick={this.createOrder}>PLACE BUY ORDER</Button>
-                                    :
-                                    <Button type='submit' color='orange'>PLACE SELL ORDER</Button>
-                                }
-                                
-                            </Form>
+                                <Divider />
+                                <Form> 
+                                    <Form.Field>
+                                        <label>CHOOSE A MARKETPLACE</label>
+                                        <Button.Group>
+                                            <Button primary onClick={this.setTradingExchangeCoin}>BINK -> WETH</Button>
+                                            <Button.Or />
+                                            <Button secondary onClick={this.setTradingExchangeCoin}>ZRX -> WETH</Button>
+                                        </Button.Group>
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>I WANT TO </label>
+                                        <Dropdown fluid selection
+                                            options={this.marketOptions}  
+                                            defaultValue={this.marketOptions[0].value} 
+                                            onChange={this.toggleBuySell}
+                                        />
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>HOW MANY <Label color='blue' basic>{this.state.tradingCoin}</Label> YOU WANT TO BUY</label>
+                                        <input placeholder='0' type='text' ref='tradingCoin'/>
+                                        <label>Balace {this.state.tradingBalance}</label>
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>EXCHANGE PRICE OF <Label color='yellow' basic>{this.state.exchangeCoin}</Label></label>
+                                        <input placeholder='0' type='text' ref='exchangeCoin'/>
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>FEE</label>
+                                        ABSOLUTELY FREE!!
+                                    </Form.Field>
+                                    {/* <Form.Field>
+                                        <label>0.00% FEE</label>
+                                        <p>0 ZRX</p>
+                                        <p>$ 0 USD</p>
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>TOTAL</label>
+                                        <p>0 WETH</p>
+                                        <p>$ 0 USD</p>
+                                    </Form.Field> */}
+                                    {
+                                        (this.state.orderType === 'buy') ?
+                                        <Button type='submit' color='green' onClick={this.createOrder}>PLACE BUY ORDER</Button>
+                                        :
+                                        <Button type='submit' color='orange'>PLACE SELL ORDER</Button>
+                                    }
+                                </Form>
+                            </Segment>  
                         </Grid.Column>
                         <Grid.Column width={10}>
                             <OrderBook from={this.state.tradingCoin} to={this.state.exchangeCoin}/>

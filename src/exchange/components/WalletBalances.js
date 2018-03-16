@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Table,Container,Checkbox } from 'semantic-ui-react'
 import Exchange from '../Exchange';
 import WrapUnWrapEther from './WrapUnWrapEther';
-
+var store = require('store');
 
 class WalletBalance extends Component {
     state = {
