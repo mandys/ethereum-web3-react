@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Container, Dropdown,Form, Button,Segment,Divider } from 'semantic-ui-react'
+import {Container, Dropdown,Form, Button,Segment,Divider,Grid } from 'semantic-ui-react'
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
 import Exchange from '../Exchange';
@@ -127,59 +127,66 @@ class BuySellToken extends Component {
     render() {
         return (
             <Container>
-                 <Segment clearing>
-                    MARKETPLACE
-                    <Button floated='right'>
-                    <Dropdown inline 
-                        options={this.coins}  
-                        defaultValue={this.coins[0].value} 
-                        onChange={this.tradingCoin}
-                    />
-                    </Button>
-                </Segment>   
-                <label>Exchange TOKEN</label>
-                <Dropdown 
-                    fluid search selection 
-                    options={this.coins} 
-                    defaultValue={this.coins[1].value}
-                    onChange={this.exchangeCoin}
-                />
-                <Divider />
-                <Button.Group>
-                    <Button color='green' onClick={this.toggleBuySell}>BUY</Button>
-                    <Button.Or />
-                    <Button color='orange' onClick={this.toggleBuySell}>SELL</Button>
-                </Button.Group>
-                <Form>
-                    <Form.Field>
-                        <label>AMOUNT {this.state.tradingCoin}</label>
-                        <input placeholder='0' type='text' ref='tradingCoin'/>
-                        <label>Balace {this.state.tradingBalance}</label>
-                    </Form.Field>
-                    <Form.Field>
-                        <label>PRICE {this.state.exchangeCoin}</label>
-                        <input placeholder='0' type='text' ref='exchangeCoin'/>
-                    </Form.Field>
-                    <Form.Field>
-                        <label>0.00% FEE</label>
-                        <p>0 ZRX</p>
-                        <p>$ 0 USD</p>
-                    </Form.Field>
-                    <Form.Field>
-                        <label>TOTAL</label>
-                        <p>0 WETH</p>
-                        <p>$ 0 USD</p>
-                    </Form.Field>
-                    {
-                        (this.state.orderType === 'buy') ?
-                        <Button type='submit' color='green' onClick={this.createOrder}>PLACE BUY ORDER</Button>
-                        :
-                        <Button type='submit' color='orange'>PLACE SELL ORDER</Button>
-                    }
-                    
-                </Form>
-                <Divider />
-                <OrderBook from={this.state.tradingCoin} to={this.state.exchangeCoin}/>
+                <Grid>
+                    <Grid.Row>
+                        <Grid.Column width={6}>
+                            <Segment clearing>
+                                MARKETPLACE
+                                <Button floated='right'>
+                                <Dropdown inline 
+                                    options={this.coins}  
+                                    defaultValue={this.coins[0].value} 
+                                    onChange={this.tradingCoin}
+                                />
+                                </Button>
+                            </Segment>   
+                            <label>Exchange TOKEN</label>
+                            <Dropdown 
+                                fluid search selection 
+                                options={this.coins} 
+                                defaultValue={this.coins[1].value}
+                                onChange={this.exchangeCoin}
+                            />
+                            <Divider />
+                            <Button.Group>
+                                <Button color='green' onClick={this.toggleBuySell}>BUY</Button>
+                                <Button.Or />
+                                <Button color='orange' onClick={this.toggleBuySell}>SELL</Button>
+                            </Button.Group>
+                            <Form>
+                                <Form.Field>
+                                    <label>AMOUNT {this.state.tradingCoin}</label>
+                                    <input placeholder='0' type='text' ref='tradingCoin'/>
+                                    <label>Balace {this.state.tradingBalance}</label>
+                                </Form.Field>
+                                <Form.Field>
+                                    <label>PRICE {this.state.exchangeCoin}</label>
+                                    <input placeholder='0' type='text' ref='exchangeCoin'/>
+                                </Form.Field>
+                                <Form.Field>
+                                    <label>0.00% FEE</label>
+                                    <p>0 ZRX</p>
+                                    <p>$ 0 USD</p>
+                                </Form.Field>
+                                <Form.Field>
+                                    <label>TOTAL</label>
+                                    <p>0 WETH</p>
+                                    <p>$ 0 USD</p>
+                                </Form.Field>
+                                {
+                                    (this.state.orderType === 'buy') ?
+                                    <Button type='submit' color='green' onClick={this.createOrder}>PLACE BUY ORDER</Button>
+                                    :
+                                    <Button type='submit' color='orange'>PLACE SELL ORDER</Button>
+                                }
+                                
+                            </Form>
+                        </Grid.Column>
+                        <Grid.Column width={10}>
+                            <OrderBook from={this.state.tradingCoin} to={this.state.exchangeCoin}/>
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
             </Container>
         );
     }

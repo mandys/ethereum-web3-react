@@ -8,6 +8,8 @@ import WithWeb3 from './WithWeb3';
 import Presale from './Presale';
 import WalletBalance from './exchange/components/WalletBalances';
 import BuySellToken from './exchange/components/BuySellToken';
+import Bdex from './exchange/Bdex';
+import WelcomeIntro from './util/WelcomeIntro';
 
 const url = require("url");
 
@@ -43,6 +45,13 @@ switch (urlParams["pathname"]) {
         case "/BuySellToken":
         ReactDOM.render(
             <BuySellToken />, document.getElementById('root'));
+        break;
+        case "/WelcomeIntro":
+            ReactDOM.render(
+                <WelcomeIntro />, document.getElementById('root'));
+        case "/Bdex":
+        ReactDOM.render(
+            <Bdex />, document.getElementById('root'));
         break;
     case undefined:
     default:
