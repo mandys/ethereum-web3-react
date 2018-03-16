@@ -11,7 +11,7 @@ class OrderBook extends Component {
 
         orders = store.get("orders");
 
-        if(orders[`${this.props.from}:${this.props.to}`]) {
+        if(orders && orders[`${this.props.from}:${this.props.to}`]) {
             this.setState({
                 orders: orders[`${this.props.from}:${this.props.to}`]
             })
@@ -25,7 +25,7 @@ class OrderBook extends Component {
     componentDidUpdate = async(prevProps, prevState) => {
         console.log(this.props);
         console.log(prevProps);
-        if(prevProps.from !== this.props.from) {
+        if(prevProps.from !== this.props.from ) {
             let orders = {}
             if (typeof(Storage) !== "undefined") { 
                 orders = store.get("orders");
