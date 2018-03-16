@@ -92,8 +92,8 @@ class BuySellToken extends Component {
             salt: ZeroEx.generatePseudoRandomSalt(),
             makerFee: new BigNumber(0),
             takerFee: new BigNumber(0),
-            makerTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(this.refs.tradingCoin.value), this.DECIMALS), // Base 18 decimals
-            takerTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(this.refs.exchangeCoin.value), this.DECIMALS), // Base 18 decimals
+            makerTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(this.refs.exchangeCoin.value), this.DECIMALS), // Base 18 decimals
+            takerTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(this.refs.tradingCoin.value), this.DECIMALS), // Base 18 decimals
             expirationUnixTimestampSec: new BigNumber(Date.now() + 3600000), // Valid for up to an hour
         };    
         const orderHash = ZeroEx.getOrderHashHex(order);
@@ -111,13 +111,27 @@ class BuySellToken extends Component {
             fromToken: this.refs.tradingCoin.value,
             toToken: this.refs.exchangeCoin.value
         }
-        orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`].push(newOrder);
-        store.set("orders", orders)
+        
         const shouldAddPersonalMessagePrefix = true;
         let ecSignature = '';
         try {
             ecSignature = await this.props.zeroEx.signOrderHashAsync(orderHash, this.props.ownerAddress, shouldAddPersonalMessagePrefix);
             console.log('ecSignature', ecSignature);
+            let orders = {};
+            if(store.get("orders")) {
+                orders = store.get("orders");
+            }
+
+            if(typeof orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`] === 'undefined') {
+                orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`] = [];
+            }
+            const newOrder = {
+                hash: orderHash,
+                fromToken: this.refs.tradingCoin.value,
+                toToken: this.refs.exchangeCoin.value
+            }
+            orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`].push(newOrder);
+            store.set("orders", orders)
         } catch(e) {
             console.log(e);
         }
