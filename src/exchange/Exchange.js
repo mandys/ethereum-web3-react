@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Web3 from 'web3';
 import { InjectedWeb3Subprovider } from '@0xproject/subproviders';
 import { ZeroEx } from '0x.js';
-import { Message, Container } from 'semantic-ui-react'
+import { Message, Container, Dimmer, Loader } from 'semantic-ui-react'
 const Web3ProviderEngine = require('web3-provider-engine');
 const RpcSubprovider = require('web3-provider-engine/subproviders/rpc.js')
 
@@ -55,12 +55,13 @@ const Exchange = (PassedComponent) => class extends Component {
 
     render() {
 
-        return (this.state.ownerAddress ? <PassedComponent {...this.state} {...this.props} /> : 
-                <Container>
-                    <Message color='red' header='Unlock your MetaMask' content='Please unlock your metamask and refresh the page' />
-                </Container>    
-                )
-        }
+        return (
+            this.state.ownerAddress ? <PassedComponent {...this.state} {...this.props} /> :
+                <Dimmer active>
+                    <Loader size='massive'>Loading</Loader>
+                </Dimmer>
+        )
+    }
 }
 
 export default Exchange;
