@@ -49,12 +49,13 @@ class WalletBalance extends Component {
         let allowance = {}
         for(var key in this.props.tokenContractAddresses) {
         console.log(allowance);
-            allowance[key] = this.props.zeroEx.token.getProxyAllowanceAsync(
+            allowance[key] = await this.props.zeroEx.token.getProxyAllowanceAsync(
                 this.props.tokenContractAddresses[key], 
                 this.props.ownerAddress
             )
+            allowance[key] = allowance[key]/Math.pow(10, this.DECIMALS)
         }
-        console.log(allowance);
+        console.log('alowance',allowance);
         this.setState({
             allowance:allowance
         })
