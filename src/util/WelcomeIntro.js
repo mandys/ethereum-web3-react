@@ -10,7 +10,7 @@ class WelcomeIntro extends Component {
     componentDidMount = () => {
         const modalShown = store.get('modalShown')
         console.log('modalShown',modalShown, new Date().getTime() + 24*60*60);
-        if(modalShown != 1) {
+        if(modalShown !== 1) {
             this.setState({ modalOpen: true })
         }
     }

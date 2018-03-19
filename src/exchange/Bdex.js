@@ -1,7 +1,7 @@
 import WalletBalance from './components/WalletBalances'
 import BuySellTokens from './components/BuySellToken'
 import WelcomeIntro from '../util/WelcomeIntro'
-import { Table,Container,Checkbox, Divider } from 'semantic-ui-react'
+import { Container, Divider } from 'semantic-ui-react'
 import React, { Component } from 'react';
 
 
@@ -14,7 +14,6 @@ class Bdex extends Component {
                     <WelcomeIntro />
                 </Container>
     }
-    
 };
 
 export default Bdex

@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
-import { Table,Header } from 'semantic-ui-react'
+import { Table,Header,Button } from 'semantic-ui-react'
+import Exchange from '../Exchange';
+import { ZeroEx } from '0x.js';
+import { BigNumber } from '@0xproject/utils';
 var store = require('store')
+
 
 class OrderBook extends Component {
     state = {
         orders:[]
     }
+    DECIMALS = 18
     componentDidMount = async() => {
         let orders = {}
 
@@ -41,6 +46,46 @@ class OrderBook extends Component {
             }
         }
     }
+
+    fillOrder = async(signedOrder, toAmount) => {
+        console.log('signedOrder',signedOrder)
+        console.log('toAmount',toAmount)
+        try {
+            const orderValidOrNot = ZeroEx.isValidOrderHash('0x16c70dcc13c40f679fa2cbd6dbfbb886ccac38334c756975fbc26c6fa264f434')
+            console.log('orderValidOrNot', orderValidOrNot)
+        } catch(e) {
+            console.log(e)
+        }
+        const shouldThrowOnInsufficientBalanceOrAllowance = false;
+        const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(toAmount), this.DECIMALS);
+        // const signedOrder = this.convertPortalOrder(signedOrder);
+        const txHash = await this.props.zeroEx.exchange.fillOrderAsync(
+            this.convertPortalOrder(signedOrder),
+            fillTakerTokenAmount,
+            shouldThrowOnInsufficientBalanceOrAllowance,
+            '0xb1f13818094091343c127945e2B894CeB2d3fd27'.toLowerCase()
+        );
+        console.log('txHash', txHash);
+        let transactions = {};
+        if(store.get("transactions")) {
+            transactions = store.get("orders");
+        }
+        transactions.push(txHash);
+        console.log('txHash', txHash);
+        const txReceipt = await this.props.zeroEx.awaitTransactionMinedAsync(txHash);
+        console.log('FillOrder transaction receipt: ', txReceipt);
+    }
+
+    convertPortalOrder = (signedOrder) => {
+        const rawSignedOrder = signedOrder;
+        rawSignedOrder.makerFee = new BigNumber(rawSignedOrder.makerFee);
+        rawSignedOrder.takerFee = new BigNumber(rawSignedOrder.takerFee);
+        rawSignedOrder.makerTokenAmount = new BigNumber(rawSignedOrder.makerTokenAmount);
+        rawSignedOrder.takerTokenAmount = new BigNumber(rawSignedOrder.takerTokenAmount);
+        rawSignedOrder.expirationUnixTimestampSec = new BigNumber(rawSignedOrder.expirationUnixTimestampSec);
+        rawSignedOrder.salt = new BigNumber(rawSignedOrder.salt);
+        return rawSignedOrder;
+    }
     
     render() {
         return (
@@ -52,7 +97,7 @@ class OrderBook extends Component {
                         <Table.HeaderCell>Amount {this.props.from}</Table.HeaderCell>
                         <Table.HeaderCell>Amount {this.props.to}</Table.HeaderCell>
                         <Table.HeaderCell>Order #</Table.HeaderCell>
-                        <Table.HeaderCell>Status</Table.HeaderCell>
+                        <Table.HeaderCell>Action</Table.HeaderCell>
                     </Table.Row>
                     </Table.Header>
 
@@ -64,7 +109,7 @@ class OrderBook extends Component {
                                     <Table.Cell>{order.fromToken}</Table.Cell>
                                     <Table.Cell>{order.toToken}</Table.Cell>
                                     <Table.Cell>{order.hash}</Table.Cell>
-                                    <Table.Cell>pending</Table.Cell>
+                                    <Table.Cell><Button onClick={() => this.fillOrder(order.signedOrder, order.toToken) }>Fill Order</Button></Table.Cell>
                                 </Table.Row>
                             )
                         })
@@ -76,4 +121,4 @@ class OrderBook extends Component {
     }
 }
 
-export default OrderBook;
+export default Exchange(OrderBook);

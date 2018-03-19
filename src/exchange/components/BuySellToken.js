@@ -98,25 +98,17 @@ class BuySellToken extends Component {
         };    
         const orderHash = ZeroEx.getOrderHashHex(order);
         console.log('orderHash', orderHash);
-        let orders = {};
-        if(store.get("orders")) {
-            orders = store.get("orders");
-        }
-
-        if(typeof orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`] === 'undefined') {
-            orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`] = [];
-        }
-        const newOrder = {
-            hash: orderHash,
-            fromToken: this.refs.tradingCoin.value,
-            toToken: this.refs.exchangeCoin.value
-        }
-        
+        let signedOrder = '';
         const shouldAddPersonalMessagePrefix = true;
         let ecSignature = '';
         try {
             ecSignature = await this.props.zeroEx.signOrderHashAsync(orderHash, this.props.ownerAddress, shouldAddPersonalMessagePrefix);
             console.log('ecSignature', ecSignature);
+            // Append signature to order
+            signedOrder = {
+                ...order,
+                ecSignature,
+            };
             let orders = {};
             if(store.get("orders")) {
                 orders = store.get("orders");
@@ -125,22 +117,18 @@ class BuySellToken extends Component {
             if(typeof orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`] === 'undefined') {
                 orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`] = [];
             }
-            const newOrder = {
+            orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`].push({
                 hash: orderHash,
                 fromToken: this.refs.tradingCoin.value,
-                toToken: this.refs.exchangeCoin.value
-            }
-            orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`].push(newOrder);
+                toToken: this.refs.exchangeCoin.value,
+                signedOrder: signedOrder
+            });
             store.set("orders", orders)
         } catch(e) {
             console.log(e);
         }
         
-        // Append signature to order
-        let signedOrder = {
-            ...order,
-            ecSignature,
-        };
+        
         console.log('signedOrder', signedOrder);
         try {
             const isOrderValid = await this.props.zeroEx.exchange.validateOrderFillableOrThrowAsync(signedOrder);
@@ -155,7 +143,7 @@ class BuySellToken extends Component {
             <Container>
                 <Grid>
                     <Grid.Row>
-                        <Grid.Column width={6}>
+                        <Grid.Column width={5}>
                             <Segment>
                                 MARKETPLACE
                                 <Divider />
@@ -208,7 +196,7 @@ class BuySellToken extends Component {
                                 </Form>
                             </Segment>  
                         </Grid.Column>
-                        <Grid.Column width={10}>
+                        <Grid.Column width={11}>
                             <OrderBook from={this.state.tradingCoin} to={this.state.exchangeCoin}/>
                         </Grid.Column>
                     </Grid.Row>

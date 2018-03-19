@@ -2,12 +2,16 @@ import React, { Component } from 'react';
 import { Table,Container,Checkbox } from 'semantic-ui-react'
 import Exchange from '../Exchange';
 import WrapUnWrapEther from './WrapUnWrapEther';
-var store = require('store');
 
 class WalletBalance extends Component {
     state = {
         disabled: false,
         balances: {
+            'WETH': 0,
+            'ZRX': 0,
+            'BINK': 0
+        },
+        allowance: {
             'WETH': 0,
             'ZRX': 0,
             'BINK': 0
@@ -36,6 +40,25 @@ class WalletBalance extends Component {
 
     componentDidMount = () => {
         this.getBalances();
+        this.getAllowances();
+        // zeroEx.token.getProxyAllowanceAsync
+    }
+
+    getAllowances = async() => {
+        console.log(this.props.tokenContractAddresses);
+        let allowance = {}
+        for(var key in this.props.tokenContractAddresses) {
+        console.log(allowance);
+            allowance[key] = this.props.zeroEx.token.getProxyAllowanceAsync(
+                this.props.tokenContractAddresses[key], 
+                this.props.ownerAddress
+            )
+        }
+        console.log(allowance);
+        this.setState({
+            allowance:allowance
+        })
+        
     }
 
     getBalances = async() => {
@@ -88,7 +111,10 @@ class WalletBalance extends Component {
                         </Table.Cell>
                         <Table.Cell>Wrapped Ether</Table.Cell>
                         <Table.Cell>
-                            <Checkbox toggle onChange={(e) => this.takeAllowance(e, 'WETH')} disabled={this.state.disabled}/>
+                            <Checkbox toggle 
+                            checked={this.state.allowance['WETH']}
+                            onChange={(e) => this.takeAllowance(e, 'WETH')} 
+                            disabled={this.state.disabled}/>
                         </Table.Cell>
                         <Table.Cell>{this.state.balances['WETH']}</Table.Cell>
                         <Table.Cell>$0.00</Table.Cell>
@@ -97,7 +123,10 @@ class WalletBalance extends Component {
                         <Table.Cell>BINK</Table.Cell>
                         <Table.Cell>Bink Token</Table.Cell>
                         <Table.Cell>
-                            <Checkbox toggle onChange={(e) => this.takeAllowance(e, 'BINK')} disabled={this.state.disabled}/>
+                            <Checkbox toggle 
+                            checked={this.state.allowance['BINK']}
+                            onChange={(e) => this.takeAllowance(e, 'BINK')} 
+                            disabled={this.state.disabled}/>
                         </Table.Cell>
                         <Table.Cell>{this.state.balances['BINK']}</Table.Cell>
                         <Table.Cell>$0.00</Table.Cell>
@@ -106,7 +135,10 @@ class WalletBalance extends Component {
                         <Table.Cell>ZRX</Table.Cell>
                         <Table.Cell>0x</Table.Cell>
                         <Table.Cell>
-                            <Checkbox toggle onChange={(e) => this.takeAllowance(e, 'ZRX')} disabled={this.state.disabled}/>
+                            <Checkbox toggle 
+                            checked={this.state.allowance['ZRX']}
+                            onChange={(e) => this.takeAllowance(e, 'ZRX')} 
+                            disabled={this.state.disabled}/>
                         </Table.Cell>
                         <Table.Cell>{this.state.balances['ZRX']}</Table.Cell>
                         <Table.Cell>$0.00</Table.Cell>
