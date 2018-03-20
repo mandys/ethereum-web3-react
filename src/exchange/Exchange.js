@@ -26,7 +26,7 @@ const Exchange = (PassedComponent) => class extends Component {
     }
     componentDidMount = async() => {
         const zeroEx = new ZeroEx(this.providerEngine, { networkId: this.NETWORK_ID });
-        const WETH_ADDRESS = zeroEx.etherToken.getContractAddressIfExists();
+        const WETH_ADDRESS = await zeroEx.tokenRegistry.getTokenAddressBySymbolIfExistsAsync('WETH');
         console.log('WETH_ADDRESS', WETH_ADDRESS);
         const ZRX_ADDRESS = zeroEx.exchange.getZRXTokenAddress();
         console.log('ZRX_ADDRESS', ZRX_ADDRESS);
