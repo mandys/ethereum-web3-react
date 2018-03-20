@@ -153,7 +153,7 @@ class BuySellToken extends Component {
                                         <Button.Group>
                                             <Button primary onClick={this.setTradingExchangeCoin}>BINK -> WETH</Button>
                                             <Button.Or />
-                                            <Button secondary onClick={this.setTradingExchangeCoin}>ZRX -> WETH</Button>
+                                            <Button secondary onClick={this.setTradingExchangeCoin}>WETH -> BINK</Button>
                                         </Button.Group>
                                     </Form.Field>
                                     <Form.Field>

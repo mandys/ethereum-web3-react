@@ -7,9 +7,9 @@ class WalletBalance extends Component {
     state = {
         disabled: false,
         balances: {
-            'WETH': 0,
-            'ZRX': 0,
-            'BINK': 0
+            'WETH': 'NILL',
+            'ZRX': 'NILL',
+            'BINK': 'NILL'
         },
         allowance: {
             'WETH': 0,

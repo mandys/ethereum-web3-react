@@ -66,14 +66,30 @@ class OrderBook extends Component {
             '0xb1f13818094091343c127945e2B894CeB2d3fd27'.toLowerCase()
         );
         console.log('txHash', txHash);
-        let transactions = {};
-        if(store.get("transactions")) {
-            transactions = store.get("orders");
-        }
-        transactions.push(txHash);
+        // let transactions = {};
+        // if(store.get("transactions")) {
+        //     transactions = store.get("orders");
+        // }
+        // if(!transactions) {
+        //     transactions = {}
+        // }
+        // transactions.push(txHash);
         console.log('txHash', txHash);
         const txReceipt = await this.props.zeroEx.awaitTransactionMinedAsync(txHash);
         console.log('FillOrder transaction receipt: ', txReceipt);
+    }
+
+    cancelOrder = async(signedOrder, toAmount) => {
+        console.log('signedOrder',signedOrder)
+        console.log('toAmount',toAmount)
+        const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(toAmount), this.DECIMALS);
+        // const signedOrder = this.convertPortalOrder(signedOrder);
+        const txHash = await this.props.zeroEx.exchange.cancelOrderAsync(
+            this.convertPortalOrder(signedOrder),
+            fillTakerTokenAmount
+        );
+        console.log('txHash', txHash);
+        console.log('txHash', txHash);
     }
 
     convertPortalOrder = (signedOrder) => {
@@ -85,6 +101,14 @@ class OrderBook extends Component {
         rawSignedOrder.expirationUnixTimestampSec = new BigNumber(rawSignedOrder.expirationUnixTimestampSec);
         rawSignedOrder.salt = new BigNumber(rawSignedOrder.salt);
         return rawSignedOrder;
+    }
+    orderstatus = (signedOrder) => {
+        this.props.zeroEx.exchange.validateOrderFillableOrThrowAsync(this.convertPortalOrder(signedOrder))
+            .then(response => {
+                console.log('orderstatus',response);
+            }) .catch(err => {
+                console.log('orderstatus',err)
+            })
     }
     
     render() {
@@ -104,12 +128,21 @@ class OrderBook extends Component {
                     <Table.Body>
                     {
                         this.state.orders.map((order,i) => {
+                            console.log(this.orderstatus(order.signedOrder));
+                          
                             return (
                                 <Table.Row key={i}>
                                     <Table.Cell>{order.fromToken}</Table.Cell>
                                     <Table.Cell>{order.toToken}</Table.Cell>
                                     <Table.Cell>{order.hash}</Table.Cell>
-                                    <Table.Cell><Button onClick={() => this.fillOrder(order.signedOrder, order.toToken) }>Fill Order</Button></Table.Cell>
+                                    <Table.Cell>
+                                        <p>
+                                            <Button onClick={() => this.fillOrder(order.signedOrder, order.toToken) }>Fill Order</Button>
+                                        </p>
+                                        <p>
+                                            <Button onClick={() => this.cancelOrder(order.signedOrder, order.toToken) }>Cancel Order</Button>
+                                        </p>
+                                    </Table.Cell>
                                 </Table.Row>
                             )
                         })
