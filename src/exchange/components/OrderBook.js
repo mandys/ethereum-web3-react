@@ -15,11 +15,28 @@ class OrderBook extends Component {
         let orders = {}
 
         orders = store.get("orders");
-
         if(orders && orders[`${this.props.from}:${this.props.to}`]) {
-            this.setState({
-                orders: orders[`${this.props.from}:${this.props.to}`]
-            })
+            console.log('filteredOrders',orders[`${this.props.from}:${this.props.to}`]);
+            let neworders = []
+            orders[`${this.props.from}:${this.props.to}`].map((order)=>{
+                this.props.zeroEx.exchange.getUnavailableTakerAmountAsync(order.hash)
+                    .then(response => {
+                        let bal = parseFloat(order.toToken) - (response/Math.pow(10, this.DECIMALS))
+                        console.log('orderstatus',bal);
+                        if(bal > 0){
+                            this.setState({
+                                orders: neworders.concat(order)
+                            })
+                        }
+                    }) .catch(err => {
+                        console.log('orderstatus',err)
+                        return false;
+                    })
+            }) 
+            console.log('filteredOrders',neworders);
+            // this.setState({
+            //     orders: neworders
+            // })
         } else {
             this.setState({
                 orders: []
@@ -35,7 +52,7 @@ class OrderBook extends Component {
             if (typeof(Storage) !== "undefined") { 
                 orders = store.get("orders");
             }
-            if(orders[`${this.props.from}:${this.props.to}`]) {
+            if(orders && orders[`${this.props.from}:${this.props.to}`]) {
                 this.setState({
                     orders: orders[`${this.props.from}:${this.props.to}`]
                 })
@@ -102,13 +119,16 @@ class OrderBook extends Component {
         rawSignedOrder.salt = new BigNumber(rawSignedOrder.salt);
         return rawSignedOrder;
     }
-    orderstatus = (signedOrder) => {
-        this.props.zeroEx.exchange.validateOrderFillableOrThrowAsync(this.convertPortalOrder(signedOrder))
-            .then(response => {
-                console.log('orderstatus',response);
-            }) .catch(err => {
-                console.log('orderstatus',err)
-            })
+    orderstatus = async(orderHash, takerAmount) => {
+        this.props.zeroEx.exchange.getUnavailableTakerAmountAsync(orderHash)
+        .then(response => {
+            let bal = parseFloat(takerAmount) - (response/Math.pow(10, this.DECIMALS))
+            console.log('orderstatus',bal);
+            return (bal > 0)?true:false
+        }) .catch(err => {
+            console.log('orderstatus',err)
+            return false;
+        })
     }
     
     render() {
@@ -128,8 +148,6 @@ class OrderBook extends Component {
                     <Table.Body>
                     {
                         this.state.orders.map((order,i) => {
-                            console.log(this.orderstatus(order.signedOrder));
-                          
                             return (
                                 <Table.Row key={i}>
                                     <Table.Cell>{order.fromToken}</Table.Cell>
