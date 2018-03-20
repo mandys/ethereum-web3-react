@@ -192,6 +192,23 @@ class App extends Component {
             })   
         }
     }
+    takeAllowance = async(e, data) => {
+        let token = data.name
+        console.log('inside getAllowanceFromMaker');
+        console.log(this.props.tokenContractAddresses[token]);
+        try {
+            const setMakerAllowTxHash = await this.props.zeroEx.token.setUnlimitedProxyAllowanceAsync(this.props.tokenContractAddresses[token], this.props.ownerAddress);
+            console.log('setMakerAllowTxHash', setMakerAllowTxHash);
+            await this.props.zeroEx.awaitTransactionMinedAsync(setMakerAllowTxHash);
+
+            this.setState((prevState) => {
+                prevState.allowance[`${token}`] = 1
+                return prevState
+            })
+        } catch(e) {
+            console.log(e)
+        }
+    }
     componentDidMount = () => {
         this.getBalances();
         this.getAllowances();
@@ -363,14 +380,29 @@ class App extends Component {
                                             <Table.Cell textAlign="right">{this.state.balances.ZRX == 'NIL' ? ( 
                                                 <div><Icon name="spinner" /> Fetching Balanace</div> 
                                             ): this.state.balances.ZRX}</Table.Cell>
-                                            <Table.Cell textAlign="right">{this.state.allowance.ZRX !== 0 ? <Icon name="unlock" /> : <Icon name="lock" />}</Table.Cell>
+                                            <Table.Cell textAlign="right">
+                                                {
+                                                    this.state.allowance.ZRX !== 0 ? <Icon name="unlock" /> : 
+                                                    (
+                                                        <Button name="ZRX" icon onClick={this.takeAllowance}><Icon name="lock" /></Button>
+                                                        
+                                                    )
+                                                }
+                                            </Table.Cell>
                                         </Table.Row>
                                         <Table.Row>
                                             <Table.Cell width="4">WETH<br />Wrapped Ether</Table.Cell>
                                             <Table.Cell textAlign="right">{this.state.balances.WETH == 'NIL' ? ( 
                                                 <div><Icon name="spinner" /> Fetching Balanace</div> 
                                             ): this.state.balances.WETH}</Table.Cell>
-                                            <Table.Cell textAlign="right">{this.state.allowance.WETH !== 0 ? <Icon name="unlock" /> : <Icon name="lock" />}</Table.Cell>
+                                            <Table.Cell textAlign="right">
+                                                {
+                                                    this.state.allowance.WETH !== 0 ? <Icon name="unlock" /> : 
+                                                    (
+                                                        <Button name="WETH" icon onClick={this.takeAllowance}><Icon name="lock" /></Button>
+                                                    )
+                                                }
+                                            </Table.Cell>
                                         </Table.Row>
                                     </Table.Body>
                                 </Table>
