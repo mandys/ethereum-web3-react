@@ -13,7 +13,6 @@ class OrderBook extends Component {
     DECIMALS = 18
     componentDidMount = async() => {
         let orders = {}
-
         orders = store.get("orders");
         if(orders && orders[`${this.props.from}:${this.props.to}`]) {
             console.log('filteredOrders',orders[`${this.props.from}:${this.props.to}`]);
@@ -34,9 +33,6 @@ class OrderBook extends Component {
                     })
             }) 
             console.log('filteredOrders',neworders);
-            // this.setState({
-            //     orders: neworders
-            // })
         } else {
             this.setState({
                 orders: []

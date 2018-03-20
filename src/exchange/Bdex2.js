@@ -29,7 +29,8 @@ class App extends Component {
         exchangeCoin: 'WETH',
         orderType: 'buy',
         current0xPrice: 0,
-        currentWETHPrice: 0
+        currentWETHPrice: 0,
+        orders: []
     }
     DECIMALS = 18
     getBalances = async() => {
@@ -209,10 +210,39 @@ class App extends Component {
             console.log(e)
         }
     }
+    showOrders = async() => {
+        let orders = {}
+        orders = store.get("orders");
+        if(orders && orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`]) {
+            console.log('filteredOrders',`${this.state.tradingCoin}:${this.state.exchangeCoin}`);
+            let neworders = []
+            orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`].map((order)=>{
+                this.props.zeroEx.exchange.getUnavailableTakerAmountAsync(order.hash)
+                    .then(response => {
+                        let bal = parseFloat(order.toToken) - (response/Math.pow(10, this.DECIMALS))
+                        console.log('orderstatus',bal);
+                        if(bal > 0){
+                            this.setState({
+                                orders: neworders.concat(order)
+                            })
+                        }
+                    }) .catch(err => {
+                        console.log('orderstatus',err)
+                        return false;
+                    })
+            }) 
+            console.log('filteredOrders',neworders);
+        } else {
+            this.setState({
+                orders: []
+            })
+        }
+    }
     componentDidMount = () => {
         this.getBalances();
         this.getAllowances();
         this.getMarketPrices('ZRX', 'WETH');
+        this.showOrders();
     }
     handleItemClick = (e, {name}) => {
         console.log(name)
@@ -345,16 +375,26 @@ class App extends Component {
                                             <Table.Cell textAlign="right">Price</Table.Cell>
                                             <Table.Cell textAlign="right">Sum In USD</Table.Cell>
                                         </Table.Row>
-                                        <Table.Row>
-                                            <Table.Cell width="4">0.0159799</Table.Cell>
-                                            <Table.Cell textAlign="right">625.7822278</Table.Cell>
-                                            <Table.Cell textAlign="right">$5473.05</Table.Cell>
-                                        </Table.Row>
-                                        <Table.Row>
-                                            <Table.Cell width="4">5.0000000</Table.Cell>
-                                            <Table.Cell textAlign="right">1.0000000</Table.Cell>
-                                            <Table.Cell textAlign="right">$2736.55</Table.Cell>
-                                        </Table.Row>
+                                        {
+                                            this.state.orders.map((order,i) => {
+                                                return (
+                                                    <Table.Row key={i}>
+                                                        <Table.Cell>{order.fromToken}</Table.Cell>
+                                                        <Table.Cell textAlign="right">{order.toToken}</Table.Cell>
+                                                        <Table.Cell textAlign="right">{order.toToken*this.state.currentWETHPrice}</Table.Cell>
+                                                        {/* <Table.Cell>
+                                                            <p>
+                                                                <Button onClick={() => this.fillOrder(order.signedOrder, order.toToken) }>Fill Order</Button>
+                                                            </p>
+                                                            <p>
+                                                                <Button onClick={() => this.cancelOrder(order.signedOrder, order.toToken) }>Cancel Order</Button>
+                                                            </p>
+                                                        </Table.Cell> */}
+                                                    </Table.Row>
+                                                )
+                                            })
+                                        }
+
                                     </Table.Body>
                                 </Table>
                             </Grid.Column>
