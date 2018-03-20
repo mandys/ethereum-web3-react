@@ -6,6 +6,7 @@ import { Container, Segment, Menu, Icon, Image, Grid, Table, Form, Button, Divid
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
 var store = require('store')
+var axios = require('axios');
 
 class App extends Component {
     tradingCoin = '';
@@ -27,6 +28,8 @@ class App extends Component {
         tradingCoin: 'ZRX',
         exchangeCoin: 'WETH',
         orderType: 'buy',
+        current0xPrice: 0,
+        currentWETHPrice: 0
     }
     DECIMALS = 18
     getBalances = async() => {
@@ -150,9 +153,49 @@ class App extends Component {
             })
         }
     }
+    getMarketPrices = (coin_1, coin_2) => {
+        console.log('getting market prices...');
+        /* check for only one price in store as other will automatically be there */
+        const current0xPrice = store.get('current0xPrice');
+        const currentWETHPrice = store.get('currentWETHPrice')
+        console.log('current0xPrice', current0xPrice);
+        console.log('currentWETHPrice', currentWETHPrice);
+        if ( current0xPrice ) {
+            this.setState({
+                current0xPrice: current0xPrice
+            })
+            this.setState({
+                currentWETHPrice: currentWETHPrice
+            })
+        } else {
+            axios.get('https://api.coinmarketcap.com/v1/ticker/0x/')
+            .then((response) => {
+                console.log(response.data[0]);
+                store.set('current0xPrice', response.data[0].price_usd)
+                this.setState({
+                    current0xPrice: response.data[0].price_usd
+                })
+            })
+            .catch((e) => {
+                console.log(e)
+            })
+        axios.get('https://api.coinmarketcap.com/v1/ticker/ethereum/')
+            .then((response) => {
+                console.log(response.data[0]);
+                store.set('currentWETHPrice', response.data[0].price_usd)
+                this.setState({
+                    currentWETHPrice: response.data[0].price_usd
+                })
+            })
+            .catch((e) => {
+                console.log(e)
+            })   
+        }
+    }
     componentDidMount = () => {
         this.getBalances();
         this.getAllowances();
+        this.getMarketPrices('ZRX', 'WETH');
     }
     handleItemClick = (e, {name}) => {
         console.log(name)
@@ -196,7 +239,16 @@ class App extends Component {
                                         <Table.Row>
                                             <Table.Cell width="2"><Image src="https://assets.paradex.io/icons/zrx.svg" size="mini" /></Table.Cell>
                                             <Table.Cell textAlign="left">ZRX / WETH</Table.Cell>
-                                            <Table.Cell textAlign="right">0.0085</Table.Cell>
+                                            <Table.Cell textAlign="right">
+                                            {this.state.currentWETHPrice === 0 ? 
+                                                ( 
+                                                    <Icon name="spinner" /> 
+                                                ) : 
+                                                (
+                                                    (this.state.current0xPrice / this.state.currentWETHPrice).toFixed(8)
+                                                )
+                                            }
+                                            </Table.Cell>
                                         </Table.Row>
                                     </Table.Body>
                                 </Table>
