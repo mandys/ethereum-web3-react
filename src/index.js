@@ -9,6 +9,7 @@ import Presale from './Presale';
 import WalletBalance from './exchange/components/WalletBalances';
 import BuySellToken from './exchange/components/BuySellToken';
 import Bdex from './exchange/Bdex';
+import Bdex2 from './exchange/Bdex2';
 import WelcomeIntro from './util/WelcomeIntro';
 
 const url = require("url");
@@ -22,7 +23,7 @@ let urlParams = getUrlVars();
 console.log(urlParams);
 
 switch (urlParams["pathname"]) {
-    case "/wallet":
+        case "/wallet":
         ReactDOM.render(
             <Wallet />, document.getElementById('root'));
         break;
@@ -49,12 +50,17 @@ switch (urlParams["pathname"]) {
         case "/WelcomeIntro":
             ReactDOM.render(
                 <WelcomeIntro />, document.getElementById('root'));
+        break;
         case "/Bdex":
         ReactDOM.render(
             <Bdex />, document.getElementById('root'));
         break;
-    case undefined:
-    default:
+        case "/Bdex2":
+        ReactDOM.render(
+            <Bdex2 />, document.getElementById('root'));
+        break;
+        case undefined:
+        default:
         ReactDOM.render(
             <App/>, document.getElementById('root'));
         break;
