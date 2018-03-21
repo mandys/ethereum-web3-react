@@ -122,7 +122,8 @@ class App extends Component {
                 hash: orderHash,
                 fromToken: this.tradingCoin,
                 toToken: this.exchangeCoin,
-                signedOrder: signedOrder
+                signedOrder: signedOrder,
+                orderType:this.state.orderType
             });
             store.set("orders", orders)
         } catch(e) {
@@ -222,8 +223,9 @@ class App extends Component {
                         let bal = parseFloat(order.toToken) - (response/Math.pow(10, this.DECIMALS))
                         console.log('orderstatus',bal);
                         if(bal > 0){
+                            neworders.push(order)
                             this.setState({
-                                orders: neworders.concat(order)
+                                orders: neworders
                             })
                         }
                     }) .catch(err => {
@@ -377,6 +379,7 @@ class App extends Component {
                                         </Table.Row>
                                         {
                                             this.state.orders.map((order,i) => {
+                                                let rowColor = (order.orderType === 'buy')?'positive':'negitive'
                                                 return (
                                                     <Table.Row key={i}>
                                                         <Table.Cell>{order.fromToken}</Table.Cell>
