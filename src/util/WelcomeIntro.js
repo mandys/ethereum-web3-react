@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Header, Container, Label, Table, Modal, Divider,Button, Icon } from 'semantic-ui-react'
+import { Header, Container, Label, Table, Divider,Button, Icon } from 'semantic-ui-react'
 var store = require('store')
 var expirePlugin = require('store/plugins/expire')
 store.addPlugin(expirePlugin)
@@ -8,25 +8,23 @@ class WelcomeIntro extends Component {
     state = { modalOpen: false }
 
     componentDidMount = () => {
-        const modalShown = store.get('modalShown')
-        console.log('modalShown',modalShown, new Date().getTime() + 24*60*60);
-        if(modalShown !== 1) {
-            this.setState({ modalOpen: true })
-        }
+        // const modalShown = store.get('modalShown')
+        // console.log('modalShown',modalShown, new Date().getTime() + 24*60*60);
+        // if(modalShown !== 1) {
+        //     this.setState({ modalOpen: true })
+        // }
     }
 
     handleClose = () => {
-        store.set('modalShown', 1)
-        this.setState({ modalOpen: false });
-        
+        // store.set('modalShown', 1)
+        // this.setState({ modalOpen: false });
     } 
     render() {
         return (
-            <Modal open={this.state.modalOpen} >
-            <Container text={true}>
+            <Container text={true} inverted style={{height:'100%'}}>
                 <Divider hidden/>
-                <Header size='large' textAlign='center'>Welcome to BDEX!</Header>
-                <Table inverted >
+                <Header size='large' textAlign='center' color='green'>Welcome to BDEX!</Header>
+                <Table  inverted>
                     <Table.Body>
                         <Table.Row>
                             <Table.Cell>
@@ -80,12 +78,11 @@ class WelcomeIntro extends Component {
                     </Table.Body>
                 </Table>        
             </Container>
-                <Modal.Actions>
-                    <Button color='green' onClick={this.handleClose} inverted>
-                        <Icon name='checkmark' /> Got it
-                    </Button>
-                </Modal.Actions>
-            </Modal>
+                
+            // <Button color='green' onClick={this.handleClose} inverted>
+            //     <Icon name='checkmark' /> Got it
+            // </Button>
+               
         );
     }
 }
