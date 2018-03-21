@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import Exchange from './Exchange'
 import WelcomeIntro from '../util/WelcomeIntro'
 //import 'semantic-ui-css/semantic.min.css';
-import { Container, Segment, Menu, Icon, Image, Grid, Table, Form, Button, Divider, Input, Tab } from 'semantic-ui-react'
+import { Container, Segment, Menu, Icon, Image, Grid, Table,  Button, Divider, Tab,Label } from 'semantic-ui-react'
+import {Form, Input } from 'formsy-semantic-ui-react';
+import Formsy from 'formsy-react';
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
 var store = require('store')
@@ -34,7 +36,8 @@ class App extends Component {
         orderType: 'buy',
         current0xPrice: 0,
         currentWETHPrice: 0,
-        orders: []
+        orders: [],
+        canSubmit: false
     }
     DECIMALS = 18
     getBalances = async() => {
@@ -256,6 +259,15 @@ class App extends Component {
             activeItem: name
         })
     }
+
+    disableButton = () => {
+        this.setState({ canSubmit: false });
+    }
+    
+    enableButton = () => {
+        this.setState({ canSubmit: true });
+    }
+
     render() {
         const { activeItem } = this.state
         const panes = [
@@ -305,7 +317,7 @@ class App extends Component {
                                     <Table.Body>
                                         <Table.Row>
                                             <Table.Cell>
-                                                <Form size="small" inverted>
+                                                <Formsy size="small" inverted onSubmit={this.createOrder} onValid={this.enableButton} onInvalid={this.disableButton}>
                                                     <span>Amount</span>
                                                     <Input
                                                         fluid
@@ -314,6 +326,8 @@ class App extends Component {
                                                         placeholder='0'
                                                         name='tradingCoin'
                                                         onChange={this.setCoins}
+                                                        validations="isNumeric,minLength:1"
+                                                        instantValidation required 
                                                     />
                                                     <Divider hidden />
                                                     <span>Price</span>
@@ -324,29 +338,27 @@ class App extends Component {
                                                         placeholder='0'
                                                         name='exchangeCoin'
                                                         onChange={this.setCoins}
+                                                        validations="isNumeric,minLength:1"
+                                                        instantValidation required
                                                     />
-                                                    <Divider hidden />
-                                                </Form>                                            
-                                            </Table.Cell>
-                                        </Table.Row>
-                                        <Table.Row>
-                                            <Table.Cell>
-                                                {
-                                                    this.state.orderType === 'buy' ? (
-                                                        <Button positive fluid type='submit' onClick={this.createOrder} size="medium">Place Buy Order</Button>
-                                                    ) : (
-                                                        <Button negative fluid type='submit' onClick={this.createOrder} size="medium">Place Sell Order</Button>
-                                                    )
-                                                }
-                                                
+                                                    <Divider />
+                                                    {
+                                                        this.state.orderType === 'buy' ? (
+                                                            <Button positive fluid type='submit' size="medium" disabled={!this.state.canSubmit}>Place Buy Order</Button>
+                                                        ) : (
+                                                            <Button negative fluid type='submit' size="medium" disabled={!this.state.canSubmit}>Place Sell Order</Button>
+                                                        )
+                                                    }
+                                                </Formsy>                                            
                                             </Table.Cell>
                                         </Table.Row>
                                     </Table.Body>
                                 </Table>                                
                             </Grid.Column>
                             <Grid.Column textAlign="center" verticalAlign="middle" width={8}>
-                                <iframe src="https://player.vimeo.com/video/258162625" width="640" height="330" frameborder="0"></iframe>
+                                iframe
                             </Grid.Column>
+
 
                             {/* ORDER BOOK */}
                             <Grid.Column width={4}>
@@ -364,11 +376,13 @@ class App extends Component {
                                         </Table.Row>
                                         {
                                             this.state.orders.map((order,i) => {
-                                                let rowColor = (order.orderType === 'buy')?'positive':'negitive'
+                                                let rowColor = (order.orderType === 'buy')?'green':'red'
                                                 return (
                                                     <Table.Row key={i}>
                                                         <Table.Cell>{order.fromToken}</Table.Cell>
-                                                        <Table.Cell textAlign="right">{order.toToken}</Table.Cell>
+                                                        <Table.Cell textAlign="right" >
+                                                            <Label color={rowColor}>{order.toToken}</Label>
+                                                        </Table.Cell>
                                                         <Table.Cell textAlign="right">{order.toToken*this.state.currentWETHPrice}</Table.Cell>
                                                         {/* <Table.Cell>
                                                             <p>
