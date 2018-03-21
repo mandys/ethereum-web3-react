@@ -9,6 +9,10 @@ var store = require('store')
 var axios = require('axios');
 
 class App extends Component {
+    constructor(props) {
+        super(props);
+        console.log(props);
+    }
     tradingCoin = '';
     exchangeCoin = ''
     state = { 
@@ -257,27 +261,8 @@ class App extends Component {
             { menuItem: 'Filled Orders', render: () => <Tab.Pane inverted padded="very" attached={false}>You have no filled orders for this market.</Tab.Pane> },
         ]
         return (
-            <Container fluid>
-                <Segment raised inverted>
+                <div>
                     <WelcomeIntro />
-                    <Menu borderless color='blue' inverted size='large'>
-                        <Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick}>
-                        <Image src='https://www.binkd.com/img/home/binkd_brand_name.png' size='small' />
-                        </Menu.Item>
-                        <Menu.Item name='Markets' active={activeItem === 'Markets'} onClick={this.handleItemClick} />
-                        <Menu.Item name='Welcome' active={activeItem === 'Welcome'} onClick={this.handleItemClick} />
-                        <Menu.Item name='Account' active={activeItem === 'Account'} onClick={this.handleItemClick} />
-                        <Menu.Item name='Support' active={activeItem === 'Support'} onClick={this.handleItemClick} />
-                        <Menu.Menu position='right'>
-                            <Menu.Item as='a'>
-                                Address:  <Icon name="user circle" />{this.props.ownerAddress}
-                            </Menu.Item>
-                            <Menu.Item>
-                                <Icon name="bell outline" size="large" />
-                            </Menu.Item>
-                        </Menu.Menu>
-                    </Menu>
-
                     <Grid celled='internally'>
                         <Grid.Row>
                             <Grid.Column width={4}>
@@ -485,10 +470,9 @@ class App extends Component {
                         </Grid.Row>
 
                     </Grid>
-                </Segment>
-            </Container>
+                </div>
         );
     }
 }
 
-export default Exchange(App);
+export default App;
