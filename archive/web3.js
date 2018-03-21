@@ -1,26 +1,35 @@
-import { default as Web3 } from 'web3';
-import Promise, { promisifyAll } from 'bluebird'
+import React, { Component } from 'react';
+import getWeb3 from './util/getWeb3';
 
-export const getWeb3Async = () => new Promise((resolve, reject) => {
-  // Wait for loading completion to avoid race conditions with web3 injection timing.
-  window.addEventListener('load', function () {
-    let web3 = window.web3
-
-    if (typeof web3 !== 'undefined') {
-      // Injected Web3 detected. Use Mist/MetaMask's provider.
-      web3 = new Web3(web3.currentProvider)
-      console.log('Metamask Loaded')
-    } else {
-      // No web3 instance injected, using Local web3.
-      const provider = new Web3.providers.HttpProvider('http://localhost:8545')
-      web3 = new Web3(provider)
+class Web3 extends Component {
+    constructor(props) {
+      super(props);
+      this.state = { web3: null };
     }
-    console.log('logging web3');
-    console.log(web3);
-    // wrap callback functions with promises
-    promisifyAll(web3.eth, {suffix: 'Async'})
-    promisifyAll(web3.net, {suffix: 'Async'})
-    promisifyAll(web3.version, {suffix: 'Async'})
-    resolve(web3)
-  })
-})
+    componentDidMount = async () => {
+        console.log('componentdid mount from Web3.js');
+        try {
+            const web3 = await getWeb3();
+            this.setState({
+                web3: web3
+            })
+        } catch(err) {
+            console.log(err);
+        }
+    }
+
+    render() {
+        console.log(this.state);
+        return (
+            <div>
+                {/*
+                    Instead of providing a static representation of what <Mouse> renders,
+                    use the `render` prop to dynamically determine what to render.
+                */}
+                {this.props.children(this.state)}
+            </div>
+        );
+    }
+  }
+
+export default Web3;
