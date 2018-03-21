@@ -276,7 +276,6 @@ class App extends Component {
         ]
         return (
                 <div>
-                    <WelcomeIntro />
                     <Grid celled='internally'>
                         <Grid.Row>
                             <Grid.Column width={4}>
