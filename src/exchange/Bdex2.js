@@ -383,7 +383,7 @@ class App extends Component {
                                                         <Table.Cell textAlign="right" >
                                                             <Label color={rowColor}>{order.toToken}</Label>
                                                         </Table.Cell>
-                                                        <Table.Cell textAlign="right">{order.toToken*this.state.currentWETHPrice}</Table.Cell>
+                                                        <Table.Cell textAlign="right">{(order.toToken*this.state.currentWETHPrice).toFixed(2)}</Table.Cell>
                                                         {/* <Table.Cell>
                                                             <p>
                                                                 <Button onClick={() => this.fillOrder(order.signedOrder, order.toToken) }>Fill Order</Button>
