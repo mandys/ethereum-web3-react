@@ -92,6 +92,35 @@ class BdexAction {
         return filledOrders;
     }
 
+    getBalances = async(ownerAddress, tokenContractAddresses) => {
+        console.log(tokenContractAddresses);
+        let balances = {}
+        for(var key in tokenContractAddresses) {
+            balances[key] = await this.getTokenBalance(ownerAddress, tokenContractAddresses[key])
+        }
+        console.log(balances);
+        return balances;
+    }
+
+    getTokenBalance = async(ownerAddress, tokenAddress) => {
+        let balance = await this.zeroEx.token.getBalanceAsync(tokenAddress, ownerAddress);
+        let tokenBalance = balance/Math.pow(10, this.DECIMALS)
+        return tokenBalance;
+    }
+
+    getAllowances = async(ownerAddress, tokenContractAddresses) => {
+        let allowance = {}
+        for(var key in tokenContractAddresses) {
+        console.log(allowance);
+            allowance[key] = await this.zeroEx.token.getProxyAllowanceAsync(
+                tokenContractAddresses[key], 
+                ownerAddress
+            )
+            allowance[key] = allowance[key]/Math.pow(10, this.DECIMALS)
+        }
+        return allowance
+    }
+
 }
 
 export default BdexAction;

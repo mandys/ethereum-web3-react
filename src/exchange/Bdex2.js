@@ -40,39 +40,7 @@ class App extends Component {
         canSubmit: false,
     }
     DECIMALS = 18
-    getBalances = async() => {
-        console.log(this.props.tokenContractAddresses);
-        let balances = {}
-        for(var key in this.props.tokenContractAddresses) {
-            balances[key] = await this.getTokenBalance(this.props.tokenContractAddresses[key])
-        }
-        console.log(balances);
-        this.setState({
-            balances:balances
-        })
-    }
-    getTokenBalance = async(tokenAddress) => {
-        let balance = await this.props.zeroEx.token.getBalanceAsync(tokenAddress, this.props.ownerAddress);
-        let tokenBalance = balance/Math.pow(10, this.DECIMALS)
-        return tokenBalance;
-    }
-    getAllowances = async() => {
-        console.log(this.props.tokenContractAddresses);
-        let allowance = {}
-        for(var key in this.props.tokenContractAddresses) {
-        console.log(allowance);
-            allowance[key] = await this.props.zeroEx.token.getProxyAllowanceAsync(
-                this.props.tokenContractAddresses[key], 
-                this.props.ownerAddress
-            )
-            allowance[key] = allowance[key]/Math.pow(10, this.DECIMALS)
-        }
-        console.log('alowance',allowance);
-        this.setState({
-            allowance:allowance
-        })
-        
-    }
+
     setCoins = (e, data) => {
         console.log(data);
         if ( data.name === 'tradingCoin' ) {
@@ -227,8 +195,12 @@ class App extends Component {
         await this.getMarketPrices('ZRX', 'WETH');
         this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
         if ( this.props.ownerAddress ) {
-            this.getBalances();
-            this.getAllowances();
+            let balances = await this.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
+            let allowance = await this.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
+            this.setState({
+                balances: balances,
+                allowance: allowance
+            })
         }
         this.showOrders();
     }

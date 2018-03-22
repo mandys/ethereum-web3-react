@@ -21,23 +21,31 @@ class Account extends Component {
         activeOders: [],
         filledOrders: [],
     }
+    DECIMALS = 18
     componentDidMount = async() => {
         this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
         let activeOders = await this.bdexUtil.getActiveOrders();
         this.setState({
             activeOders: activeOders
         })
+        
         let filledOders = await this.bdexUtil.getFilledOrders();
         this.setState({
             filledOders: filledOders
+        })
+        let balances = await this.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
+        let allowance = await this.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
+        this.setState({
+            balances: balances,
+            allowance: allowance
         })
     }
 
     
 
-    fillOrder = async(signedOrder, toAmount) => {
+    fillOrder = async(signedOrder, toAmountValue) => {
         console.log('signedOrder',signedOrder)
-        console.log('toAmount',toAmount)
+        console.log('toAmount',toAmountValue)
         try {
             const orderValidOrNot = ZeroEx.isValidOrderHash('0x16c70dcc13c40f679fa2cbd6dbfbb886ccac38334c756975fbc26c6fa264f434')
             console.log('orderValidOrNot', orderValidOrNot)
@@ -45,13 +53,13 @@ class Account extends Component {
             console.log(e)
         }
         const shouldThrowOnInsufficientBalanceOrAllowance = false;
-        const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(toAmount), this.DECIMALS);
+        const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(parseFloat(toAmountValue)), this.DECIMALS);
         // const signedOrder = this.convertPortalOrder(signedOrder);
         const txHash = await this.props.zeroEx.exchange.fillOrderAsync(
             this.convertPortalOrder(signedOrder),
             fillTakerTokenAmount,
             shouldThrowOnInsufficientBalanceOrAllowance,
-            '0xb1f13818094091343c127945e2B894CeB2d3fd27'.toLowerCase()
+            this.props.ownerAddress
         );
         console.log('txHash', txHash);
         // let transactions = {};
@@ -67,10 +75,10 @@ class Account extends Component {
         console.log('FillOrder transaction receipt: ', txReceipt);
     }
 
-    cancelOrder = async(signedOrder, toAmount) => {
+    cancelOrder = async(signedOrder, toAmountValue) => {
         console.log('signedOrder',signedOrder)
-        console.log('toAmount',toAmount)
-        const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(toAmount), this.DECIMALS);
+        console.log('toAmount',toAmountValue)
+        const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(toAmountValue), this.DECIMALS);
         // const signedOrder = this.convertPortalOrder(signedOrder);
         const txHash = await this.props.zeroEx.exchange.cancelOrderAsync(
             this.convertPortalOrder(signedOrder),
@@ -90,7 +98,7 @@ class Account extends Component {
         rawSignedOrder.salt = new BigNumber(rawSignedOrder.salt);
         return rawSignedOrder;
     }
-    DECIMALS = 18
+    
     render() {
         return (
             <div>
@@ -170,9 +178,9 @@ class Account extends Component {
                                                 <Table.Cell>{order.toTokenValue}</Table.Cell>
                                                 <Table.Cell>
                                                     <Button.Group>
-                                                        <Button onClick={() => this.fillOrder(order.signedOrder, order.toToken) } positive>Fill</Button>
+                                                        <Button onClick={() => this.fillOrder(order.signedOrder, order.toTokenValue) } positive>Fill</Button>
                                                         <Button.Or />
-                                                        <Button onClick={() => this.cancelOrder(order.signedOrder, order.toToken) } negative>Cancel</Button>
+                                                        <Button onClick={() => this.cancelOrder(order.signedOrder, order.toTokenValue) } negative>Cancel</Button>
                                                     </Button.Group>
                                                 </Table.Cell>
                                             </Table.Row>
