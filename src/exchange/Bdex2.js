@@ -299,26 +299,30 @@ class App extends Component {
                                                     <span>Amount</span>
                                                     <Input
                                                         fluid
-                                                        label={{ basic: true, content: 'ZRX' }}
                                                         labelPosition='right'
                                                         placeholder='0'
                                                         name='tradingCoin'
                                                         onChange={this.setCoins}
                                                         validations="isNumeric,minLength:1"
                                                         instantValidation required 
-                                                    />
+                                                    >
+                                                        <input />
+                                                        <Label>ZRX</Label>
+                                                    </Input>
                                                     <Divider hidden />
                                                     <span>Price</span>
                                                     <Input
                                                         fluid
-                                                        label={{ basic: true, content: 'WETH' }}
                                                         labelPosition='right'
                                                         placeholder='0'
                                                         name='exchangeCoin'
                                                         onChange={this.setCoins}
                                                         validations="isNumeric,minLength:1"
                                                         instantValidation required
-                                                    />
+                                                    >
+                                                        <input />
+                                                        <Label>WETH</Label>
+                                                    </Input>
                                                     <Divider />
                                                     {
                                                         this.state.orderType === 'buy' ? (
