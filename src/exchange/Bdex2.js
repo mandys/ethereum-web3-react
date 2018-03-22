@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Exchange from './Exchange'
-import WelcomeIntro from '../util/WelcomeIntro'
 //import 'semantic-ui-css/semantic.min.css';
 import { Container, Segment, Menu, Icon, Image, Grid, Table,  Button, Divider, Tab,Label } from 'semantic-ui-react'
 import {Form, Input } from 'formsy-semantic-ui-react';
@@ -132,6 +131,15 @@ class App extends Component {
                 signedOrder: signedOrder,
                 orderType:this.state.orderType
             });
+            axios.post('http://localhost:3001/orders/create',signedOrder, {
+                "Access-Control-Allow-Origin" : "*"
+           })
+            .then((orders) => {
+                console.log('savedOrder',orders)
+            })
+            .catch((e) => {
+                console.log(e)
+            })
             store.set("orders", orders)
         } catch(e) {
             console.log(e);
@@ -219,33 +227,42 @@ class App extends Component {
         }
     }
     showOrders = async() => {
-        let orders = {}
-        orders = store.get("orders");
-        if(orders && orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`]) {
-            console.log('filteredOrders',`${this.state.tradingCoin}:${this.state.exchangeCoin}`);
-            let neworders = []
-            orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`].map((order)=>{
-                this.props.zeroEx.exchange.getUnavailableTakerAmountAsync(order.hash)
-                    .then(response => {
-                        let bal = parseFloat(order.toToken) - (response/Math.pow(10, this.DECIMALS))
-                        console.log('orderstatus',bal);
-                        if(bal > 0){
-                            neworders.push(order)
-                            this.setState({
-                                orders: neworders
-                            })
-                        }
-                    }) .catch(err => {
-                        console.log('orderstatus',err)
-                        return false;
-                    })
-            }) 
-            console.log('filteredOrders',neworders);
-        } else {
-            this.setState({
-                orders: []
-            })
-        }
+       
+        // orders = store.get("orders");
+        axios.get('http://localhost:3001/orders')
+        .then((response) => {
+            let orders = response.data.results
+            console.log('orders',orders)
+            if(orders) {
+                console.log('filteredOrders',`${this.state.tradingCoin}:${this.state.exchangeCoin}`);
+                let neworders = []
+                orders.map((order)=>{
+                    this.props.zeroEx.exchange.getUnavailableTakerAmountAsync(order.hash)
+                        .then(response => {
+                            let bal = parseFloat(order.toToken) - (response/Math.pow(10, this.DECIMALS))
+                            console.log('orderstatus',bal);
+                            if(bal > 0){
+                                neworders.push(order)
+                                this.setState({
+                                    orders: neworders
+                                })
+                            }
+                        }) .catch(err => {
+                            console.log('orderstatus',err)
+                            return false;
+                        })
+                }) 
+                console.log('filteredOrders',neworders);
+            } else {
+                this.setState({
+                    orders: []
+                })
+            }
+        })
+        .catch((e) => {
+            console.log(e)
+        })
+        
     }
     componentDidMount = () => {
         this.getBalances();
@@ -276,7 +293,6 @@ class App extends Component {
         ]
         return (
                 <div>
-                    <WelcomeIntro />
                     <Grid celled='internally'>
                         <Grid.Row>
                             <Grid.Column width={4}>
@@ -383,7 +399,7 @@ class App extends Component {
                                                         <Table.Cell textAlign="right" >
                                                             <Label color={rowColor}>{order.toToken}</Label>
                                                         </Table.Cell>
-                                                        <Table.Cell textAlign="right">{(order.toToken*this.state.currentWETHPrice).toFixed(2)}</Table.Cell>
+                                                        <Table.Cell textAlign="right">{(order.toToken*this.state.currentWETHPrice).toFixed}</Table.Cell>
                                                         {/* <Table.Cell>
                                                             <p>
                                                                 <Button onClick={() => this.fillOrder(order.signedOrder, order.toToken) }>Fill Order</Button>

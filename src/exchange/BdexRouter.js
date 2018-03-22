@@ -50,7 +50,7 @@ class BdexRouter extends Component {
                             <Route path="/welcome" component={WelcomeIntro} />
                             <Route path="/account" component={Account} />
                             <Route path="/support" component={Support} />
-                            <Route component={App} />
+                            {/* <Route component={App} /> */}
                         </Switch>
                     </Segment>
                 </Container>
