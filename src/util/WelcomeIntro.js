@@ -21,7 +21,7 @@ class WelcomeIntro extends Component {
     } 
     render() {
         return (
-            <Container text={true} inverted style={{height:'100%'}}>
+            <Container text={true} style={{height:'100%'}}>
                 <Divider hidden/>
                 <Header size='large' textAlign='center' color='green'>Welcome to BDEX!</Header>
                 <Table  inverted>

@@ -295,7 +295,7 @@ class App extends Component {
                                     <Table.Body>
                                         <Table.Row>
                                             <Table.Cell>
-                                                <Formsy size="small" inverted onSubmit={this.createOrder} onValid={this.enableButton} onInvalid={this.disableButton}>
+                                                <Formsy size="small" onSubmit={this.createOrder} onValid={this.enableButton} onInvalid={this.disableButton}>
                                                     <span>Amount</span>
                                                     <Input
                                                         fluid
