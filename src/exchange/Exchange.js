@@ -16,13 +16,16 @@ const Exchange = (PassedComponent) => class extends Component {
          };
         this.NETWORK_ID = 42;
         this.providerEngine = new Web3ProviderEngine();
-        this.providerEngine.addProvider(new InjectedWeb3Subprovider(window.web3.currentProvider));
+        if ( typeof window.web3 !== 'undefined' ) {
+            this.providerEngine.addProvider(new InjectedWeb3Subprovider(window.web3.currentProvider));
+        }
         this.providerEngine.addProvider(new RpcSubprovider({
             rpcUrl: 'https://kovan.infura.io/SNWrFm1CMX7BfYqvkFXf',
         }))
           
         this.providerEngine.start();
         this.web3 = new Web3(this.providerEngine);
+        console.log(this.web3);
     }
     componentDidMount = async() => {
         const zeroEx = new ZeroEx(this.providerEngine, { networkId: this.NETWORK_ID });
@@ -35,7 +38,11 @@ const Exchange = (PassedComponent) => class extends Component {
         const addresses = await zeroEx.getAvailableAddressesAsync();
         // const tokens = await zeroEx.tokenRegistry.getTokensAsync();
         // console.log('tokens', tokens)
-        const address = addresses[0];
+        let address = addresses[0];
+        console.log('address', address)
+        if ( !address ) {
+            address = ''
+        }
         this.setState(() => {
             return {
                 zeroEx: zeroEx,
@@ -56,7 +63,7 @@ const Exchange = (PassedComponent) => class extends Component {
     render() {
 
         return (
-            this.state.ownerAddress ? <PassedComponent {...this.state} {...this.props} /> :
+            this.state.zeroEx ? <PassedComponent {...this.state} {...this.props} web3={this.web3} /> :
                 <Dimmer active>
                     <Loader size='massive'>Loading</Loader>
                 </Dimmer>
