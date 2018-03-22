@@ -265,8 +265,14 @@ class App extends Component {
         
     }
     componentDidMount = () => {
-        this.getBalances();
-        this.getAllowances();
+        /* From exchange, ownerAddress could come as null
+         * as Metamask might be locked and then ZeroEx cannot
+         * read the address
+         */
+        if ( this.props.ownerAddress ) {
+            this.getBalances();
+            this.getAllowances();
+        }
         this.getMarketPrices('ZRX', 'WETH');
         this.showOrders();
     }

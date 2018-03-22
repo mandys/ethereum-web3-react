@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
-import { Container, Segment, Menu, Icon, Image, Grid, Table, Form, Button, Divider, Input, Tab } from 'semantic-ui-react'
+import { Container, Segment, Menu, Icon, Image, Grid, Table, Form, Button, Divider, Input, Tab, Popup } from 'semantic-ui-react'
 import Exchange from './Exchange'
 import App from './Bdex2'
 import WelcomeIntro from '../util/WelcomeIntro'
@@ -36,7 +36,22 @@ class BdexRouter extends Component {
                             <Menu.Item as={Link} to='/support' name='Support' active={activeItem === 'Support'} onClick={this.handleItemClick} />
                             <Menu.Menu position='right'>
                                 <Menu.Item as='a'>
-                                    Address:  <Icon name="user circle" />{this.props.ownerAddress}
+                                    {
+                                        this.props.ownerAddress ? 
+                                        (
+                                            <span>Address: <Icon name="user circle" />{this.props.ownerAddress}</span>
+                                        ) 
+                                        : 
+                                        (
+                                            <Segment raised secondary>  
+                                                <Popup
+                                                    trigger={<span><Icon color="red" name="warning sign" />Connect a Wallet</span>}
+                                                    content="Please make sure you have Metamask installed and it's in unlocked state!"
+                                                />
+                                            </Segment>
+                                        )
+                                    }
+                                    
                                 </Menu.Item>
                                 <Menu.Item>
                                     <Icon name="bell outline" size="large" />
