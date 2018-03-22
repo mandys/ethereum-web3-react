@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
-import { Container, Segment, Menu, Icon, Image, Grid, Table, Form, Button, Divider, Input, Tab, Popup } from 'semantic-ui-react'
+import { Container, Segment, Menu, Icon, Image, Popup } from 'semantic-ui-react'
 import Exchange from './Exchange'
 import App from './Bdex2'
 import WelcomeIntro from '../util/WelcomeIntro'
@@ -63,7 +63,7 @@ class BdexRouter extends Component {
                         <Switch>
                             <Route exact path="/" render={props => <App {...this.props} />} />
                             <Route path="/welcome" component={WelcomeIntro} />
-                            <Route path="/account" component={Account} />
+                            <Route path="/account" render={props => <Account {...this.props} />}  />
                             <Route path="/support" component={Support} />
                             {/* <Route component={App} /> */}
                         </Switch>

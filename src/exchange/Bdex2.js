@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import Exchange from './Exchange'
 //import 'semantic-ui-css/semantic.min.css';
-import { Container, Segment, Menu, Icon, Image, Grid, Table,  Button, Divider, Tab,Label } from 'semantic-ui-react'
-import {Form, Input } from 'formsy-semantic-ui-react';
+import { Segment, Icon, Image, Grid, Table,  Button, Divider, Tab,Label } from 'semantic-ui-react'
+import {Input } from 'formsy-semantic-ui-react';
 import Formsy from 'formsy-react';
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
+import BdexUtil from '../util/bdex-utils'
 var store = require('store')
 var axios = require('axios');
 
@@ -15,7 +15,8 @@ class App extends Component {
         console.log(props);
     }
     tradingCoin = '';
-    exchangeCoin = ''
+    exchangeCoin = '';
+    bdexUtil = null;
     state = { 
         activeItem: 'Welcome',
         balances: {
@@ -36,7 +37,7 @@ class App extends Component {
         current0xPrice: 0,
         currentWETHPrice: 0,
         orders: [],
-        canSubmit: false
+        canSubmit: false,
     }
     DECIMALS = 18
     getBalances = async() => {
@@ -116,31 +117,17 @@ class App extends Component {
                 ...order,
                 ecSignature,
             };
-            let orders = {};
-            if(store.get("orders")) {
-                orders = store.get("orders");
-            }
-
-            if(typeof orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`] === 'undefined') {
-                orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`] = [];
-            }
-            orders[`${this.state.tradingCoin}:${this.state.exchangeCoin}`].push({
-                hash: orderHash,
-                fromToken: this.tradingCoin,
-                toToken: this.exchangeCoin,
-                signedOrder: signedOrder,
-                orderType:this.state.orderType
+            
+            await this.bdexUtil.saveOrder({
+                "hash": orderHash,
+                "fromToken": this.state.tradingCoin,
+                "fromTokenValue": this.tradingCoin,
+                "toToken": this.state.exchangeCoin,
+                "toTokenValue": this.exchangeCoin,
+                "signedOrder": signedOrder,
+                "orderType": this.state.orderType
             });
-            axios.post('http://localhost:3001/orders/create',signedOrder, {
-                "Access-Control-Allow-Origin" : "*"
-           })
-            .then((orders) => {
-                console.log('savedOrder',orders)
-            })
-            .catch((e) => {
-                console.log(e)
-            })
-            store.set("orders", orders)
+            ///save orders will come here
         } catch(e) {
             console.log(e);
         }
@@ -170,7 +157,7 @@ class App extends Component {
             })
         }
     }
-    getMarketPrices = (coin_1, coin_2) => {
+    getMarketPrices = async(coin_1, coin_2) => {
         console.log('getting market prices...');
         /* check for only one price in store as other will automatically be there */
         const current0xPrice = store.get('current0xPrice');
@@ -227,53 +214,22 @@ class App extends Component {
         }
     }
     showOrders = async() => {
-       
-        // orders = store.get("orders");
-        axios.get('http://localhost:3001/orders')
-        .then((response) => {
-            let orders = response.data.results
-            console.log('orders',orders)
-            if(orders) {
-                console.log('filteredOrders',`${this.state.tradingCoin}:${this.state.exchangeCoin}`);
-                let neworders = []
-                orders.map((order)=>{
-                    this.props.zeroEx.exchange.getUnavailableTakerAmountAsync(order.hash)
-                        .then(response => {
-                            let bal = parseFloat(order.toToken) - (response/Math.pow(10, this.DECIMALS))
-                            console.log('orderstatus',bal);
-                            if(bal > 0){
-                                neworders.push(order)
-                                this.setState({
-                                    orders: neworders
-                                })
-                            }
-                        }) .catch(err => {
-                            console.log('orderstatus',err)
-                            return false;
-                        })
-                }) 
-                console.log('filteredOrders',neworders);
-            } else {
-                this.setState({
-                    orders: []
-                })
-            }
-        })
-        .catch((e) => {
-            console.log(e)
-        })
-        
+        let orders = await this.bdexUtil.getAllOrders();
+        this.setState({
+            orders: orders
+        })  
     }
-    componentDidMount = () => {
+    componentDidMount = async() => {
         /* From exchange, ownerAddress could come as null
          * as Metamask might be locked and then ZeroEx cannot
          * read the address
          */
+        await this.getMarketPrices('ZRX', 'WETH');
+        this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
         if ( this.props.ownerAddress ) {
             this.getBalances();
             this.getAllowances();
         }
-        this.getMarketPrices('ZRX', 'WETH');
         this.showOrders();
     }
     handleItemClick = (e, {name}) => {
@@ -392,28 +348,20 @@ class App extends Component {
                                     </Table.Header>
                                     <Table.Body>
                                         <Table.Row>
-                                            <Table.Cell width="4">Amount ZRX</Table.Cell>
-                                            <Table.Cell textAlign="right">Price</Table.Cell>
-                                            <Table.Cell textAlign="right">Sum In USD</Table.Cell>
+                                            <Table.Cell width="4">AMOUNT</Table.Cell>
+                                            <Table.Cell textAlign="right">PRICE</Table.Cell>
+                                            <Table.Cell textAlign="right">SUM IN USD</Table.Cell>
                                         </Table.Row>
                                         {
                                             this.state.orders.map((order,i) => {
                                                 let rowColor = (order.orderType === 'buy')?'green':'red'
                                                 return (
                                                     <Table.Row key={i}>
-                                                        <Table.Cell>{order.fromToken}</Table.Cell>
-                                                        <Table.Cell textAlign="right" >
-                                                            <Label color={rowColor}>{order.toToken}</Label>
+                                                        <Table.Cell>{order.fromTokenValue}</Table.Cell>
+                                                        <Table.Cell textAlign="right">
+                                                            <Label color={rowColor}>{order.toTokenValue}</Label>
                                                         </Table.Cell>
-                                                        <Table.Cell textAlign="right">{(order.toToken*this.state.currentWETHPrice).toFixed}</Table.Cell>
-                                                        {/* <Table.Cell>
-                                                            <p>
-                                                                <Button onClick={() => this.fillOrder(order.signedOrder, order.toToken) }>Fill Order</Button>
-                                                            </p>
-                                                            <p>
-                                                                <Button onClick={() => this.cancelOrder(order.signedOrder, order.toToken) }>Cancel Order</Button>
-                                                            </p>
-                                                        </Table.Cell> */}
+                                                        <Table.Cell textAlign="right">{(5*1).toFixed}</Table.Cell>
                                                     </Table.Row>
                                                 )
                                             })
@@ -449,7 +397,6 @@ class App extends Component {
                                                     this.state.allowance.ZRX !== 0 ? <Icon name="unlock" /> : 
                                                     (
                                                         <Button name="ZRX" icon onClick={this.takeAllowance}><Icon name="lock" /></Button>
-                                                        
                                                     )
                                                 }
                                             </Table.Cell>
