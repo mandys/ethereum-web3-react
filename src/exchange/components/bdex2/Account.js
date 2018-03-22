@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { Header, Grid, Icon, Button, Table, Segment } from 'semantic-ui-react'
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
-
+import BdexUtil from '../../../util/bdex-utils'
 class Account extends Component {
+    bdexUtil = null;
     state = { 
         from:"ZRX",
         to:"WETH",
@@ -18,14 +19,15 @@ class Account extends Component {
             'BINK': 0
         },
         activeOders: [],
-        filledOrders: []
+        filledOrders: [],
     }
     componentDidMount = async() => {
+        this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
         let activeOders = await this.bdexUtil.getActiveOrders();
         this.setState({
             activeOders: activeOders
         })
-        let filledOders = await this.bdexUtil.getFilledeOrders();
+        let filledOders = await this.bdexUtil.getFilledOrders();
         this.setState({
             filledOders: filledOders
         })
