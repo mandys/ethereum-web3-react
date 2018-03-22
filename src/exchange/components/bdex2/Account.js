@@ -177,11 +177,7 @@ class Account extends Component {
                                                 <Table.Cell>{order.toTokenValue}</Table.Cell>
                                                 <Table.Cell>{order.toTokenValue}</Table.Cell>
                                                 <Table.Cell>
-                                                    <Button.Group>
-                                                        <Button onClick={() => this.fillOrder(order.signedOrder, order.toTokenValue) } positive>Fill</Button>
-                                                        <Button.Or />
-                                                        <Button onClick={() => this.cancelOrder(order.signedOrder, order.toTokenValue) } negative>Cancel</Button>
-                                                    </Button.Group>
+                                                    <Button onClick={() => this.cancelOrder(order.signedOrder, order.toTokenValue) } negative>Cancel</Button> 
                                                 </Table.Cell>
                                             </Table.Row>
                                         )
