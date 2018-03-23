@@ -11,7 +11,7 @@ class BdexRouter extends Component {
     constructor(props) {
         super(props);
         this.state = { 
-            activeItem: 'Markets'
+            activeItem: '/'
          };
     }
     handleItemClick = (e, data) => {
@@ -39,7 +39,7 @@ class BdexRouter extends Component {
                                     </Dropdown.Menu>
                                 </Dropdown>
                             </Menu.Item>
-                            <Menu.Item as={Link} to='/welcome' name='Welcome' active={activeItem === 'Welcome'} onClick={this.handleItemClick} />
+                            <Menu.Item as={Link} to='/' name='Welcome' active={activeItem === 'Welcome' || activeItem === '/'} onClick={this.handleItemClick} />
                             <Menu.Item as={Link} to='/account' name='Account' active={activeItem === 'Account'} onClick={this.handleItemClick} />
                             <Menu.Item as={Link} to='/support' name='Support' active={activeItem === 'Support'} onClick={this.handleItemClick} />
                             <Menu.Menu position='right'>
