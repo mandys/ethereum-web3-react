@@ -132,6 +132,17 @@ class BdexAction {
         return rawSignedOrder;
     }
 
+    getMarketPrice = async(coin) => {
+        let coinMappings = {
+            'WETH': 'ethereum',
+            'ZRX': '0x'
+        }
+        console.log('getting market prices');
+        let response = await axios.get(`https://api.coinmarketcap.com/v1/ticker/${coinMappings[coin]}/`)
+        console.log(coin,' price is ',response.data[0]);
+        return response.data[0].price_usd;
+    }
+
 
 }
 

@@ -18,6 +18,7 @@ class Account extends Component {
             'ZRX': 0,
             'BINK': 0
         },
+        wethPrice:0,
         activeOders: [],
         filledOrders: [],
     }
@@ -35,9 +36,11 @@ class Account extends Component {
         })
         let balances = await this.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
         let allowance = await this.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
+        let wethPrice = await this.bdexUtil.getMarketPrice('WETH');
         this.setState({
             balances: balances,
-            allowance: allowance
+            allowance: allowance,
+            wethPrice: wethPrice
         })
     }
 
@@ -153,8 +156,7 @@ class Account extends Component {
                                                 <Table.Row key={i}>
                                                     <Table.Cell>{order.fromToken}</Table.Cell>
                                                     <Table.Cell>{order.toToken}</Table.Cell>
-                                                    <Table.Cell>{order.hash}</Table.Cell>
-                                                    
+                                                    <Table.Cell>{order.hash*this.state.wethPrice}</Table.Cell>
                                                 </Table.Row>
                                             )
                                         })

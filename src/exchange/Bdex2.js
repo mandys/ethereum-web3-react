@@ -29,13 +29,14 @@ class App extends Component {
             'ZRX': 0,
             'BINK': 0
         },
+        prices: {
+            'WETH': 0
+        },
         positive: true,
         negative: false,
         tradingCoin: 'ZRX',
         exchangeCoin: 'WETH',
         orderType: 'buy',
-        current0xPrice: 0,
-        currentWETHPrice: 0,
         orders: [],
         canSubmit: false,
     }
@@ -125,45 +126,7 @@ class App extends Component {
             })
         }
     }
-    getMarketPrices = async(coin_1, coin_2) => {
-        console.log('getting market prices...');
-        /* check for only one price in store as other will automatically be there */
-        const current0xPrice = store.get('current0xPrice');
-        const currentWETHPrice = store.get('currentWETHPrice')
-        console.log('current0xPrice', current0xPrice);
-        console.log('currentWETHPrice', currentWETHPrice);
-        if ( current0xPrice ) {
-            this.setState({
-                current0xPrice: current0xPrice
-            })
-            this.setState({
-                currentWETHPrice: currentWETHPrice
-            })
-        } else {
-            axios.get('https://api.coinmarketcap.com/v1/ticker/0x/')
-            .then((response) => {
-                console.log(response.data[0]);
-                store.set('current0xPrice', response.data[0].price_usd)
-                this.setState({
-                    current0xPrice: response.data[0].price_usd
-                })
-            })
-            .catch((e) => {
-                console.log(e)
-            })
-        axios.get('https://api.coinmarketcap.com/v1/ticker/ethereum/')
-            .then((response) => {
-                console.log(response.data[0]);
-                store.set('currentWETHPrice', response.data[0].price_usd)
-                this.setState({
-                    currentWETHPrice: response.data[0].price_usd
-                })
-            })
-            .catch((e) => {
-                console.log(e)
-            })   
-        }
-    }
+    
     takeAllowance = async(e, data) => {
         let token = data.name
         console.log('inside getAllowanceFromMaker');
@@ -196,8 +159,14 @@ class App extends Component {
              * as Metamask might be locked and then ZeroEx cannot
              * read the address
              */
-            await this.getMarketPrices('ZRX', 'WETH');
             this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
+            let prices = this.state.prices;
+            prices['ZRX'] = await this.bdexUtil.getMarketPrice('ZRX');
+            prices['WETH'] = await this.bdexUtil.getMarketPrice('WETH');
+            console.log("prices",prices)
+            this.setState({
+                prices: prices,
+            })
             if ( this.props.ownerAddress ) {
                 let balances = await this.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
                 let allowance = await this.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
@@ -273,12 +242,12 @@ class App extends Component {
                                             <Table.Cell width="2"><Image src="https://assets.paradex.io/icons/zrx.svg" size="mini" /></Table.Cell>
                                             <Table.Cell textAlign="left">ZRX / WETH</Table.Cell>
                                             <Table.Cell textAlign="right">
-                                            {this.state.currentWETHPrice === 0 ? 
+                                            {this.state.prices['WETH'] === 0 ? 
                                                 ( 
                                                     <Icon name="spinner" /> 
                                                 ) : 
                                                 (
-                                                    (this.state.current0xPrice / this.state.currentWETHPrice).toFixed(8)
+                                                    (this.state.prices['ZRX'] / this.state.prices['WETH']).toFixed(8)
                                                 )
                                             }
                                             </Table.Cell>
@@ -374,7 +343,7 @@ class App extends Component {
                                                         <Table.Cell textAlign="right">
                                                             <Label color={rowColor}>{order.toTokenValue}</Label>
                                                         </Table.Cell>
-                                                        <Table.Cell textAlign="right">{(order.toTokenValue*this.state.currentWETHPrice).toFixed(2)}</Table.Cell>
+                                                        <Table.Cell textAlign="right">{(order.toTokenValue*this.state.prices['WETH']).toFixed(2)}</Table.Cell>
                                                         <Table.Cell textAlign="right">
                                                             <Button onClick={() => this.fillOrder(order.signedOrder, order.toTokenValue) } positive>Fill</Button>
                                                         </Table.Cell>
