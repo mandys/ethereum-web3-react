@@ -232,7 +232,7 @@ class App extends Component {
         const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(parseFloat(toAmountValue)), this.DECIMALS);
         // const signedOrder = this.convertPortalOrder(signedOrder);
         const txHash = await this.props.zeroEx.exchange.fillOrderAsync(
-            this.convertPortalOrder(signedOrder),
+            this.bdexUtil.convertPortalOrder(signedOrder),
             fillTakerTokenAmount,
             shouldThrowOnInsufficientBalanceOrAllowance,
             this.props.ownerAddress
@@ -249,17 +249,6 @@ class App extends Component {
         console.log('txHash', txHash);
         const txReceipt = await this.props.zeroEx.awaitTransactionMinedAsync(txHash);
         console.log('FillOrder transaction receipt: ', txReceipt);
-    }
-
-    convertPortalOrder = (signedOrder) => {
-        const rawSignedOrder = signedOrder;
-        rawSignedOrder.makerFee = new BigNumber(rawSignedOrder.makerFee);
-        rawSignedOrder.takerFee = new BigNumber(rawSignedOrder.takerFee);
-        rawSignedOrder.makerTokenAmount = new BigNumber(rawSignedOrder.makerTokenAmount);
-        rawSignedOrder.takerTokenAmount = new BigNumber(rawSignedOrder.takerTokenAmount);
-        rawSignedOrder.expirationUnixTimestampSec = new BigNumber(rawSignedOrder.expirationUnixTimestampSec);
-        rawSignedOrder.salt = new BigNumber(rawSignedOrder.salt);
-        return rawSignedOrder;
     }
 
     render() {

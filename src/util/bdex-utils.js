@@ -121,6 +121,18 @@ class BdexAction {
         return allowance
     }
 
+    convertPortalOrder = (signedOrder) => {
+        const rawSignedOrder = signedOrder;
+        rawSignedOrder.makerFee = new BigNumber(rawSignedOrder.makerFee);
+        rawSignedOrder.takerFee = new BigNumber(rawSignedOrder.takerFee);
+        rawSignedOrder.makerTokenAmount = new BigNumber(rawSignedOrder.makerTokenAmount);
+        rawSignedOrder.takerTokenAmount = new BigNumber(rawSignedOrder.takerTokenAmount);
+        rawSignedOrder.expirationUnixTimestampSec = new BigNumber(rawSignedOrder.expirationUnixTimestampSec);
+        rawSignedOrder.salt = new BigNumber(rawSignedOrder.salt);
+        return rawSignedOrder;
+    }
+
+
 }
 
 export default BdexAction;

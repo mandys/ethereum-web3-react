@@ -41,62 +41,17 @@ class Account extends Component {
         })
     }
 
-    
-
-    fillOrder = async(signedOrder, toAmountValue) => {
-        console.log('signedOrder',signedOrder)
-        console.log('toAmount',toAmountValue)
-        try {
-            const orderValidOrNot = ZeroEx.isValidOrderHash('0x16c70dcc13c40f679fa2cbd6dbfbb886ccac38334c756975fbc26c6fa264f434')
-            console.log('orderValidOrNot', orderValidOrNot)
-        } catch(e) {
-            console.log(e)
-        }
-        const shouldThrowOnInsufficientBalanceOrAllowance = false;
-        const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(parseFloat(toAmountValue)), this.DECIMALS);
-        // const signedOrder = this.convertPortalOrder(signedOrder);
-        const txHash = await this.props.zeroEx.exchange.fillOrderAsync(
-            this.convertPortalOrder(signedOrder),
-            fillTakerTokenAmount,
-            shouldThrowOnInsufficientBalanceOrAllowance,
-            this.props.ownerAddress
-        );
-        console.log('txHash', txHash);
-        // let transactions = {};
-        // if(store.get("transactions")) {
-        //     transactions = store.get("orders");
-        // }
-        // if(!transactions) {
-        //     transactions = {}
-        // }
-        // transactions.push(txHash);
-        console.log('txHash', txHash);
-        const txReceipt = await this.props.zeroEx.awaitTransactionMinedAsync(txHash);
-        console.log('FillOrder transaction receipt: ', txReceipt);
-    }
-
     cancelOrder = async(signedOrder, toAmountValue) => {
         console.log('signedOrder',signedOrder)
         console.log('toAmount',toAmountValue)
         const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(toAmountValue), this.DECIMALS);
         // const signedOrder = this.convertPortalOrder(signedOrder);
         const txHash = await this.props.zeroEx.exchange.cancelOrderAsync(
-            this.convertPortalOrder(signedOrder),
+            this.bdexUtil.convertPortalOrder(signedOrder),
             fillTakerTokenAmount
         );
         console.log('txHash', txHash);
         console.log('txHash', txHash);
-    }
-
-    convertPortalOrder = (signedOrder) => {
-        const rawSignedOrder = signedOrder;
-        rawSignedOrder.makerFee = new BigNumber(rawSignedOrder.makerFee);
-        rawSignedOrder.takerFee = new BigNumber(rawSignedOrder.takerFee);
-        rawSignedOrder.makerTokenAmount = new BigNumber(rawSignedOrder.makerTokenAmount);
-        rawSignedOrder.takerTokenAmount = new BigNumber(rawSignedOrder.takerTokenAmount);
-        rawSignedOrder.expirationUnixTimestampSec = new BigNumber(rawSignedOrder.expirationUnixTimestampSec);
-        rawSignedOrder.salt = new BigNumber(rawSignedOrder.salt);
-        return rawSignedOrder;
     }
     
     render() {
