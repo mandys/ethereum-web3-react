@@ -18,7 +18,9 @@ class Account extends Component {
             'ZRX': 0,
             'BINK': 0
         },
-        wethPrice:0,
+        prices:{
+            "WETH":0
+        },
         activeOders: [],
         filledOrders: [],
     }
@@ -36,11 +38,11 @@ class Account extends Component {
         })
         let balances = await this.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
         let allowance = await this.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
-        let wethPrice = await this.bdexUtil.getMarketPrice('WETH');
+        let prices = await this.bdexUtil.getMarketPrices();
         this.setState({
             balances: balances,
             allowance: allowance,
-            wethPrice: wethPrice
+            prices: prices
         })
     }
 
@@ -133,7 +135,7 @@ class Account extends Component {
                                             <Table.Row key={i}>
                                                 <Table.Cell>{order.fromTokenValue}</Table.Cell>
                                                 <Table.Cell>{order.toTokenValue}</Table.Cell>
-                                                <Table.Cell>{order.toTokenValue}</Table.Cell>
+                                                <Table.Cell>{order.toTokenValue*this.state.price['WETH']}</Table.Cell>
                                                 <Table.Cell>
                                                     <Button onClick={() => this.cancelOrder(order.signedOrder, order.toTokenValue) } negative>Cancel</Button> 
                                                 </Table.Cell>

@@ -1,6 +1,7 @@
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
 var store = require('store')
+var expirePlugin = require('store/plugins/expire')
 var axios = require('axios');
 
 class BdexAction {
@@ -132,16 +133,23 @@ class BdexAction {
         return rawSignedOrder;
     }
 
-    getMarketPrice = async(coin) => {
-        let coinMappings = {
-            'WETH': 'ethereum',
-            'ZRX': '0x'
-        }
+    getMarketPrices = async(coin) => {
         console.log('getting market prices');
-        let response = await axios.get(`https://api.coinmarketcap.com/v1/ticker/${coinMappings[coin]}/`)
-        console.log(coin,' price is ',response.data[0]);
-        return response.data[0].price_usd;
+        if(store.get('prices')) {
+            return store.get('prices');
+        } else{
+            let response = await axios.get('https://api.coinmarketcap.com/v1/ticker/?limit=0')
+            console.log(coin,' price is ',response);
+            let prices = {};
+            response.data.forEach((coin) => {
+                prices[coin.symbol] = coin.price_usd
+            })
+            store.set('prices', prices, new Date().getTime() + 60*60)
+            return prices;
+        }
     }
+
+    
 
 
 }

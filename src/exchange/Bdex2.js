@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 //import 'semantic-ui-css/semantic.min.css';
 import { Segment, Icon, Image, Grid, Table,  Button, Divider, Tab,Label } from 'semantic-ui-react'
-import {Input } from 'formsy-semantic-ui-react';
-import Formsy from 'formsy-react';
+import {Input,Form } from 'formsy-semantic-ui-react';
+import {addValidationRule} from 'formsy-react';
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
 import BdexUtil from '../util/bdex-utils'
@@ -13,6 +13,7 @@ class App extends Component {
     constructor(props) {
         super(props);
         console.log(props);
+       
     }
     tradingCoin = '';
     exchangeCoin = '';
@@ -39,6 +40,7 @@ class App extends Component {
         orderType: 'buy',
         orders: [],
         canSubmit: false,
+        lastTradedPrice:0
     }
     DECIMALS = 18
 
@@ -51,6 +53,7 @@ class App extends Component {
         }
     }
     createOrder = async (e, data) => {
+        alert(this.state.balances['WETH']);
         let order = {
             maker: this.props.ownerAddress,
             taker: ZeroEx.NULL_ADDRESS,
@@ -160,13 +163,15 @@ class App extends Component {
              * read the address
              */
             this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
-            let prices = this.state.prices;
-            prices['ZRX'] = await this.bdexUtil.getMarketPrice('ZRX');
-            prices['WETH'] = await this.bdexUtil.getMarketPrice('WETH');
+            let prices = await this.bdexUtil.getMarketPrices();
             console.log("prices",prices)
             this.setState({
                 prices: prices,
+                lastTradedPrice:(prices['ZRX'] / prices['WETH']).toFixed(8)
+            }, () => {
+                this.exchangeCoin = this.state.lastTradedPrice
             })
+
             if ( this.props.ownerAddress ) {
                 let balances = await this.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
                 let allowance = await this.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
@@ -176,7 +181,9 @@ class App extends Component {
                 })
             }
             this.showOrders();
+            
         }
+        
     }
     handleItemClick = (e, {name}) => {
         console.log(name)
@@ -226,11 +233,16 @@ class App extends Component {
     }
 
     render() {
+        addValidationRule('isInsufficientBalance', function (values, value, others) {
+            console.log('in validation');
+            return value*others[0] <= others[1];
+        })
         const { activeItem } = this.state
         const panes = [
             { menuItem: 'Open Orders', render: () => <Tab.Pane inverted padded="very" attached={false}>You have no open orders for this market.</Tab.Pane> },
             { menuItem: 'Filled Orders', render: () => <Tab.Pane inverted padded="very" attached={false}>You have no filled orders for this market.</Tab.Pane> },
         ]
+        const errorLabel = <Label color="red" pointing/>
         return (
                 <div>
                     <Grid celled='internally'>
@@ -247,7 +259,7 @@ class App extends Component {
                                                     <Icon name="spinner" /> 
                                                 ) : 
                                                 (
-                                                    (this.state.prices['ZRX'] / this.state.prices['WETH']).toFixed(8)
+                                                    this.state.lastTradedPrice
                                                 )
                                             }
                                             </Table.Cell>
@@ -273,7 +285,8 @@ class App extends Component {
                                     <Table.Body>
                                         <Table.Row>
                                             <Table.Cell>
-                                                <Formsy size="small" onSubmit={this.createOrder} onValid={this.enableButton} onInvalid={this.disableButton}>
+                                                <Form size="small" onSubmit={this.createOrder} onValid={this.enableButton} onInvalid={this.disableButton}>
+                                                    
                                                     <span>Amount</span>
                                                     <Input
                                                         fluid
@@ -281,9 +294,11 @@ class App extends Component {
                                                         placeholder='0'
                                                         name='tradingCoin'
                                                         onChange={this.setCoins}
-                                                        validations="isNumeric,minLength:1"
+                                                        validations={`isNumeric,minLength:1,isInsufficientBalance:[${this.state.lastTradedPrice},${this.state.balances['WETH']}]`}
                                                         instantValidation required 
-                                                    >
+                                                        validationErrors={{ isNumeric: 'Numeric...', minLength: 'Required 1', isInsufficientBalance: 'Insufficient Balance' }}
+                                                         errorLabel = {errorLabel}
+                                                    >                                                    
                                                         <input />
                                                         <Label>ZRX</Label>
                                                     </Input>
@@ -297,6 +312,7 @@ class App extends Component {
                                                         onChange={this.setCoins}
                                                         validations="isNumeric,minLength:1"
                                                         instantValidation required
+                                                        value={this.state.lastTradedPrice}
                                                     >
                                                         <input />
                                                         <Label>WETH</Label>
@@ -309,7 +325,7 @@ class App extends Component {
                                                             <Button negative fluid type='submit' size="medium" disabled={!this.state.canSubmit}>Place Sell Order</Button>
                                                         )
                                                     }
-                                                </Formsy>                                            
+                                                </Form>                                            
                                             </Table.Cell>
                                         </Table.Row>
                                     </Table.Body>
