@@ -29,7 +29,6 @@ class BdexRouter extends Component {
                             <Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick}>
                                 <Image src='https://www.binkd.com/img/home/binkd_brand_name.png' size='small' />
                             </Menu.Item>
-                            <Menu.Item as={Link} to='/welcome' name='Welcome' active={activeItem === 'Welcome'} onClick={this.handleItemClick} />
                             <Menu.Item active={activeItem === 'Markets'} >
                                 <Dropdown item text="Markets" floating button>
                                     <Dropdown.Menu>
@@ -40,6 +39,7 @@ class BdexRouter extends Component {
                                     </Dropdown.Menu>
                                 </Dropdown>
                             </Menu.Item>
+                            <Menu.Item as={Link} to='/welcome' name='Welcome' active={activeItem === 'Welcome'} onClick={this.handleItemClick} />
                             <Menu.Item as={Link} to='/account' name='Account' active={activeItem === 'Account'} onClick={this.handleItemClick} />
                             <Menu.Item as={Link} to='/support' name='Support' active={activeItem === 'Support'} onClick={this.handleItemClick} />
                             <Menu.Menu position='right'>
