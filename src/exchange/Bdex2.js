@@ -188,21 +188,26 @@ class App extends Component {
         })  
     }
     componentDidMount = async() => {
-        /* From exchange, ownerAddress could come as null
-         * as Metamask might be locked and then ZeroEx cannot
-         * read the address
-         */
-        await this.getMarketPrices('ZRX', 'WETH');
-        this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
-        if ( this.props.ownerAddress ) {
-            let balances = await this.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
-            let allowance = await this.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
-            this.setState({
-                balances: balances,
-                allowance: allowance
-            })
+        console.log('props', this.props)
+        if ( this.props.location.pathname === '/' ) {
+            this.props.history.push('/welcome')
+        } else {
+            /* From exchange, ownerAddress could come as null
+             * as Metamask might be locked and then ZeroEx cannot
+             * read the address
+             */
+            await this.getMarketPrices('ZRX', 'WETH');
+            this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
+            if ( this.props.ownerAddress ) {
+                let balances = await this.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
+                let allowance = await this.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
+                this.setState({
+                    balances: balances,
+                    allowance: allowance
+                })
+            }
+            this.showOrders();
         }
-        this.showOrders();
     }
     handleItemClick = (e, {name}) => {
         console.log(name)
@@ -369,7 +374,7 @@ class App extends Component {
                                                         <Table.Cell textAlign="right">
                                                             <Label color={rowColor}>{order.toTokenValue}</Label>
                                                         </Table.Cell>
-                                                        <Table.Cell textAlign="right">{(5*1).toFixed}</Table.Cell>
+                                                        <Table.Cell textAlign="right">{(order.toTokenValue*this.state.currentWETHPrice).toFixed(2)}</Table.Cell>
                                                         <Table.Cell textAlign="right">
                                                             <Button onClick={() => this.fillOrder(order.signedOrder, order.toTokenValue) } positive>Fill</Button>
                                                         </Table.Cell>
