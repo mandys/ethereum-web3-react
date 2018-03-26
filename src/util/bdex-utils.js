@@ -17,42 +17,33 @@ class BdexAction {
         }
         orders.push(order);
         store.set("orders", orders)
-        // axios.post('http://localhost:3001/orders/create', order, {
-        //     "Access-Control-Allow-Origin" : "*"
-        // })
-        // .then((orders) => {
-        //     console.log('savedOrder',orders)
-        //     return true;
-        // })
-        // .catch((e) => {
-        //     console.log(e);
-        //     return false;
-        // })
+        axios.post('http://localhost:3001/orders/create', order, {
+            "Access-Control-Allow-Origin" : "*"
+        })
+        .then((orders) => {
+            console.log('savedOrder',orders)
+            return true;
+        })
+        .catch((e) => {
+            console.log(e);
+            return false;
+        })
     }
 
     getAllOrders = async() => {
+        // let responseData = await axios.get('http://localhost:3001/orders');
+        // let orders = responseData.data.results;
+        // if(orders) {
+        //     return orders;
+        // } else {
+        //     return [];
+        // }
         let orders =[]
         if(store.get("orders")) {
             orders = store.get("orders");
         }
         console.log('all orders',orders);
         return orders
-        // axios.get('http://localhost:3001/orders')
-        // .then((response) => {
-        //     let orders = response.data.results
-        //     console.log('orders',orders)
-        //     if(orders) {
-        //         console.log('filteredOrders',`${this.state.tradingCoin}:${this.state.exchangeCoin}`);
-        //         return await getActiveOrders(orders)
-        //         console.log('filteredOrders',neworders);
-        //     } else {
-        //         return [];
-        //     }
-        // })
-        // .catch((e) => {
-        //     return false;
-        //     console.log(e)
-        // })
     }
 
     getActiveOrders = async() => {

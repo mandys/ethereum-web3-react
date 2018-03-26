@@ -97,7 +97,6 @@ class App extends Component {
                 "signedOrder": signedOrder,
                 "orderType": this.state.orderType
             });
-            ///save orders will come here
         } catch(e) {
             console.log(e);
         }
@@ -146,7 +145,7 @@ class App extends Component {
         }
     }
     showOrders = async() => {
-        let orders = await this.bdexUtil.getAllOrders();
+        let orders = await this.bdexUtil.getActiveOrders();
         this.setState({
             orders: orders
         })  
