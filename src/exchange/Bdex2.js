@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 //import 'semantic-ui-css/semantic.min.css';
-import { Segment, Icon, Image, Grid, Table,  Button, Divider, Tab,Label } from 'semantic-ui-react'
+import { Icon, Image, Grid, Table,  Button, Divider, Tab,Label } from 'semantic-ui-react'
 import {Input,Form } from 'formsy-semantic-ui-react';
 import {addValidationRule} from 'formsy-react';
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
 import BdexUtil from '../util/bdex-utils'
-var store = require('store')
-var axios = require('axios');
 
 class App extends Component {
     constructor(props) {
@@ -64,12 +62,12 @@ class App extends Component {
             takerFee: new BigNumber(0),
             expirationUnixTimestampSec: new BigNumber(Date.now() + 3600000), // Valid for up to an hour
         };  
-        if ( this.state.orderType == 'buy') {
+        if ( this.state.orderType === 'buy') {
             order.makerTokenAddress  = this.props.tokenContractAddresses[this.state.exchangeCoin]
             order.takerTokenAddress  = this.props.tokenContractAddresses[this.state.tradingCoin]
             order.makerTokenAmount   =  ZeroEx.toBaseUnitAmount(new BigNumber(this.exchangeCoin), this.DECIMALS) // Base 18 decimals
             order.takerTokenAmount   =  ZeroEx.toBaseUnitAmount(new BigNumber(this.tradingCoin), this.DECIMALS) // Base 18 decimals
-        } else if ( this.state.orderType == 'sell' ) {
+        } else if ( this.state.orderType === 'sell' ) {
             order.makerTokenAddress  =  this.props.tokenContractAddresses[this.state.tradingCoin]
             order.takerTokenAddress  =  this.props.tokenContractAddresses[this.state.exchangeCoin]
             order.makerTokenAmount   =  ZeroEx.toBaseUnitAmount(new BigNumber(this.tradingCoin), this.DECIMALS) // Base 18 decimals
@@ -115,13 +113,13 @@ class App extends Component {
     }
     handleBuySellToggle = (e, data) => {
         console.log(data.children)
-        if (data.children == 'Buy') {
+        if (data.children === 'Buy') {
             this.setState({
                 positive: true,
                 negative: false,
                 orderType: 'buy'
             })
-        } else if (data.children == 'Sell') {
+        } else if (data.children === 'Sell') {
             this.setState({
                 positive: false,
                 negative: true,
@@ -237,6 +235,10 @@ class App extends Component {
             console.log('in validation');
             return others[0]*others[1] <= others[2];
         })
+        addValidationRule('isInsufficientBalanceExchange', function (values, value, others) {
+            console.log('in validation');
+            return others[0]*others[1] <= others[2];
+        })
         const { activeItem } = this.state
         const panes = [
             { menuItem: 'Open Orders', render: () => <Tab.Pane inverted padded="very" attached={false}>You have no open orders for this market.</Tab.Pane> },
@@ -310,10 +312,10 @@ class App extends Component {
                                                         placeholder='0'
                                                         name='exchangeCoin'
                                                         onChange={this.setCoins}
-                                                        validations={`isNumeric,minLength:1,isInsufficientBalance:[${this.tradingCoin},${this.exchangeCoin},${this.state.balances['WETH']}]`}
+                                                        validations={`isNumeric,minLength:1,isInsufficientBalanceExchange:[${this.tradingCoin},${this.exchangeCoin},${this.state.balances['WETH']}]`}
                                                         instantValidation required
                                                         value={this.state.lastTradedPrice}
-                                                        validationErrors={{ isNumeric: 'Numeric...', minLength: 'Required 1', isInsufficientBalance: 'Insufficient Balance' }}
+                                                        validationErrors={{ isNumeric: 'Numeric...', minLength: 'Required 1', isInsufficientBalanceExchange: 'Insufficient Balance' }}
                                                     >
                                                         <input />
                                                         <Label>WETH</Label>
@@ -391,7 +393,7 @@ class App extends Component {
                                         </Table.Row>
                                         <Table.Row>
                                             <Table.Cell width="4">ZRX<br />0x</Table.Cell>
-                                            <Table.Cell textAlign="right">{this.state.balances.ZRX == 'NIL' ? ( 
+                                            <Table.Cell textAlign="right">{this.state.balances.ZRX === 'NIL' ? ( 
                                                 <div><Icon name="spinner" /> Fetching Balanace</div> 
                                             ): this.state.balances.ZRX}</Table.Cell>
                                             <Table.Cell textAlign="right">
@@ -405,7 +407,7 @@ class App extends Component {
                                         </Table.Row>
                                         <Table.Row>
                                             <Table.Cell width="4">WETH<br />Wrapped Ether</Table.Cell>
-                                            <Table.Cell textAlign="right">{this.state.balances.WETH == 'NIL' ? ( 
+                                            <Table.Cell textAlign="right">{this.state.balances.WETH === 'NIL' ? ( 
                                                 <div><Icon name="spinner" /> Fetching Balanace</div> 
                                             ): this.state.balances.WETH}</Table.Cell>
                                             <Table.Cell textAlign="right">

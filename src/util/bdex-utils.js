@@ -3,7 +3,7 @@ import { ZeroEx } from '0x.js';
 var store = require('store')
 var expirePlugin = require('store/plugins/expire')
 var axios = require('axios');
-
+store.addPlugin(expirePlugin)
 class BdexAction {
     constructor(web3, zeroEx) {
         this.web3 = web3;

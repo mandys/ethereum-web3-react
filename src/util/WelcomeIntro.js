@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Header, Container, Label, Table, Divider,Button, Icon } from 'semantic-ui-react'
+import { Header, Container, Label, Table, Divider } from 'semantic-ui-react'
 var store = require('store')
 var expirePlugin = require('store/plugins/expire')
 store.addPlugin(expirePlugin)

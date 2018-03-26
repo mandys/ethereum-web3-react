@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Web3 from 'web3';
 import { InjectedWeb3Subprovider } from '@0xproject/subproviders';
 import { ZeroEx } from '0x.js';
-import { Message, Container, Dimmer, Loader } from 'semantic-ui-react'
+import { Dimmer, Loader } from 'semantic-ui-react'
 const Web3ProviderEngine = require('web3-provider-engine');
 const RpcSubprovider = require('web3-provider-engine/subproviders/rpc.js')
 
