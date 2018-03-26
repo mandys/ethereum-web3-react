@@ -51,7 +51,6 @@ class App extends Component {
         }
     }
     createOrder = async (e, data) => {
-        alert(this.state.balances['WETH']);
         let order = {
             maker: this.props.ownerAddress,
             taker: ZeroEx.NULL_ADDRESS,
@@ -232,11 +231,11 @@ class App extends Component {
     render() {
         addValidationRule('isInsufficientBalance', function (values, value, others) {
             console.log('in validation');
-            return others[0]*others[1] <= others[2];
+            return value*others[0] <= others[1];
         })
         addValidationRule('isInsufficientBalanceExchange', function (values, value, others) {
             console.log('in validation');
-            return others[0]*others[1] <= others[2];
+            return value*others[0] <= others[1];
         })
         const { activeItem } = this.state
         const panes = [
@@ -295,7 +294,7 @@ class App extends Component {
                                                         placeholder='0'
                                                         name='tradingCoin'
                                                         onChange={this.setCoins}
-                                                        validations={`isNumeric,minLength:1,isInsufficientBalance:[${this.tradingCoin},${this.exchangeCoin},${this.state.balances['WETH']}]`}
+                                                        validations={`isNumeric,minLength:1,isInsufficientBalance:[${this.exchangeCoin},${this.state.balances['WETH']}]`}
                                                         instantValidation required 
                                                         validationErrors={{ isNumeric: 'Numeric...', minLength: 'Required 1', isInsufficientBalance: 'Insufficient Balance' }}
                                                          errorLabel = {errorLabel}
@@ -311,7 +310,7 @@ class App extends Component {
                                                         placeholder='0'
                                                         name='exchangeCoin'
                                                         onChange={this.setCoins}
-                                                        validations={`isNumeric,minLength:1,isInsufficientBalanceExchange:[${this.tradingCoin},${this.exchangeCoin},${this.state.balances['WETH']}]`}
+                                                        validations={`isNumeric,minLength:1,isInsufficientBalanceExchange:[${this.tradingCoin},${this.state.balances['WETH']}]`}
                                                         instantValidation required
                                                         value={this.state.lastTradedPrice}
                                                         validationErrors={{ isNumeric: 'Numeric...', minLength: 'Required 1', isInsufficientBalanceExchange: 'Insufficient Balance' }}
