@@ -135,7 +135,7 @@ class Account extends Component {
                                             <Table.Row key={i}>
                                                 <Table.Cell>{order.fromTokenValue}</Table.Cell>
                                                 <Table.Cell>{order.toTokenValue}</Table.Cell>
-                                                <Table.Cell>{order.toTokenValue*this.state.price['WETH']}</Table.Cell>
+                                                <Table.Cell>{order.toTokenValue*this.state.prices['WETH']}</Table.Cell>
                                                 <Table.Cell>
                                                     <Button onClick={() => this.cancelOrder(order.signedOrder, order.toTokenValue) } negative>Cancel</Button> 
                                                 </Table.Cell>

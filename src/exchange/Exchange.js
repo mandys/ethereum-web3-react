@@ -20,7 +20,8 @@ const Exchange = (PassedComponent) => class extends Component {
             this.providerEngine.addProvider(new InjectedWeb3Subprovider(window.web3.currentProvider));
         }
         this.providerEngine.addProvider(new RpcSubprovider({
-            rpcUrl: 'https://kovan.infura.io/SNWrFm1CMX7BfYqvkFXf',
+            rpcUrl: 'http://54.219.243.226:8545/',
+            // rpcUrl: 'https://kovan.infura.io/SNWrFm1CMX7BfYqvkFXf',
         }))
           
         this.providerEngine.start();

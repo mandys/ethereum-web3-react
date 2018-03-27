@@ -104,12 +104,21 @@ class App extends Component {
         
         console.log('signedOrder', signedOrder);
         try {
+            let orderSync = this.props.zeroEx.orderStateWatcher.subscribe(this.orderStateChangeCallback) 
+            console.log('orderSync', orderSync);
+            console.log('zeroex',this.props.zeroEx);
+            let orderWatch = this.props.zeroEx.orderStateWatcher.addOrder(signedOrder);
+            console.log('orderWatch', orderWatch);
+
             const isOrderValid = await this.props.zeroEx.exchange.validateOrderFillableOrThrowAsync(signedOrder);
             console.log('isOrderValid', isOrderValid);
         } catch(e) {
             console.log(e);
         }
     }
+
+
+
     handleBuySellToggle = (e, data) => {
         console.log(data.children)
         if (data.children === 'Buy') {
@@ -180,7 +189,10 @@ class App extends Component {
             this.showOrders();
             
         }
-        
+    }
+    orderStateChangeCallback = async(err,orderState) => {
+        console.log('orderStateChangeCallback err', err)
+        console.log('orderStateChangeCallback orderState', orderState)
     }
     handleItemClick = (e, {name}) => {
         console.log(name)
@@ -343,7 +355,7 @@ class App extends Component {
                                 <Table inverted striped>
                                     <Table.Header>
                                         <Table.Row>
-                                            <Table.HeaderCell colSpan="3">ZRX:WETH ORDER BOOK</Table.HeaderCell>
+                                            <Table.HeaderCell colSpan="4">ZRX:WETH ORDER BOOK</Table.HeaderCell>
                                         </Table.Row>
                                     </Table.Header>
                                     <Table.Body>
