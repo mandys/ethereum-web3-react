@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 //import 'semantic-ui-css/semantic.min.css';
-import { Icon, Image, Grid, Table,  Button, Divider, Tab, Label, Transition } from 'semantic-ui-react'
+import { Icon, Image, Grid, Table,  Button, Divider, Tab, Label, Transition, Checkbox } from 'semantic-ui-react'
 import {Input,Form } from 'formsy-semantic-ui-react';
 import {addValidationRule} from 'formsy-react';
 import { BigNumber } from '@0xproject/utils';
@@ -17,6 +17,7 @@ class App extends Component {
     tradingCoin = 0;
     exchangeCoin = 0;
     bdexUtil = null;
+    duration = 24*60*60
     state = { 
         activeItem: 'Welcome',
         balances: {
@@ -234,7 +235,7 @@ class App extends Component {
             console.log(e)
         }
         const shouldThrowOnInsufficientBalanceOrAllowance = false;
-        const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(parseFloat(toAmountValue)), this.DECIMALS);
+        const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(parseFloat(signedOrder.takerTokenAmount)), this.DECIMALS);
         // const signedOrder = this.convertPortalOrder(signedOrder);
         const txHash = await this.props.zeroEx.exchange.fillOrderAsync(
             this.bdexUtil.convertPortalOrder(signedOrder),
@@ -252,6 +253,10 @@ class App extends Component {
         this.setState({
             hideOrderForm: !this.state.hideOrderForm
         })
+    }
+
+    setDuration = (e,data) => {
+        this.duration = data.value
     }
 
     render() {
@@ -316,11 +321,50 @@ class App extends Component {
                                                     onValid={this.enableButton} 
                                                     onInvalid={this.disableButton}
                                                 >
-                                                <Transition.Group animation='horizontal flip' duration='1500'>
+                                                <Transition.Group animation='horizontal flip' duration='1000'>
                                                 { (this.state.hideOrderForm) && <div>
-                                                    You are going to {this.state.orderType} &nbsp;
-                                                        {this.tradingCoin} {this.state.tradingCoin} for&nbsp;  
-                                                        {this.exchangeCoin} {this.state.exchangeCoin} 
+                                                    <h5>{this.state.orderType}</h5>
+                                                    <div>{this.tradingCoin} {this.state.tradingCoin}</div> 
+                                                    <small>
+                                                        ${(this.tradingCoin*this.state.prices[this.state.tradingCoin]).toFixed(2)}
+                                                    </small> 
+                                                    <h5>PRICE</h5>
+                                                    <div>{this.exchangeCoin} {this.state.exchangeCoin}</div> 
+                                                    <small>
+                                                        ${(this.exchangeCoin*this.state.prices[this.state.exchangeCoin]).toFixed(2)}
+                                                    </small>
+                                                    <h5>Keep the order public</h5>
+                                                    <p>
+                                                    <Button
+                                                        content='1 Hour'
+                                                        type='button'
+                                                        size='mini'
+                                                        value={60*60}
+                                                        onClick={this.setDuration}
+                                                    />
+                                                    <Button
+                                                        content='1 Day'
+                                                        type='button'
+                                                        size='mini'
+                                                        value={24*60*60}
+                                                        checked={true}
+                                                        onClick={this.setDuration}
+                                                    />
+                                                    <Button
+                                                        content='1 Week'
+                                                        type='button'
+                                                        size='mini'
+                                                        value={7*24*60*60}
+                                                        onClick={this.setDuration}
+                                                    />
+                                                    <Button
+                                                        content='1 Month'
+                                                        type='button'
+                                                        size='mini'
+                                                        value={30*24*60*60}
+                                                        onClick={this.setDuration}
+                                                    />
+                                                    </p>
                                                     <Button.Group widths='2'>
                                                         <Button content='CANCEL' onClick={this.flipOrder} type='button'/>
                                                         <Button color='blue' content='CONFIRM' type='submit'/>
@@ -328,7 +372,7 @@ class App extends Component {
                                                     </div> 
                                                 }
                                                 </Transition.Group>
-                                                <Transition.Group animation='horizontal flip' duration='1500'>
+                                                <Transition.Group animation='horizontal flip' duration='1000'>
                                                 { (this.state.hideOrderForm === false) && <div>
                                                     <span>Amount</span>
                                                     <Input
