@@ -17,17 +17,17 @@ class BdexAction {
         }
         orders.push(order);
         store.set("orders", orders)
-        axios.post('http://localhost:3001/orders/create', order, {
-            "Access-Control-Allow-Origin" : "*"
-        })
-        .then((orders) => {
-            console.log('savedOrder',orders)
-            return true;
-        })
-        .catch((e) => {
-            console.log(e);
-            return false;
-        })
+        // axios.post('http://localhost:3001/orders/create', order, {
+        //     "Access-Control-Allow-Origin" : "*"
+        // })
+        // .then((orders) => {
+        //     console.log('savedOrder',orders)
+        //     return true;
+        // })
+        // .catch((e) => {
+        //     console.log(e);
+        //     return false;
+        // })
     }
 
     getAllOrders = async() => {

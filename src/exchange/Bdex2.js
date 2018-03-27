@@ -53,7 +53,7 @@ class App extends Component {
             this.exchangeCoin = data.value
         }
     }
-    createOrder = async (e, data) => {
+    createOrder = async (e) => {
         let order = {
             maker: this.props.ownerAddress,
             taker: ZeroEx.NULL_ADDRESS,
@@ -62,7 +62,7 @@ class App extends Component {
             salt: ZeroEx.generatePseudoRandomSalt(),
             makerFee: new BigNumber(0),
             takerFee: new BigNumber(0),
-            expirationUnixTimestampSec: new BigNumber(Date.now() + 3600000), // Valid for up to an hour
+            expirationUnixTimestampSec: new BigNumber(Date.now() + this.duration), // Valid for up to an hour
         };  
         if ( this.state.orderType === 'buy') {
             order.makerTokenAddress  = this.props.tokenContractAddresses[this.state.exchangeCoin]
@@ -88,19 +88,9 @@ class App extends Component {
             signedOrder = {
                 ...order,
                 ecSignature,
-            };
-        } catch(e) {
-            console.log(e);
-        }
+            };   
         
-        
-        console.log('signedOrder', signedOrder);
-        try {
-            let orderSync = this.props.zeroEx.orderStateWatcher.subscribe(this.orderStateChangeCallback) 
-            console.log('orderSync', orderSync);
-            console.log('zeroex',this.props.zeroEx);
-            let orderWatch = this.props.zeroEx.orderStateWatcher.addOrder(signedOrder);
-            console.log('orderWatch', orderWatch);
+            console.log('signedOrder', signedOrder);
             await this.bdexUtil.saveOrder({
                 "hash": orderHash,
                 "fromToken": this.state.tradingCoin,
@@ -111,11 +101,12 @@ class App extends Component {
                 "orderType": this.state.orderType
             });
             this.showOrders();
+            
+            const isOrderValid = await this.props.zeroEx.exchange.validateOrderFillableOrThrowAsync(signedOrder);
+            console.log('isOrderValid', isOrderValid);
             this.setState({
                 hideOrderForm:false
             })
-            const isOrderValid = await this.props.zeroEx.exchange.validateOrderFillableOrThrowAsync(signedOrder);
-            console.log('isOrderValid', isOrderValid);
         } catch(e) {
             console.log(e);
             this.setState({
@@ -228,12 +219,6 @@ class App extends Component {
     fillOrder = async(signedOrder, toAmountValue) => {
         console.log('signedOrder',signedOrder)
         console.log('toAmount',toAmountValue)
-        try {
-            const orderValidOrNot = ZeroEx.isValidOrderHash('0x16c70dcc13c40f679fa2cbd6dbfbb886ccac38334c756975fbc26c6fa264f434')
-            console.log('orderValidOrNot', orderValidOrNot)
-        } catch(e) {
-            console.log(e)
-        }
         const shouldThrowOnInsufficientBalanceOrAllowance = false;
         const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(parseFloat(signedOrder.takerTokenAmount)), this.DECIMALS);
         // const signedOrder = this.convertPortalOrder(signedOrder);
@@ -408,9 +393,9 @@ class App extends Component {
                                                     <Divider />
                                                     {
                                                         this.state.orderType === 'buy' ? (
-                                                            <Button positive fluid type='button' 
+                                                            <Button positive fluid type='submit' 
                                                                 size="medium" disabled={!this.state.canSubmit}
-                                                                onClick={this.flipOrder} 
+                                                                // onClick={this.flipOrder} 
                                                             >PLACE BUY ORDER</Button>
                                                         ) : (
                                                             <Button negative fluid type='button' 
