@@ -7,6 +7,7 @@ import Exchange from '../Exchange';
 class WrapUnWrapEther extends Component {
     state = {
         showOverlay: false,
+        disabled: false,
         labels:{
             ETH: {
                 name: 'Ether',
@@ -20,7 +21,7 @@ class WrapUnWrapEther extends Component {
     }
     showWrapOverlay = async (e, token) => {
         this.setState({
-            showOverlay: true
+            showOverlay: true,
         });
     }
 
@@ -38,12 +39,18 @@ class WrapUnWrapEther extends Component {
             const ethToConvert = ZeroEx.toBaseUnitAmount(ethAmount, decimals); // Number of ETH to convert to WETH
             console.log('ethToCovert', ethToConvert);
             console.log('ethAddress', this.props.tokenContractAddresses['WETH'])
+            this.setState({
+                showOverlay: false,
+                disabled:true
+            });
             const convertEthTxHash = await this.props.zeroEx.etherToken.depositAsync(this.props.tokenContractAddresses['WETH'], ethToConvert, this.props.ownerAddress);
             console.log('convertEthTxHash', convertEthTxHash);
+            let transactionMined = await this.props.zeroEx.awaitTransactionMinedAsync(convertEthTxHash);
+            console.log('transactionMined',transactionMined);
+            this.props.setBalanceAllowance();
             this.setState({
-                showOverlay: false
+                disabled:false
             });
-            await this.props.zeroEx.awaitTransactionMinedAsync(convertEthTxHash);
         } catch (e) {
             this.setState({
                 showOverlay: false
@@ -60,12 +67,17 @@ class WrapUnWrapEther extends Component {
             const ethToConvert = ZeroEx.toBaseUnitAmount(ethAmount, decimals); // Number of ETH to convert to WETH
             console.log('wethToCovert', ethToConvert);
             console.log('wethAddress', this.props.tokenContractAddresses['WETH'])
+            this.setState({
+                showOverlay: false,
+                disabled:true
+            });
             const convertWethTxHash = await this.props.zeroEx.etherToken.withdrawAsync(this.props.tokenContractAddresses['WETH'], ethToConvert, this.props.ownerAddress);
             console.log('convertWEthTxHash', convertWethTxHash);
+            let transactionMined = await this.props.zeroEx.awaitTransactionMinedAsync(convertWethTxHash);
+            console.log('transactionMined',transactionMined);
             this.setState({
-                showOverlay: false
+                disabled:false
             });
-            await this.props.zeroEx.awaitTransactionMinedAsync(convertWethTxHash);
         } catch (e) {
             this.setState({
                 showOverlay: false
@@ -77,7 +89,7 @@ class WrapUnWrapEther extends Component {
     render() {
         return (
             <div>
-                <Button size='mini' onClick={(e) => this.showWrapOverlay(e, 'WETH')} >
+                <Button size='mini' onClick={(e) => this.showWrapOverlay(e, 'WETH')} disabled={this.state.disabled}>
                     {this.state.labels[this.props.from].label}
                 </Button>
 
@@ -106,13 +118,13 @@ class WrapUnWrapEther extends Component {
                         </div>
                         <p>1 {this.props.from} = 1 {this.props.to}</p>
                         <Divider />
-                        <Button.Group>
-                            <Button content='CANCEL' basic onClick={this.closeOverlay} />
+                        <Button.Group widths='2'>
+                            <Button content='CANCEL' onClick={this.closeOverlay} />
                             {
                                 (this.props.from === "ETH") ?
-                                <Button color='blue' content='CONVERT' basic onClick={this.wrapEther}/>
+                                <Button color='blue' content='CONVERT'  onClick={this.wrapEther} />
                                 :
-                                <Button color='blue' content='CONVERT' basic onClick={this.unWrapEther}/>
+                                <Button color='blue' content='CONVERT'  onClick={this.unWrapEther}/>
                             }
                         </Button.Group>
                     </Modal.Content>

@@ -87,16 +87,6 @@ class App extends Component {
                 ...order,
                 ecSignature,
             };
-            
-            await this.bdexUtil.saveOrder({
-                "hash": orderHash,
-                "fromToken": this.state.tradingCoin,
-                "fromTokenValue": this.tradingCoin,
-                "toToken": this.state.exchangeCoin,
-                "toTokenValue": this.exchangeCoin,
-                "signedOrder": signedOrder,
-                "orderType": this.state.orderType
-            });
         } catch(e) {
             console.log(e);
         }
@@ -109,7 +99,16 @@ class App extends Component {
             console.log('zeroex',this.props.zeroEx);
             let orderWatch = this.props.zeroEx.orderStateWatcher.addOrder(signedOrder);
             console.log('orderWatch', orderWatch);
-
+            await this.bdexUtil.saveOrder({
+                "hash": orderHash,
+                "fromToken": this.state.tradingCoin,
+                "fromTokenValue": this.tradingCoin,
+                "toToken": this.state.exchangeCoin,
+                "toTokenValue": this.exchangeCoin,
+                "signedOrder": signedOrder,
+                "orderType": this.state.orderType
+            });
+            this.showOrders();
             const isOrderValid = await this.props.zeroEx.exchange.validateOrderFillableOrThrowAsync(signedOrder);
             console.log('isOrderValid', isOrderValid);
         } catch(e) {
@@ -179,17 +178,22 @@ class App extends Component {
             })
 
             if ( this.props.ownerAddress ) {
-                let balances = await this.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
-                let allowance = await this.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
-                this.setState({
-                    balances: balances,
-                    allowance: allowance
-                })
+                this.setBalanceAllowance();
             }
             this.showOrders();
             
         }
     }
+
+    setBalanceAllowance = async() => {
+        let balances = await this.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
+        let allowance = await this.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
+        this.setState({
+            balances: balances,
+            allowance: allowance
+        })
+    }
+
     orderStateChangeCallback = async(err,orderState) => {
         console.log('orderStateChangeCallback err', err)
         console.log('orderStateChangeCallback orderState', orderState)
@@ -417,7 +421,14 @@ class App extends Component {
                                             </Table.Cell>
                                         </Table.Row>
                                         <Table.Row>
-                                            <Table.Cell width="4">WETH<br />Wrapped Ether <WrapUnWrapEther from="ETH" to="WETH" {...this.props} /></Table.Cell>
+                                            <Table.Cell width="4">WETH<br />Wrapped Ether 
+                                                <WrapUnWrapEther 
+                                                    from="ETH" 
+                                                    to="WETH" 
+                                                    {...this.props} 
+                                                    setBalanceAllowance={this.setBalanceAllowance}
+                                                />
+                                            </Table.Cell>
                                             <Table.Cell textAlign="right">{this.state.balances.WETH === 'NIL' ? ( 
                                                 <div><Icon name="spinner" /> Fetching Balanace</div> 
                                             ): this.state.balances.WETH}</Table.Cell>
