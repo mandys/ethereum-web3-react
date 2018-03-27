@@ -44,6 +44,27 @@ const Exchange = (PassedComponent) => class extends Component {
         if ( !address ) {
             address = ''
         }
+        /**
+         * Below code is for monitoring change of accounts
+         * or locking/unlocking of metamask
+         */
+        const accountSwitchWatcher = setInterval(async() => {
+            const addresses = await zeroEx.getAvailableAddressesAsync()
+            let newAddress;
+            if ( addresses.length > 0 ) {
+                newAddress = addresses[0]
+            } else {
+                newAddress = ''
+            }
+            this.setState((prevState) => {
+                if ( prevState.ownerAddress !== newAddress) {
+                    console.log('prevState', prevState)
+                    return {
+                        ownerAddress: newAddress
+                    }
+                }
+            })
+        }, 1000)
         this.setState(() => {
             return {
                 zeroEx: zeroEx,

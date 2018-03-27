@@ -160,28 +160,32 @@ class App extends Component {
     }
     componentDidMount = async() => {
         console.log('props', this.props)
-        if ( this.props.location.pathname === '/' ) {
-            this.props.history.push('/welcome')
-        } else {
-            /* From exchange, ownerAddress could come as null
-             * as Metamask might be locked and then ZeroEx cannot
-             * read the address
-             */
-            this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
-            let prices = await this.bdexUtil.getMarketPrices();
-            console.log("prices",prices)
-            this.setState({
-                prices: prices,
-                lastTradedPrice:(prices['ZRX'] / prices['WETH']).toFixed(8)
-            }, () => {
-                this.exchangeCoin = this.state.lastTradedPrice
-            })
 
+        /* From exchange, ownerAddress could come as null
+            * as Metamask might be locked and then ZeroEx cannot
+            * read the address
+            */
+        this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
+        let prices = await this.bdexUtil.getMarketPrices();
+        console.log("prices",prices)
+        this.setState({
+            prices: prices,
+            lastTradedPrice:(prices['ZRX'] / prices['WETH']).toFixed(8)
+        }, () => {
+            this.exchangeCoin = this.state.lastTradedPrice
+        })
+
+        if ( this.props.ownerAddress ) {
+            this.setBalanceAllowance();
+        }
+        this.showOrders();
+    }
+
+    componentDidUpdate = async(prevProps, prevState) => {
+        if ( prevProps.ownerAddress !== this.props.ownerAddress) {
             if ( this.props.ownerAddress ) {
                 this.setBalanceAllowance();
             }
-            this.showOrders();
-            
         }
     }
 
