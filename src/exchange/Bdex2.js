@@ -6,6 +6,7 @@ import {addValidationRule} from 'formsy-react';
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
 import BdexUtil from '../util/bdex-utils'
+import WrapUnWrapEther from './components/WrapUnWrapEther'
 
 class App extends Component {
     constructor(props) {
@@ -404,7 +405,7 @@ class App extends Component {
                                             </Table.Cell>
                                         </Table.Row>
                                         <Table.Row>
-                                            <Table.Cell width="4">WETH<br />Wrapped Ether</Table.Cell>
+                                            <Table.Cell width="4">WETH<br />Wrapped Ether <WrapUnWrapEther from="ETH" to="WETH" {...this.props} /></Table.Cell>
                                             <Table.Cell textAlign="right">{this.state.balances.WETH === 'NIL' ? ( 
                                                 <div><Icon name="spinner" /> Fetching Balanace</div> 
                                             ): this.state.balances.WETH}</Table.Cell>

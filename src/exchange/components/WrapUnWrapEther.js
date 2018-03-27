@@ -122,4 +122,4 @@ class WrapUnWrapEther extends Component {
     }
 }
 
-export default Exchange(WrapUnWrapEther);
+export default WrapUnWrapEther;
