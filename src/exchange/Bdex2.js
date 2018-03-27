@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 //import 'semantic-ui-css/semantic.min.css';
-import { Icon, Image, Grid, Table,  Button, Divider, Tab,Label } from 'semantic-ui-react'
+import { Icon, Image, Grid, Table,  Button, Divider, Tab, Label, Transition } from 'semantic-ui-react'
 import {Input,Form } from 'formsy-semantic-ui-react';
 import {addValidationRule} from 'formsy-react';
 import { BigNumber } from '@0xproject/utils';
@@ -39,7 +39,8 @@ class App extends Component {
         orderType: 'buy',
         orders: [],
         canSubmit: false,
-        lastTradedPrice:0
+        lastTradedPrice:0,
+        hideOrderForm: false
     }
     DECIMALS = 18
 
@@ -109,10 +110,16 @@ class App extends Component {
                 "orderType": this.state.orderType
             });
             this.showOrders();
+            this.setState({
+                hideOrderForm:false
+            })
             const isOrderValid = await this.props.zeroEx.exchange.validateOrderFillableOrThrowAsync(signedOrder);
             console.log('isOrderValid', isOrderValid);
         } catch(e) {
             console.log(e);
+            this.setState({
+                hideOrderForm:false
+            })
         }
     }
 
@@ -236,17 +243,15 @@ class App extends Component {
             this.props.ownerAddress
         );
         console.log('txHash', txHash);
-        // let transactions = {};
-        // if(store.get("transactions")) {
-        //     transactions = store.get("orders");
-        // }
-        // if(!transactions) {
-        //     transactions = {}
-        // }
-        // transactions.push(txHash);
         console.log('txHash', txHash);
         const txReceipt = await this.props.zeroEx.awaitTransactionMinedAsync(txHash);
         console.log('FillOrder transaction receipt: ', txReceipt);
+    }
+
+    flipOrder = () => {
+        this.setState({
+            hideOrderForm: !this.state.hideOrderForm
+        })
     }
 
     render() {
@@ -306,8 +311,25 @@ class App extends Component {
                                     <Table.Body>
                                         <Table.Row>
                                             <Table.Cell>
-                                                <Form size="small" onSubmit={this.createOrder} onValid={this.enableButton} onInvalid={this.disableButton}>
-                                                    
+                                                <Form size="small" 
+                                                    onSubmit={this.createOrder} 
+                                                    onValid={this.enableButton} 
+                                                    onInvalid={this.disableButton}
+                                                >
+                                                <Transition.Group animation='horizontal flip' duration='1500'>
+                                                { (this.state.hideOrderForm) && <div>
+                                                    You are going to {this.state.orderType} &nbsp;
+                                                        {this.tradingCoin} {this.state.tradingCoin} for&nbsp;  
+                                                        {this.exchangeCoin} {this.state.exchangeCoin} 
+                                                    <Button.Group widths='2'>
+                                                        <Button content='CANCEL' onClick={this.flipOrder} type='button'/>
+                                                        <Button color='blue' content='CONFIRM' type='submit'/>
+                                                    </Button.Group>                                                   
+                                                    </div> 
+                                                }
+                                                </Transition.Group>
+                                                <Transition.Group animation='horizontal flip' duration='1500'>
+                                                { (this.state.hideOrderForm === false) && <div>
                                                     <span>Amount</span>
                                                     <Input
                                                         fluid
@@ -318,7 +340,7 @@ class App extends Component {
                                                         validations={`isNumeric,minLength:1,isInsufficientBalance:[${this.exchangeCoin},${this.state.balances['WETH']}]`}
                                                         instantValidation required 
                                                         validationErrors={{ isNumeric: 'Numeric...', minLength: 'Required 1', isInsufficientBalance: 'Insufficient Balance' }}
-                                                         errorLabel = {errorLabel}
+                                                        errorLabel = {errorLabel}
                                                     >                                                    
                                                         <input />
                                                         <Label>ZRX</Label>
@@ -342,12 +364,21 @@ class App extends Component {
                                                     <Divider />
                                                     {
                                                         this.state.orderType === 'buy' ? (
-                                                            <Button positive fluid type='submit' size="medium" disabled={!this.state.canSubmit}>Place Buy Order</Button>
+                                                            <Button positive fluid type='button' 
+                                                                size="medium" disabled={!this.state.canSubmit}
+                                                                onClick={this.flipOrder} 
+                                                            >PLACE BUY ORDER</Button>
                                                         ) : (
-                                                            <Button negative fluid type='submit' size="medium" disabled={!this.state.canSubmit}>Place Sell Order</Button>
+                                                            <Button negative fluid type='button' 
+                                                                size="medium" disabled={!this.state.canSubmit} 
+                                                                onClick={this.flipOrder}
+                                                            >PLACE SELL ORDER</Button>
                                                         )
                                                     }
-                                                </Form>                                            
+                                                </div> }
+                                                </Transition.Group>
+                                                    
+                                                </Form>                         
                                             </Table.Cell>
                                         </Table.Row>
                                     </Table.Body>
@@ -381,9 +412,14 @@ class App extends Component {
                                                         <Table.Cell textAlign="right">
                                                             <Label color={rowColor}>{order.toTokenValue}</Label>
                                                         </Table.Cell>
-                                                        <Table.Cell textAlign="right">{(order.toTokenValue*this.state.prices['WETH']).toFixed(2)}</Table.Cell>
                                                         <Table.Cell textAlign="right">
-                                                            <Button onClick={() => this.fillOrder(order.signedOrder, order.toTokenValue) } positive>Fill</Button>
+                                                            {(order.toTokenValue*this.state.prices['WETH']).toFixed(2)}
+                                                        </Table.Cell>
+                                                        <Table.Cell textAlign="right">
+                                                            <Button 
+                                                                onClick={() => this.fillOrder(order.signedOrder, order.toTokenValue) } 
+                                                                positive
+                                                            >Fill</Button>
                                                         </Table.Cell>
                                                     </Table.Row>
                                                 )

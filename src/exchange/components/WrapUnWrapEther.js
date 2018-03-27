@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Button, Modal, Grid,Image,Divider } from 'semantic-ui-react'
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
-import Exchange from '../Exchange';
 
 class WrapUnWrapEther extends Component {
     state = {
