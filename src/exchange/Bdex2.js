@@ -108,7 +108,7 @@ class App extends Component {
                 hideOrderForm:false
             })
         } catch(e) {
-            console.log(e);
+            console.log(e); 
             this.setState({
                 hideOrderForm:false
             })
@@ -393,9 +393,9 @@ class App extends Component {
                                                     <Divider />
                                                     {
                                                         this.state.orderType === 'buy' ? (
-                                                            <Button positive fluid type='submit' 
+                                                            <Button positive fluid type='button' 
                                                                 size="medium" disabled={!this.state.canSubmit}
-                                                                // onClick={this.flipOrder} 
+                                                                onClick={this.flipOrder} 
                                                             >PLACE BUY ORDER</Button>
                                                         ) : (
                                                             <Button negative fluid type='button' 
