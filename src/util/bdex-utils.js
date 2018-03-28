@@ -45,42 +45,52 @@ class BdexAction {
         console.log('all orders',orders);
         return orders
     }
+    isBigEnough(value) {
+        return value > 0;
+    }
 
     getActiveOrders = async() => {
         let orders = await this.getAllOrders();
+        console.log('all orders', orders)
         let activeOrders = []
-        activeOrders = orders.filter(async(order)=>{
-            await this.zeroEx.exchange.getUnavailableTakerAmountAsync(order.hash)
-            .then(response => {
+        try{
+            for(let i in orders) {
+                let order = orders[i];
+                let response = await this.zeroEx.exchange.getUnavailableTakerAmountAsync(order.hash)
+                console.log('resp',response)
                 let bal = parseFloat(order.toTokenValue) - (response/Math.pow(10, this.DECIMALS))
                 console.log('bal',bal);
                 if(bal > 0){
-                    return true
-                }
-            }).catch(err => {  
-                console.log('balerr',err)
-                return false;
-            })
-        })
+                    activeOrders.push(order)
+                } 
+            }
+            console.log('all orders', orders)
+            console.log('active orders', activeOrders)
+        }catch(e)  {
+            console.log('balerr',e)
+        }
         return activeOrders;
     }
 
     getFilledOrders = async() => {
         let orders = await this.getAllOrders();
         let filledOrders = []
-        filledOrders = orders.filter(async(order)=>{
-            await this.zeroEx.exchange.getUnavailableTakerAmountAsync(order.hash)
-            .then(response => {
+        try{
+            for(let i in orders) {
+                let order = orders[i];
+                let response = await this.zeroEx.exchange.getUnavailableTakerAmountAsync(order.hash)
+                console.log('resp',response)
                 let bal = parseFloat(order.toTokenValue) - (response/Math.pow(10, this.DECIMALS))
                 console.log('bal',bal);
-                if(bal <= 0){
-                    return true
-                }
-            }).catch(err => {  
-                console.log('balerr',err)
-                return false;
-            })
-        })
+                if(bal > 0){
+                    filledOrders.push(order)
+                } 
+            }
+            console.log('all orders', orders)
+            console.log('active orders', filledOrders)
+        }catch(e)  {
+            console.log('balerr',e)
+        }
         return filledOrders;
     }
 

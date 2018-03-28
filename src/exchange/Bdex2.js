@@ -37,7 +37,8 @@ class App extends Component {
         tradingCoin: 'ZRX',
         exchangeCoin: 'WETH',
         orderType: 'buy',
-        orders: [],
+        activeOrders: [],
+        filledOrders:[],
         canSubmit: false,
         lastTradedPrice:0,
         hideOrderForm: false,
@@ -152,9 +153,11 @@ class App extends Component {
         }
     }
     showOrders = async() => {
-        let orders = await this.bdexUtil.getActiveOrders();
+        let activeOrders = await this.bdexUtil.getActiveOrders();
+        let filledOrders = await this.bdexUtil.getFilledOrders();
         this.setState({
-            orders: orders
+            activeOrders: activeOrders,
+            filledOrders: filledOrders
         })  
     }
     componentDidMount = async() => {
@@ -178,6 +181,15 @@ class App extends Component {
             this.setBalanceAllowance();
         }
         this.showOrders();
+        let myadd = '0x891c53A37d672783eD43E7b1f39ef360F62BA0D6'.toLowerCase();
+        const indexFilterValues = {
+            maker: myadd,
+        };
+        this.props.zeroEx.exchange.subscribe('LogCancel',indexFilterValues, (e,l)=>{
+            console.log('here in subscribe');
+            console.log('err sub',e);
+            console.log('err sub',l);
+        })
     }
 
     componentDidUpdate = async(prevProps, prevState) => {
@@ -197,10 +209,6 @@ class App extends Component {
         })
     }
 
-    orderStateChangeCallback = async(err,orderState) => {
-        console.log('orderStateChangeCallback err', err)
-        console.log('orderStateChangeCallback orderState', orderState)
-    }
     handleItemClick = (e, {name}) => {
         console.log(name)
         this.setState({
@@ -217,6 +225,7 @@ class App extends Component {
     }
 
     fillOrder = async(signedOrder, toAmountValue) => {
+
         console.log('signedOrder',signedOrder)
         console.log('toAmount',toAmountValue)
         const shouldThrowOnInsufficientBalanceOrAllowance = false;
@@ -430,10 +439,10 @@ class App extends Component {
                                         <Table.Row>
                                             <Table.Cell width="4">AMOUNT</Table.Cell>
                                             <Table.Cell textAlign="right">PRICE</Table.Cell>
-                                            <Table.Cell textAlign="right">SUM IN USD</Table.Cell>
+                                            <Table.Cell textAlign="left" colSpan="2">SUM IN USD</Table.Cell>
                                         </Table.Row>
                                         {
-                                            this.state.orders.map((order,i) => {
+                                            this.state.activeOrders.map((order,i) => {
                                                 let rowColor = (order.orderType === 'buy')?'green':'red'
                                                 return (
                                                     <Table.Row key={i}>
@@ -531,20 +540,26 @@ class App extends Component {
                                     </Table.Header>
                                     <Table.Body>
                                         <Table.Row>
-                                            <Table.Cell width="4">Amount ZRX</Table.Cell>
-                                            <Table.Cell textAlign="right">Price</Table.Cell>
-                                            <Table.Cell textAlign="right">Time</Table.Cell>
+                                            <Table.Cell width="4">AMOUNT</Table.Cell>
+                                            <Table.Cell textAlign="right">PRICE</Table.Cell>
+                                            <Table.Cell textAlign="right">SUM IN USD</Table.Cell>
                                         </Table.Row>
-                                        <Table.Row>
-                                            <Table.Cell width="4">8.255715</Table.Cell>
-                                            <Table.Cell textAlign="right">0.0008479</Table.Cell>
-                                            <Table.Cell textAlign="right">03/19 09:27</Table.Cell>
-                                        </Table.Row>
-                                        <Table.Row>
-                                            <Table.Cell width="4">10.00000</Table.Cell>
-                                            <Table.Cell textAlign="right">0.0007931</Table.Cell>
-                                            <Table.Cell textAlign="right">03/19 09:26</Table.Cell>
-                                        </Table.Row>
+                                    {
+                                        this.state.filledOrders.map((order,i) => {
+                                            let rowColor = (order.orderType === 'buy')?'green':'red'
+                                            return (
+                                                <Table.Row key={i}>
+                                                    <Table.Cell>{order.fromTokenValue}</Table.Cell>
+                                                    <Table.Cell textAlign="right">
+                                                        <Label color={rowColor}>{order.toTokenValue}</Label>
+                                                    </Table.Cell>
+                                                    <Table.Cell textAlign="right">
+                                                        {(order.toTokenValue*this.state.prices['WETH']).toFixed(2)}
+                                                    </Table.Cell>
+                                                </Table.Row>
+                                            )
+                                        })
+                                    }
                                     </Table.Body>
                                 </Table>
                             </Grid.Column>
