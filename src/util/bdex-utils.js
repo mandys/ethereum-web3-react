@@ -88,7 +88,8 @@ class BdexAction {
         console.log(tokenContractAddresses);
         let balances = {}
         for(var key in tokenContractAddresses) {
-            balances[key] = await this.getTokenBalance(ownerAddress, tokenContractAddresses[key])
+            let bal = await this.getTokenBalance(ownerAddress, tokenContractAddresses[key])
+            balances[key] = bal.toFixed(8);
         }
         console.log(balances);
         return balances;
