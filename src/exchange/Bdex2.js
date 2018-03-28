@@ -310,12 +310,12 @@ class App extends Component {
                                                 >
                                                 <Transition.Group animation='horizontal flip' duration='1000'>
                                                 { (this.state.hideOrderForm) && <div>
-                                                    <h5>{this.state.orderType}</h5>
+                                                    <div><b>{this.state.orderType}</b></div>
                                                     <div>{this.tradingCoin} {this.state.tradingCoin}</div> 
                                                     <small>
                                                         ${(this.tradingCoin*this.state.prices[this.state.tradingCoin]).toFixed(2)}
                                                     </small> 
-                                                    <h5>PRICE</h5>
+                                                    <div><b>PRICE</b></div>
                                                     <div>{this.exchangeCoin} {this.state.exchangeCoin}</div> 
                                                     <small>
                                                         ${(this.exchangeCoin*this.state.prices[this.state.exchangeCoin]).toFixed(2)}
