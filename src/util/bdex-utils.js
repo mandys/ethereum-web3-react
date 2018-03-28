@@ -136,7 +136,7 @@ class BdexAction {
             response.data.forEach((coin) => {
                 prices[coin.symbol] = coin.price_usd
             })
-            store.set('prices', prices, new Date().getTime() + 60*60)
+            store.set('prices', prices, new Date().getTime() + 24*60*60*1000)
             return prices;
         }
     }

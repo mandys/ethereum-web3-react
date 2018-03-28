@@ -248,11 +248,6 @@ class App extends Component {
 
     render() {
         addValidationRule('isInsufficientBalance', function (values, value, others) {
-            console.log('in validation');
-            return value*others[0] <= others[1];
-        })
-        addValidationRule('isInsufficientBalanceExchange', function (values, value, others) {
-            console.log('in validation');
             return value*others[0] <= others[1];
         })
         const { activeItem } = this.state
@@ -387,7 +382,7 @@ class App extends Component {
                                                         placeholder='0'
                                                         name='exchangeCoin'
                                                         onChange={this.setCoins}
-                                                        validations={`isNumeric,minLength:1,isInsufficientBalanceExchange:[${this.tradingCoin},${this.state.balances['WETH']}]`}
+                                                        validations={`isNumeric,minLength:1`}
                                                         instantValidation required
                                                         value={this.state.lastTradedPrice}
                                                         validationErrors={{ isNumeric: 'Numeric...', minLength: 'Required 1', isInsufficientBalanceExchange: 'Insufficient Balance' }}
