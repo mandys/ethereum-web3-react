@@ -82,7 +82,7 @@ class BdexAction {
                 console.log('resp',response)
                 let bal = parseFloat(order.toTokenValue) - (response/Math.pow(10, this.DECIMALS))
                 console.log('bal',bal);
-                if(bal > 0){
+                if(bal <= 0){
                     filledOrders.push(order)
                 } 
             }
