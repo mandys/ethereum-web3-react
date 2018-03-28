@@ -17,7 +17,6 @@ class App extends Component {
     tradingCoin = 0;
     exchangeCoin = 0;
     bdexUtil = null;
-    duration = 24*60*60
     state = { 
         activeItem: 'Welcome',
         balances: {
@@ -41,7 +40,8 @@ class App extends Component {
         orders: [],
         canSubmit: false,
         lastTradedPrice:0,
-        hideOrderForm: false
+        hideOrderForm: false,
+        duration:24*60*60
     }
     DECIMALS = 18
 
@@ -62,7 +62,7 @@ class App extends Component {
             salt: ZeroEx.generatePseudoRandomSalt(),
             makerFee: new BigNumber(0),
             takerFee: new BigNumber(0),
-            expirationUnixTimestampSec: new BigNumber(Date.now() + this.duration), // Valid for up to an hour
+            expirationUnixTimestampSec: new BigNumber(Date.now() + this.state.duration), // Valid for up to an hour
         };  
         if ( this.state.orderType === 'buy') {
             order.makerTokenAddress  = this.props.tokenContractAddresses[this.state.exchangeCoin]
@@ -241,7 +241,9 @@ class App extends Component {
     }
 
     setDuration = (e,data) => {
-        this.duration = data.value
+        this.setState({
+            duration: data.value
+        })
     }
 
     render() {
@@ -325,6 +327,7 @@ class App extends Component {
                                                         type='button'
                                                         size='mini'
                                                         value={60*60}
+                                                        color={this.state.duration === 60*60?'green':''}
                                                         onClick={this.setDuration}
                                                     />
                                                     <Button
@@ -332,7 +335,7 @@ class App extends Component {
                                                         type='button'
                                                         size='mini'
                                                         value={24*60*60}
-                                                        checked={true}
+                                                        color={this.state.duration === 24*60*60?'green':''}
                                                         onClick={this.setDuration}
                                                     />
                                                     <Button
@@ -340,6 +343,7 @@ class App extends Component {
                                                         type='button'
                                                         size='mini'
                                                         value={7*24*60*60}
+                                                        color={this.state.duration === 7*24*60*60?'green':''}
                                                         onClick={this.setDuration}
                                                     />
                                                     <Button
@@ -347,6 +351,7 @@ class App extends Component {
                                                         type='button'
                                                         size='mini'
                                                         value={30*24*60*60}
+                                                        color={this.state.duration === 30*24*60*60?'green':''}
                                                         onClick={this.setDuration}
                                                     />
                                                     </p>
