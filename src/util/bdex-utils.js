@@ -17,33 +17,44 @@ class BdexAction {
         }
         orders.push(order);
         store.set("orders", orders)
-        // axios.post('http://localhost:3001/orders/create', order, {
-        //     "Access-Control-Allow-Origin" : "*"
-        // })
-        // .then((orders) => {
-        //     console.log('savedOrder',orders)
-        //     return true;
-        // })
-        // .catch((e) => {
-        //     console.log(e);
-        //     return false;
-        // })
+        try{
+            axios.post('http://www-qaapi.binkd.com/orders/create', order, {
+                "Access-Control-Allow-Origin" : "*"
+            })
+            .then((orders) => {
+                console.log('savedOrder',orders)
+                return true;
+            })
+            .catch((e) => {
+                console.log(e);
+                return false;
+            })
+        } catch(e) {
+            console.log(e);
+            return;
+        }
     }
 
     getAllOrders = async() => {
-        // let responseData = await axios.get('http://localhost:3001/orders');
-        // let orders = responseData.data.results;
-        // if(orders) {
-        //     return orders;
-        // } else {
-        //     return [];
-        // }
-        let orders =[]
-        if(store.get("orders")) {
-            orders = store.get("orders");
+        try{
+            let responseData = await axios.get('http://www-qaapi.binkd.com/orders/1');
+            let orders = responseData.data.results;
+            if(orders) {
+                return orders;
+            } else {
+                return [];
+            }
+        } catch(e) {
+            console.log(e);
+            return [];
         }
-        console.log('all orders',orders);
-        return orders
+        
+        // let orders =[]
+        // if(store.get("orders")) {
+        //     orders = store.get("orders");
+        // }
+        // console.log('all orders',orders);
+        // return orders
     }
     isBigEnough(value) {
         return value > 0;
