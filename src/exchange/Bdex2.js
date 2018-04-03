@@ -7,7 +7,7 @@ import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
 import BdexUtil from '../util/bdex-utils'
 import WrapUnWrapEther from './components/WrapUnWrapEther'
-import KovanPopup from './components/bdex2/KovanPopup'
+
 class App extends Component {
     constructor(props) {
         super(props);
@@ -566,7 +566,7 @@ class App extends Component {
                         </Grid.Row>
 
                     </Grid>
-                    <KovanPopup />
+                    
                 </div>
                 
         );

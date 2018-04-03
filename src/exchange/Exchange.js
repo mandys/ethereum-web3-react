@@ -3,6 +3,7 @@ import Web3 from 'web3';
 import { InjectedWeb3Subprovider } from '@0xproject/subproviders';
 import { ZeroEx } from '0x.js';
 import { Dimmer, Loader } from 'semantic-ui-react'
+import KovanPopup from './components/bdex2/KovanPopup'
 const Web3ProviderEngine = require('web3-provider-engine');
 const RpcSubprovider = require('web3-provider-engine/subproviders/rpc.js')
 
@@ -12,13 +13,22 @@ const Exchange = (PassedComponent) => class extends Component {
         this.state = { 
             zeroEx : null,
             tokenContractAddresses: {},
-            ownerAddress:''
+            ownerAddress:'',
+            showKovanPopup:false
          };
         this.NETWORK_ID = 42;
         this.providerEngine = new Web3ProviderEngine();
         if ( typeof window.web3 !== 'undefined' ) {
             this.providerEngine.addProvider(new InjectedWeb3Subprovider(window.web3.currentProvider));
         }
+        window.web3.version.getNetwork((err, networkId)=>{
+            console.log('gettype(networkId)',typeof networkId);
+            console.log('gettype(networkId)',networkId);
+            if(networkId !== '42'){
+              this.setState({ showKovanPopup: true })
+            }
+        })
+        console.log(window.web3.currentProvider);
         this.providerEngine.addProvider(new RpcSubprovider({
             rpcUrl: 'http://54.219.243.226:8545/',
             // rpcUrl: 'https://kovan.infura.io/SNWrFm1CMX7BfYqvkFXf',
@@ -85,10 +95,15 @@ const Exchange = (PassedComponent) => class extends Component {
     render() {
 
         return (
-            this.state.zeroEx ? <PassedComponent {...this.state} {...this.props} web3={this.web3} /> :
-                <Dimmer active>
-                    <Loader size='massive'>Loading</Loader>
-                </Dimmer>
+            <div>
+                {
+                    this.state.zeroEx ? <PassedComponent {...this.state} {...this.props} web3={this.web3} /> :
+                    <Dimmer active>
+                        <Loader size='massive'>Loading</Loader>
+                    </Dimmer>
+                }
+                <KovanPopup showKovanPopup={this.state.showKovanPopup}/>
+            </div>
         )
     }
 }

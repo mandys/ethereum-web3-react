@@ -5,20 +5,6 @@ var expirePlugin = require('store/plugins/expire')
 store.addPlugin(expirePlugin)
 
 class WelcomeIntro extends Component {
-    state = { modalOpen: false }
-
-    componentDidMount = () => {
-        // const modalShown = store.get('modalShown')
-        // console.log('modalShown',modalShown, new Date().getTime() + 24*60*60);
-        // if(modalShown !== 1) {
-        //     this.setState({ modalOpen: true })
-        // }
-    }
-
-    handleClose = () => {
-        // store.set('modalShown', 1)
-        // this.setState({ modalOpen: false });
-    } 
     render() {
         return (
             <Container text={true} style={{height:'100%'}}>
@@ -78,11 +64,6 @@ class WelcomeIntro extends Component {
                     </Table.Body>
                 </Table>        
             </Container>
-                
-            // <Button color='green' onClick={this.handleClose} inverted>
-            //     <Icon name='checkmark' /> Got it
-            // </Button>
-               
         );
     }
 }
