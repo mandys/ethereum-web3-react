@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import io from 'socket.io-client';
 //import 'semantic-ui-css/semantic.min.css';
 import { Icon, Image, Grid, Table,  Button, Divider, Tab, Label, Transition, Checkbox } from 'semantic-ui-react'
 import {Input,Form } from 'formsy-semantic-ui-react';
@@ -8,13 +9,15 @@ import { ZeroEx } from '0x.js';
 import BdexUtil from '../util/bdex-utils'
 import WrapUnWrapEther from './components/WrapUnWrapEther'
 
+
 class App extends Component {
     constructor(props) {
         super(props);
         console.log(props);
        
     }
-    tradingCoin = 0;
+    socket = io('http://localhost:3001');
+    tradingCoin = 0; 
     exchangeCoin = 0;
     bdexUtil = null;
     state = { 
@@ -92,7 +95,16 @@ class App extends Component {
             };   
         
             console.log('signedOrder', signedOrder);
-            await this.bdexUtil.saveOrder({
+            // await this.bdexUtil.saveOrder({
+            //     "hash": orderHash,
+            //     "fromToken": this.state.tradingCoin,
+            //     "fromTokenValue": this.tradingCoin,
+            //     "toToken": this.state.exchangeCoin,
+            //     "toTokenValue": this.exchangeCoin,
+            //     "signedOrder": signedOrder,
+            //     "orderType": this.state.orderType
+            // });
+            this.socket.emit('add order', {
                 "hash": orderHash,
                 "fromToken": this.state.tradingCoin,
                 "fromTokenValue": this.tradingCoin,
@@ -100,8 +112,9 @@ class App extends Component {
                 "toTokenValue": this.exchangeCoin,
                 "signedOrder": signedOrder,
                 "orderType": this.state.orderType
+            }, (err) => {
+                console.log(err);
             });
-            this.showOrders();
             
             const isOrderValid = await this.props.zeroEx.exchange.validateOrderFillableOrThrowAsync(signedOrder);
             console.log('isOrderValid', isOrderValid);
@@ -160,6 +173,18 @@ class App extends Component {
             filledOrders: filledOrders
         })  
     }
+
+    updateOrderBook = () => {
+        this.socket.on('new order', (order) => {
+            let activeOrders = this.state.activeOrders;
+            activeOrders.push(order)
+            this.setState({
+                activeOrders: activeOrders
+            }) 
+        })
+        
+    }
+
     componentDidMount = async() => {
         console.log('props', this.props)
 
@@ -181,6 +206,7 @@ class App extends Component {
             this.setBalanceAllowance();
         }
         this.showOrders();
+        this.updateOrderBook()
         let myadd = '0x891c53A37d672783eD43E7b1f39ef360F62BA0D6'.toLowerCase();
         const indexFilterValues = {
             maker: myadd,
