@@ -6,6 +6,7 @@ import App from './Bdex2'
 import WelcomeIntro from '../util/WelcomeIntro'
 import Account from './components/bdex2/Account'
 import Support from './components/bdex2/Support'
+import './css/App.css'
 
 class BdexRouter extends Component {
     constructor(props) {
@@ -24,7 +25,7 @@ class BdexRouter extends Component {
         return (
             <BrowserRouter>
                 <Container fluid>
-                    <Segment raised inverted>
+                    <Segment raised inverted color='blue'>
                         <Menu borderless color='blue' inverted size='large'>
                             <Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick}>
                                 <Image src='https://www.binkd.com/img/home/binkd_brand_name.png' size='small' />

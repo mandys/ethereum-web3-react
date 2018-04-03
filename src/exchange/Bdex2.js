@@ -269,7 +269,7 @@ class App extends Component {
                 <div>
                     <Grid celled='internally'>
                         <Grid.Row>
-                            <Grid.Column width={4}>
+                            <Grid.Column computer={4} mobile={16}>
                                 <Table compact='very' inverted>
                                     <Table.Body>
                                         <Table.Row>
@@ -422,13 +422,13 @@ class App extends Component {
                                     </Table.Body>
                                 </Table>                                
                             </Grid.Column>
-                            <Grid.Column textAlign="center" verticalAlign="middle" width={8}>
+                            <Grid.Column textAlign="center" verticalAlign="middle" computer={8} mobile={16}>
                                 iframe
                             </Grid.Column>
 
 
                             {/* ORDER BOOK */}
-                            <Grid.Column width={4}>
+                            <Grid.Column computer={4} mobile={16}>
                                 <Table inverted striped>
                                     <Table.Header>
                                         <Table.Row>
@@ -438,22 +438,22 @@ class App extends Component {
                                     <Table.Body>
                                         <Table.Row>
                                             <Table.Cell width="4">AMOUNT</Table.Cell>
-                                            <Table.Cell textAlign="right">PRICE</Table.Cell>
-                                            <Table.Cell textAlign="left" colSpan="2">SUM IN USD</Table.Cell>
+                                            <Table.Cell textAlign="right" width="4">PRICE</Table.Cell>
+                                            <Table.Cell textAlign="left" colSpan="2" width="8">SUM IN USD</Table.Cell>
                                         </Table.Row>
                                         {
                                             this.state.activeOrders.map((order,i) => {
                                                 let rowColor = (order.orderType === 'buy')?'green':'red'
                                                 return (
                                                     <Table.Row key={i}>
-                                                        <Table.Cell>{order.fromTokenValue}</Table.Cell>
-                                                        <Table.Cell textAlign="right">
+                                                        <Table.Cell width="4">{order.fromTokenValue}</Table.Cell>
+                                                        <Table.Cell textAlign="right" width="4">
                                                             <Label color={rowColor}>{order.toTokenValue}</Label>
                                                         </Table.Cell>
-                                                        <Table.Cell textAlign="right">
+                                                        <Table.Cell textAlign="right" width="4">
                                                             {(order.toTokenValue*this.state.prices['WETH']).toFixed(2)}
                                                         </Table.Cell>
-                                                        <Table.Cell textAlign="right">
+                                                        <Table.Cell textAlign="right" width="4">
                                                             <Button 
                                                                 onClick={() => this.fillOrder(order.signedOrder, order.toTokenValue) } 
                                                                 positive
@@ -471,7 +471,7 @@ class App extends Component {
 
                         {/* Your Balances */}
                         <Grid.Row>
-                            <Grid.Column width={4}>
+                            <Grid.Column computer={4} mobile={16}>
                                 <Table inverted striped>
                                     <Table.Header>
                                         <Table.Row>
@@ -522,7 +522,7 @@ class App extends Component {
                                     </Table.Body>
                                 </Table>
                             </Grid.Column>
-                            <Grid.Column width={8}>
+                            <Grid.Column computer={8} mobile={16}>
                                 <Table inverted striped>
                                     <Table.Body>
                                         <Table.Row>
@@ -531,7 +531,7 @@ class App extends Component {
                                     </Table.Body>
                                 </Table>
                             </Grid.Column>
-                            <Grid.Column width={4}>
+                            <Grid.Column computer={4} mobile={16}>
                                 <Table inverted striped>
                                     <Table.Header>
                                         <Table.Row>

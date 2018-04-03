@@ -1,0 +1,15 @@
+.ui.inverted.blue.segment {
+    background-color: #00477c !important;
+}
+.ui.inverted.table {
+    background: #166aa8 !important;
+}
+.ui.inverted.blue.menu, .ui.inverted.menu .blue.active.item {
+    background-color: #014e86 !important
+}
+.ui.inverted.segment, .ui.primary.inverted.segment {
+    background: #166aa8 !important;
+}
+
+
+
