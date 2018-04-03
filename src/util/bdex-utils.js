@@ -3,9 +3,16 @@ import { ZeroEx } from '0x.js';
 var store = require('store')
 var expirePlugin = require('store/plugins/expire')
 var axios = require('axios');
+var url = require('url');
 store.addPlugin(expirePlugin)
 class BdexAction {
     constructor(web3, zeroEx) {
+        var host = url.parse(window.location.href, true).host;
+        if(host === 'www-qaapi.binkd.com') {
+            this.baseUrl = 'http://www-qaapi.binkd.com/'
+        } else {
+            this.baseUrl = 'http://localhost:3001/'
+        }
         this.web3 = web3;
         this.zeroEx = zeroEx;
         this.DECIMALS = 18
@@ -18,7 +25,7 @@ class BdexAction {
         orders.push(order);
         store.set("orders", orders)
         try{
-            axios.post('http://www-qaapi.binkd.com/orders/create', order, {
+            axios.post(`${this.baseUrl}orders/create`, order, {
                 "Access-Control-Allow-Origin" : "*"
             })
             .then((orders) => {
@@ -35,9 +42,9 @@ class BdexAction {
         }
     }
 
-    getAllOrders = async() => {
+    getOrders = async(status) => {
         try{
-            let responseData = await axios.get('http://www-qaapi.binkd.com/orders/1');
+            let responseData = await axios.get(`${this.baseUrl}orders/${status}`);
             let orders = responseData.data.results;
             if(orders) {
                 return orders;
@@ -61,7 +68,7 @@ class BdexAction {
     }
 
     getActiveOrders = async() => {
-        let orders = await this.getAllOrders();
+        let orders = await this.getOrders('active');
         console.log('all orders', orders)
         let activeOrders = []
         try{
@@ -73,7 +80,7 @@ class BdexAction {
                 console.log('bal',bal);
                 if(bal > 0){
                     activeOrders.push(order)
-                } 
+                }  
             }
             console.log('all orders', orders)
             console.log('active orders', activeOrders)
@@ -84,25 +91,13 @@ class BdexAction {
     }
 
     getFilledOrders = async() => {
-        let orders = await this.getAllOrders();
-        let filledOrders = []
         try{
-            for(let i in orders) {
-                let order = orders[i];
-                let response = await this.zeroEx.exchange.getUnavailableTakerAmountAsync(order.hash)
-                console.log('resp',response)
-                let bal = parseFloat(order.toTokenValue) - (response/Math.pow(10, this.DECIMALS))
-                console.log('bal',bal);
-                if(bal <= 0){
-                    filledOrders.push(order)
-                } 
-            }
-            console.log('all orders', orders)
-            console.log('active orders', filledOrders)
+            let filledOrders = await this.getOrders('filled');
+            return filledOrders
         }catch(e)  {
             console.log('balerr',e)
+            return [];
         }
-        return filledOrders;
     }
 
     getBalances = async(ownerAddress, tokenContractAddresses) => {
