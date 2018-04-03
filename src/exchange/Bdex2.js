@@ -270,7 +270,7 @@ class App extends Component {
                     <Grid celled='internally'>
                         <Grid.Row>
                             <Grid.Column computer={4} mobile={16}>
-                                <Table compact='very' inverted>
+                                <Table compact='very' inverted unstackable>
                                     <Table.Body>
                                         <Table.Row>
                                             <Table.Cell width="2"><Image src="https://assets.paradex.io/icons/zrx.svg" size="mini" /></Table.Cell>
@@ -429,7 +429,7 @@ class App extends Component {
 
                             {/* ORDER BOOK */}
                             <Grid.Column computer={4} mobile={16}>
-                                <Table inverted striped>
+                                <Table inverted striped unstackable>
                                     <Table.Header>
                                         <Table.Row>
                                             <Table.HeaderCell colSpan="4">ZRX:WETH ORDER BOOK</Table.HeaderCell>
@@ -472,7 +472,7 @@ class App extends Component {
                         {/* Your Balances */}
                         <Grid.Row>
                             <Grid.Column computer={4} mobile={16}>
-                                <Table inverted striped>
+                                <Table inverted striped unstackable>
                                     <Table.Header>
                                         <Table.Row>
                                             <Table.HeaderCell colSpan="3">Your Balances</Table.HeaderCell>
@@ -523,7 +523,7 @@ class App extends Component {
                                 </Table>
                             </Grid.Column>
                             <Grid.Column computer={8} mobile={16}>
-                                <Table inverted striped>
+                                <Table inverted striped unstackable>
                                     <Table.Body>
                                         <Table.Row>
                                                 <Tab as="td" menu={{ secondary: true, pointing: true, inverted: true }} panes={panes} />
@@ -532,7 +532,7 @@ class App extends Component {
                                 </Table>
                             </Grid.Column>
                             <Grid.Column computer={4} mobile={16}>
-                                <Table inverted striped>
+                                <Table inverted striped unstackable>
                                     <Table.Header>
                                         <Table.Row>
                                             <Table.HeaderCell colSpan="3">TRADE HISTORY</Table.HeaderCell>
