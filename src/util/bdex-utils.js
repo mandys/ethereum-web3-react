@@ -8,10 +8,10 @@ store.addPlugin(expirePlugin)
 class BdexAction {
     constructor(web3, zeroEx) {
         var host = url.parse(window.location.href, true).host;
-        if(host === 'www-qaapi.binkd.com') {
-            this.baseUrl = 'http://www-qaapi.binkd.com/'
-        } else {
+        if(host === 'localhost:3000') {
             this.baseUrl = 'http://localhost:3001/'
+        } else {
+            this.baseUrl = 'http://www-qaapi.binkd.com/'
         }
         this.web3 = web3;
         this.zeroEx = zeroEx;

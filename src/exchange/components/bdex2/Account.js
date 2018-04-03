@@ -49,14 +49,18 @@ class Account extends Component {
     cancelOrder = async(signedOrder, toAmountValue) => {
         console.log('signedOrder',signedOrder)
         console.log('toAmount',toAmountValue)
-        const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(toAmountValue), this.DECIMALS);
-        // const signedOrder = this.convertPortalOrder(signedOrder);
-        const txHash = await this.props.zeroEx.exchange.cancelOrderAsync(
-            this.bdexUtil.convertPortalOrder(signedOrder),
-            fillTakerTokenAmount
-        );
-        console.log('txHash', txHash);
-        console.log('txHash', txHash);
+        try {
+            const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(toAmountValue), this.DECIMALS);
+            // const signedOrder = this.convertPortalOrder(signedOrder);
+            const txHash = await this.props.zeroEx.exchange.cancelOrderAsync(
+                this.bdexUtil.convertPortalOrder(signedOrder),
+                fillTakerTokenAmount
+            );
+            console.log('txHash', txHash);
+        } catch (e) {
+            console.log(e)
+        }
+        
     }
     
     render() {
