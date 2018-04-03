@@ -437,7 +437,7 @@ class App extends Component {
                                     </Table.Header>
                                     <Table.Body>
                                         <Table.Row>
-                                            <Table.Cell width="4">AMOUNT</Table.Cell>
+                                            <Table.Cell>AMOUNT</Table.Cell>
                                             <Table.Cell textAlign="right" width="4">PRICE</Table.Cell>
                                             <Table.Cell textAlign="left" colSpan="2" width="8">SUM IN USD</Table.Cell>
                                         </Table.Row>
@@ -446,15 +446,15 @@ class App extends Component {
                                                 let rowColor = (order.orderType === 'buy')?'green':'red'
                                                 return (
                                                     <Table.Row key={i}>
-                                                        <Table.Cell width="4">{order.fromTokenValue}</Table.Cell>
-                                                        <Table.Cell textAlign="right" width="4">
+                                                        <Table.Cell>{order.fromTokenValue}</Table.Cell>
+                                                        <Table.Cell textAlign="right">
                                                             <Label color={rowColor}>{order.toTokenValue}</Label>
                                                         </Table.Cell>
-                                                        <Table.Cell textAlign="right" width="4">
+                                                        <Table.Cell textAlign="right">
                                                             {(order.toTokenValue*this.state.prices['WETH']).toFixed(2)}
                                                         </Table.Cell>
-                                                        <Table.Cell textAlign="right" width="4">
-                                                            <Button 
+                                                        <Table.Cell textAlign="right">
+                                                            <Button size='mini'
                                                                 onClick={() => this.fillOrder(order.signedOrder, order.toTokenValue) } 
                                                                 positive
                                                             >Fill</Button>
