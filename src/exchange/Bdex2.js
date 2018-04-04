@@ -7,6 +7,7 @@ import {addValidationRule} from 'formsy-react';
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
 import BdexUtil from '../util/bdex-utils'
+import DataTable from '../util/Datatable'
 import WrapUnWrapEther from './components/WrapUnWrapEther'
 
 
@@ -593,6 +594,12 @@ class App extends Component {
                                     }
                                     </Table.Body>
                                 </Table>
+                                <DataTable
+                                    data={[{'value1':1,'value2':1},{'value1':2,'value2':2}]}
+                                    header
+                                    pageLimit={1}
+                                    columns={[{key:"value1", display:"value2"}]}
+                                />
                             </Grid.Column>
                         </Grid.Row>
 
