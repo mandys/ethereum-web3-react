@@ -104,7 +104,7 @@ class App extends Component {
             //     "signedOrder": signedOrder,
             //     "orderType": this.state.orderType
             // });
-            this.socket.emit('add order', {
+            this.socket.emit('addorder', {
                 "hash": orderHash,
                 "fromToken": this.state.tradingCoin,
                 "fromTokenValue": this.tradingCoin,
@@ -175,7 +175,8 @@ class App extends Component {
     }
 
     updateOrderBook = () => {
-        this.socket.on('new order', (order) => {
+        this.socket.on('neworder', (order) => {
+            console.log("NEW ORDER LOGGED")
             let activeOrders = this.state.activeOrders;
             activeOrders.push(order)
             this.setState({
@@ -195,7 +196,7 @@ class App extends Component {
             
         this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
         console.log(this.bdexUtil)
-        this.socket = io(`${this.bdexUtil.baseUrl}:80`);
+        this.socket = io('http://www-qaapi.binkd.com:80');
         console.log(this.socket)
         let prices = await this.bdexUtil.getMarketPrices();
         console.log("prices",prices)
