@@ -10,9 +10,10 @@ class BdexAction {
     constructor(web3, zeroEx) {
         var host = url.parse(window.location.href, true).host;
         if(host === 'localhost:3000') {
-            this.baseUrl = 'http://localhost:3001/'
+            // this.baseUrl = 'http://localhost:3001/'
+            this.baseUrl = 'http://www-qaapi.binkd.com'
         } else {
-            this.baseUrl = 'http://www-qaapi.binkd.com/'
+            this.baseUrl = 'http://www-qaapi.binkd.com'
         }
         this.web3 = web3;
         this.zeroEx = zeroEx;
@@ -26,7 +27,7 @@ class BdexAction {
         orders.push(order);
         store.set("orders", orders)
         try{
-            axios.post(`${this.baseUrl}orders/create`, order, {
+            axios.post(`${this.baseUrl}/orders/create`, order, {
                 "Access-Control-Allow-Origin" : "*"
             })
             .then((orders) => {
@@ -45,7 +46,7 @@ class BdexAction {
 
     getOrders = async(status) => {
         try{
-            let responseData = await axios.get(`${this.baseUrl}orders/${status}`);
+            let responseData = await axios.get(`${this.baseUrl}/orders/${status}`);
             let orders = responseData.data.results;
             if(orders) {
                 return orders;

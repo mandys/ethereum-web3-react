@@ -16,7 +16,7 @@ class App extends Component {
         console.log(props);
        
     }
-    socket = io('http://localhost:3001');
+    socket;
     tradingCoin = 0; 
     exchangeCoin = 0;
     bdexUtil = null;
@@ -192,7 +192,11 @@ class App extends Component {
             * as Metamask might be locked and then ZeroEx cannot
             * read the address
             */
+            
         this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
+        console.log(this.bdexUtil)
+        this.socket = io(`${this.bdexUtil.baseUrl}:80`);
+        console.log(this.socket)
         let prices = await this.bdexUtil.getMarketPrices();
         console.log("prices",prices)
         this.setState({
