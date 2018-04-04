@@ -21,6 +21,7 @@
     "react-scripts": "1.1.1",
     "semantic-ui-css": "^2.3.0",
     "semantic-ui-react": "^0.79.0",
+    "socket.io-client": "^2.1.0",
     "store": "^2.0.12",
     "web3": "0.20.4",
     "web3-provider-engine": "^13.6.5"
