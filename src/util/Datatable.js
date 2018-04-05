@@ -7,7 +7,6 @@ import capitalize from 'lodash/capitalize'
 import flatten from 'lodash/flatten'
 import orderBy from 'lodash/orderBy'
 import debounce from 'lodash/debounce'
-import Pagination from 'semantic-ui-react-button-pagination';
 
 const dataParser = (obj) => {
 	if(!obj) return [{}]
