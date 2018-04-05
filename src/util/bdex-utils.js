@@ -10,10 +10,12 @@ class BdexAction {
     constructor(web3, zeroEx) {
         var host = url.parse(window.location.href, true).host;
         if(host === 'localhost:3000') {
-            // this.baseUrl = 'http://localhost:3001/'
-            this.baseUrl = 'http://www-qaapi.binkd.com'
+            this.baseUrl = 'http://localhost:3001'
+            this.socketend = 'http://localhost:3001'
+            // this.baseUrl = 'http://www-qaapi.binkd.com'
         } else {
             this.baseUrl = 'http://www-qaapi.binkd.com'
+            this.socketend = 'http://www-qaapi.binkd.com:80'
         }
         this.web3 = web3;
         this.zeroEx = zeroEx;

@@ -167,7 +167,7 @@ class App extends Component {
         })  
     }
 
-    updateOrderBook = () => {
+    socketListner = () => {
         this.socket.on('neworder', (order) => {
             console.log("NEW ORDER LOGGED")
             let activeOrders = this.state.activeOrders;
@@ -177,11 +177,28 @@ class App extends Component {
             }) 
         })
         
+        this.socket.on('fillorder', (orderhash) => {
+            console.log("fillorder LOGGED")
+            let filledOrders = this.state.filledOrders;
+            let filledOrder;
+            let activeOrders = this.state.activeOrders.filter((order) => {
+                if(order.hash !== orderhash) {
+                    return true
+                }
+                filledOrder = order
+                return false;
+            })
+            filledOrders.push(filledOrder)
+            this.setState({
+                activeOrders: activeOrders,
+                filledOrders: filledOrders
+            }) 
+        })
     }
 
     componentDidMount = async() => {
         this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
-        this.socket = io('http://www-qaapi.binkd.com:80');
+        this.socket = io(`${this.bdexUtil.socketend}`);
         let prices = await this.bdexUtil.getMarketPrices();
         let userActiveOrders = await this.bdexUtil.getUserActiveOrders(this.props.ownerAddress);
         this.setState({
@@ -196,7 +213,7 @@ class App extends Component {
             this.setBalanceAllowance();
         }
         this.showOrders();
-        this.updateOrderBook();
+        this.socketListner();
         
 
         // let myadd = '0x891c53A37d672783eD43E7b1f39ef360F62BA0D6'.toLowerCase();
@@ -242,23 +259,32 @@ class App extends Component {
         this.setState({ canSubmit: true });
     }
 
-    fillOrder = async(signedOrder, toAmountValue) => {
-
-        console.log('signedOrder',signedOrder)
-        console.log('toAmount',toAmountValue)
-        const shouldThrowOnInsufficientBalanceOrAllowance = false;
-        const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(parseFloat(signedOrder.takerTokenAmount)), this.DECIMALS);
-        // const signedOrder = this.convertPortalOrder(signedOrder);
-        const txHash = await this.props.zeroEx.exchange.fillOrderAsync(
-            this.bdexUtil.convertPortalOrder(signedOrder),
-            fillTakerTokenAmount,
-            shouldThrowOnInsufficientBalanceOrAllowance,
-            this.props.ownerAddress
-        );
-        console.log('txHash', txHash);
-        console.log('txHash', txHash);
-        const txReceipt = await this.props.zeroEx.awaitTransactionMinedAsync(txHash);
-        console.log('FillOrder transaction receipt: ', txReceipt);
+    fillOrder = async(signedOrder, toAmountValue, orderHash) => {
+        try{
+            console.log('signedOrder',signedOrder)
+            console.log('toAmount',toAmountValue)
+            const shouldThrowOnInsufficientBalanceOrAllowance = false;
+            const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(parseFloat(signedOrder.takerTokenAmount)), this.DECIMALS);
+            // const signedOrder = this.convertPortalOrder(signedOrder);
+            
+            const txHash = await this.props.zeroEx.exchange.fillOrderAsync(
+                this.bdexUtil.convertPortalOrder(signedOrder),
+                fillTakerTokenAmount,
+                shouldThrowOnInsufficientBalanceOrAllowance,
+                this.props.ownerAddress
+            );
+            console.log('txHash', txHash);
+            console.log('txHash', txHash);
+            this.socket.emit('fillorder', {
+                "hash": orderHash
+            }, (err) => {
+                console.log(err);
+            });
+            const txReceipt = await this.props.zeroEx.awaitTransactionMinedAsync(txHash);
+            console.log('FillOrder transaction receipt: ', txReceipt);
+        } catch(e) {
+            console.log('fillorder error', e);
+        }
     }
 
     flipOrder = () => {
@@ -483,7 +509,7 @@ class App extends Component {
                                             sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
                                             action: <Button size='mini' 
                                                         onClick={
-                                                            () =>this.fillOrder(order.signedOrder, order.toTokenValue)
+                                                            () =>this.fillOrder(order.signedOrder, order.toTokenValue, order.hash)
                                                         }
                                                         positive
                                                     >
