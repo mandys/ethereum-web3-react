@@ -291,6 +291,7 @@ class App extends Component {
         addValidationRule('isInsufficientBalance', function (values, value, others) {
             return value*others[0] <= others[1];
         })
+        let activeOrders = [];
         const { activeItem } = this.state
         const panes = [
             { menuItem: 'Open Orders', render: () => <Tab.Pane inverted padded="very" attached={false}>You have no open orders for this market.</Tab.Pane> },
@@ -461,43 +462,37 @@ class App extends Component {
 
                             {/* ORDER BOOK */}
                             <Grid.Column computer={4} mobile={16}>
-                                <Table inverted striped unstackable>
-                                    <Table.Header>
-                                        <Table.Row>
-                                            <Table.HeaderCell colSpan="4">ZRX:WETH ORDER BOOK</Table.HeaderCell>
-                                        </Table.Row>
-                                    </Table.Header>
-                                    <Table.Body>
-                                        <Table.Row>
-                                            <Table.Cell>AMOUNT</Table.Cell>
-                                            <Table.Cell textAlign="right" width="4">PRICE</Table.Cell>
-                                            <Table.Cell textAlign="left" colSpan="2" width="8">SUM IN USD</Table.Cell>
-                                        </Table.Row>
-                                        {
-                                            this.state.activeOrders.map((order,i) => {
-                                                let rowColor = (order.orderType === 'buy')?'green':'red'
-                                                return (
-                                                    <Table.Row key={i}>
-                                                        <Table.Cell>{order.fromTokenValue}</Table.Cell>
-                                                        <Table.Cell textAlign="right">
-                                                            <Label color={rowColor}>{order.toTokenValue}</Label>
-                                                        </Table.Cell>
-                                                        <Table.Cell textAlign="right">
-                                                            {(order.toTokenValue*this.state.prices['WETH']).toFixed(2)}
-                                                        </Table.Cell>
-                                                        <Table.Cell textAlign="right">
-                                                            <Button size='mini'
-                                                                onClick={() => this.fillOrder(order.signedOrder, order.toTokenValue) } 
-                                                                positive
-                                                            >Fill</Button>
-                                                        </Table.Cell>
-                                                    </Table.Row>
-                                                )
-                                            })
-                                        }
-
-                                    </Table.Body>
-                                </Table>
+                                {
+                                    this.state.activeOrders.forEach((order,i) => {
+                                        activeOrders.push({
+                                            amount: order.fromTokenValue,
+                                            price: <Label color={(order.orderType === 'buy')?'green':'red'} basic>
+                                                        {order.toTokenValue}
+                                                    </Label>,
+                                            sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
+                                            action: <Button size='mini' 
+                                                        onClick={
+                                                            () =>this.fillOrder(order.signedOrder, order.toTokenValue)
+                                                        }
+                                                        positive
+                                                    >
+                                                        Fill
+                                                    </Button>
+                                        })
+                                    })
+                                }
+                                <DataTable
+                                    data={activeOrders}
+                                    header
+                                    mainHeader={`${this.state.tradingCoin}:${this.state.exchangeCoin} ORDER BOOK`}
+                                    columns={[
+                                                {key:"amount", display:"AMOUNT"},
+                                                {key:"price", display:"PRICE"},
+                                                {key:"sum", display:"SUM IN USD",colSpan:2},
+                                                {key:"action"}
+                                            ]}
+                                    pageLimit={4}
+                                />
                             </Grid.Column>
                         </Grid.Row>
 
@@ -594,16 +589,7 @@ class App extends Component {
                                     }
                                     </Table.Body>
                                 </Table>
-                                <DataTable
-                                    data={this.state.activeOrders}
-                                    header
-                                    pageLimit={5}
-                                    columns={[
-                                                {key:"fromTokenValue", display:"AMOUNT"},
-                                                {key:"toTokenValue", display:"PRICE"},
-                                                {key:"toTokenValue", display:"SUM IN USD"}
-                                            ]}
-                                />
+                                
                             </Grid.Column>
                         </Grid.Row>
 

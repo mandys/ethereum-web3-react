@@ -68,6 +68,7 @@ const dataParser = (obj) => {
 class DataTable extends Component {
 	defaultPageLimit = 15
 	defaultShowSearch = false;
+	defaultMainHeader = "";
 	constructor(props) {
 		super(props)
 		this.data = props.data
@@ -76,6 +77,7 @@ class DataTable extends Component {
 		this.columns = props.columns || dataParser((this.data || []).pop())
 		this.paginationLimit = props.pageLimit || this.defaultPageLimit
 		this.showSearch = props.showSearch || this.defaultShowSearch
+		this.mainHeader = props.mainHeader || this.defaultMainHeader
 		const data = this.paginate(this.data)
 
 		this.orignalPagedData = data
@@ -95,6 +97,7 @@ class DataTable extends Component {
 		this.columns = newProps.columns || dataParser((this.data || []).pop())
 		this.paginationLimit = newProps.pageLimit || this.defaultPageLimit
 		this.showSearch = newProps.showSearch || this.defaultShowSearch
+		this.mainHeader = newProps.mainHeader || this.defaultMainHeader
 		const data = this.paginate(this.data)
 
 		this.orignalPagedData = data
@@ -120,6 +123,7 @@ class DataTable extends Component {
 			defaults: PropTypes.any,
 			accessor: PropTypes.func,
 			decorator: PropTypes.func,
+			colSpan:PropTypes.number
 		})),
 	}
 
@@ -127,7 +131,9 @@ class DataTable extends Component {
 		return (
 			<Table.Row>
 				{columns.map((column, index) => (
-					<Table.HeaderCell onClick={() => onClick(column)} className={classNameGenerator(column.key)} key={index}>
+					column.display && 
+					<Table.HeaderCell onClick={() => onClick(column)} className={classNameGenerator(column.key)} key={index} 
+						colSpan={column.colSpan?column.colSpan:1}>
 						{column.display}
 					</Table.HeaderCell>
 				))}
@@ -245,8 +251,16 @@ class DataTable extends Component {
 						<Input icon='search' value={this.state.query || ''} onChange={this.onSearch} placeholder='Search...' />
 					</Segment>
 				}
-				<Table celled attached className='sortable' inverted>
-					<Table.Header>
+				<Table className='sortable' compact inverted unstackable striped >
+				<Table.Header>
+					{
+						(this.mainHeader !== "") &&
+							
+								<Table.Row>
+									<Table.HeaderCell colSpan={this.columns.length}>{this.mainHeader}</Table.HeaderCell>
+								</Table.Row>
+							
+						}
 						{this.columns && this.renderHeader(this.columns, this.onSort, this.headerClass)}
 					</Table.Header>
 					<Table.Body>
