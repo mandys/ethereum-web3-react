@@ -15,7 +15,6 @@ class App extends Component {
     constructor(props) {
         super(props);
         console.log(props);
-       
     }
     socket;
     tradingCoin = 0; 
@@ -173,7 +172,7 @@ class App extends Component {
             let activeOrders = this.state.activeOrders;
             activeOrders.push(order)
             this.setState({
-                activeOrders: activeOrders
+                activeOrders: activeOrders 
             }) 
         })
         
@@ -316,6 +315,12 @@ class App extends Component {
                                             {order.toTokenValue}
                                         </Label>,
                                 sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
+                                action: <Button 
+                                        onClick={() => this.bdexUtil.cancelOrder(order.signedOrder, order.toTokenValue) } 
+                                        negative
+                                        >
+                                            Cancel
+                                        </Button> 
                             })
                         })
                 }
@@ -326,7 +331,8 @@ class App extends Component {
                         columns={[
                                     {key:"amount", display:"AMOUNT"},
                                     {key:"price", display:"PRICE"},
-                                    {key:"sum", display:"SUM IN USD"}
+                                    {key:"sum", display:"SUM IN USD",colSpan:2},
+                                    {key:"action"}
                                 ]}
                         pageLimit={4}
                     />

@@ -177,6 +177,23 @@ class BdexAction {
         }
     }
 
+    cancelOrder = async(signedOrder, toAmountValue) => {
+        console.log('signedOrder',signedOrder)
+        console.log('toAmount',toAmountValue)
+        try {
+            const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(toAmountValue), this.DECIMALS);
+            // const signedOrder = this.convertPortalOrder(signedOrder);
+            const txHash = await this.zeroEx.exchange.cancelOrderAsync(
+                this.convertPortalOrder(signedOrder),
+                fillTakerTokenAmount
+            );
+            console.log('txHash', txHash);
+        } catch (e) {
+            console.log(e)
+        }
+        
+    }
+
     
 
 

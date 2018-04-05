@@ -96,7 +96,6 @@ class Account extends Component {
                                                 this.state.allowance.ZRX !== 0 ? <Icon name="unlock" /> :
                                                     (
                                                         <Button name="ZRX" icon onClick={this.takeAllowance}><Icon name="lock" /></Button>
-
                                                     )
                                             }
                                         </Table.Cell>
@@ -141,7 +140,7 @@ class Account extends Component {
                                                 <Table.Cell>{order.toTokenValue}</Table.Cell>
                                                 <Table.Cell>{order.toTokenValue*this.state.prices['WETH']}</Table.Cell>
                                                 <Table.Cell>
-                                                    <Button onClick={() => this.cancelOrder(order.signedOrder, order.toTokenValue) } negative>Cancel</Button> 
+                                                    <Button onClick={() => this.bdexUtil.cancelOrder(order.signedOrder, order.toTokenValue) } negative>Cancel</Button> 
                                                 </Table.Cell>
                                             </Table.Row>
                                         )
