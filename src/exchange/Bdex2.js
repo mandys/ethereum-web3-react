@@ -595,10 +595,14 @@ class App extends Component {
                                     </Table.Body>
                                 </Table>
                                 <DataTable
-                                    data={[{'value1':1,'value2':1},{'value1':2,'value2':2}]}
+                                    data={this.state.activeOrders}
                                     header
-                                    pageLimit={1}
-                                    columns={[{key:"value1", display:"value2"}]}
+                                    pageLimit={5}
+                                    columns={[
+                                                {key:"fromTokenValue", display:"AMOUNT"},
+                                                {key:"toTokenValue", display:"PRICE"},
+                                                {key:"toTokenValue", display:"SUM IN USD"}
+                                            ]}
                                 />
                             </Grid.Column>
                         </Grid.Row>

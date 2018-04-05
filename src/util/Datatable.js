@@ -67,7 +67,7 @@ const dataParser = (obj) => {
 */
 class DataTable extends Component {
 	defaultPageLimit = 15
-
+	defaultShowSearch = false;
 	constructor(props) {
 		super(props)
 		this.data = props.data
@@ -75,7 +75,7 @@ class DataTable extends Component {
 		this.renderHeader = props.renderHeaderRow || this.defaultRenderHeaderRow
 		this.columns = props.columns || dataParser((this.data || []).pop())
 		this.paginationLimit = props.pageLimit || this.defaultPageLimit
-
+		this.showSearch = props.showSearch || this.defaultShowSearch
 		const data = this.paginate(this.data)
 
 		this.orignalPagedData = data
@@ -94,7 +94,7 @@ class DataTable extends Component {
 		this.renderHeader = newProps.renderHeaderRow || this.defaultRenderHeaderRow
 		this.columns = newProps.columns || dataParser((this.data || []).pop())
 		this.paginationLimit = newProps.pageLimit || this.defaultPageLimit
-
+		this.showSearch = newProps.showSearch || this.defaultShowSearch
 		const data = this.paginate(this.data)
 
 		this.orignalPagedData = data
@@ -112,6 +112,7 @@ class DataTable extends Component {
 		renderBodyRow: PropTypes.func,
 		renderHeaderRow: PropTypes.func,
 		pageLimit: PropTypes.number,
+		showSearch: PropTypes.bool,
 		columns: PropTypes.arrayOf(PropTypes.shape({
 			key: PropTypes.string,
 			type: PropTypes.string,
@@ -238,10 +239,13 @@ class DataTable extends Component {
 	render() {
 		return (
 			<div>
-				<Segment attached='top' floated="right">
-					<Input icon='search' value={this.state.query || ''} onChange={this.onSearch} placeholder='Search...' />
-				</Segment>
-				<Table celled attached className='sortable'>
+				{
+				this.showSearch &&
+					<Segment attached='top' floated="right">
+						<Input icon='search' value={this.state.query || ''} onChange={this.onSearch} placeholder='Search...' />
+					</Segment>
+				}
+				<Table celled attached className='sortable' inverted>
 					<Table.Header>
 						{this.columns && this.renderHeader(this.columns, this.onSort, this.headerClass)}
 					</Table.Header>
