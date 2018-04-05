@@ -19,30 +19,30 @@ class BdexAction {
         this.zeroEx = zeroEx;
         this.DECIMALS = 18
     }
-    saveOrder = (order) => {
-        let orders = [];
-        if(store.get("orders")) {
-            orders = store.get("orders");
-        }
-        orders.push(order);
-        store.set("orders", orders)
-        try{
-            axios.post(`${this.baseUrl}/orders/create`, order, {
-                "Access-Control-Allow-Origin" : "*"
-            })
-            .then((orders) => {
-                console.log('savedOrder',orders)
-                return true;
-            })
-            .catch((e) => {
-                console.log(e);
-                return false;
-            })
-        } catch(e) {
-            console.log(e);
-            return;
-        }
-    }
+    // saveOrder = (order) => {
+    //     let orders = [];
+    //     if(store.get("orders")) {
+    //         orders = store.get("orders");
+    //     }
+    //     orders.push(order);
+    //     store.set("orders", orders)
+    //     try{
+    //         axios.post(`${this.baseUrl}/orders/create`, order, {
+    //             "Access-Control-Allow-Origin" : "*"
+    //         })
+    //         .then((orders) => {
+    //             console.log('savedOrder',orders)
+    //             return true;
+    //         })
+    //         .catch((e) => {
+    //             console.log(e);
+    //             return false;
+    //         })
+    //     } catch(e) {
+    //         console.log(e);
+    //         return;
+    //     }
+    // }
 
     getOrders = async(status) => {
         try{
@@ -90,6 +90,22 @@ class BdexAction {
             console.log('balerr',e)
         }
         return activeOrders;
+    }
+
+    getUserActiveOrders = async(ownerAddress) => {
+        try{
+            let response = await axios.get(`${this.baseUrl}/users/orders/${ownerAddress}`);
+            let userActiveOrders = response.data
+            console.log('userActiveOrders', userActiveOrders)
+            if(userActiveOrders) {
+                return userActiveOrders;
+            } else {
+                return [];
+            }
+        } catch(e) {
+            console.log(e);
+            return [];
+        }
     }
 
     getFilledOrders = async() => {

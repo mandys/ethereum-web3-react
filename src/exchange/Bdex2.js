@@ -43,6 +43,7 @@ class App extends Component {
         orderType: 'buy',
         activeOrders: [],
         filledOrders:[],
+        userActiveOrders:[],
         canSubmit: false,
         lastTradedPrice:0,
         hideOrderForm: false,
@@ -96,15 +97,6 @@ class App extends Component {
             };   
         
             console.log('signedOrder', signedOrder);
-            // await this.bdexUtil.saveOrder({
-            //     "hash": orderHash,
-            //     "fromToken": this.state.tradingCoin,
-            //     "fromTokenValue": this.tradingCoin,
-            //     "toToken": this.state.exchangeCoin,
-            //     "toTokenValue": this.exchangeCoin,
-            //     "signedOrder": signedOrder,
-            //     "orderType": this.state.orderType
-            // });
             this.socket.emit('addorder', {
                 "hash": orderHash,
                 "fromToken": this.state.tradingCoin,
@@ -188,22 +180,14 @@ class App extends Component {
     }
 
     componentDidMount = async() => {
-        console.log('props', this.props)
-
-        /* From exchange, ownerAddress could come as null
-            * as Metamask might be locked and then ZeroEx cannot
-            * read the address
-            */
-            
         this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
-        console.log(this.bdexUtil)
         this.socket = io('http://www-qaapi.binkd.com:80');
-        console.log(this.socket)
         let prices = await this.bdexUtil.getMarketPrices();
-        console.log("prices",prices)
+        let userActiveOrders = await this.bdexUtil.getUserActiveOrders(this.props.ownerAddress);
         this.setState({
             prices: prices,
-            lastTradedPrice:(prices['ZRX'] / prices['WETH']).toFixed(8)
+            lastTradedPrice:(prices['ZRX'] / prices['WETH']).toFixed(8),
+            userActiveOrders: userActiveOrders
         }, () => {
             this.exchangeCoin = this.state.lastTradedPrice
         })
@@ -212,16 +196,18 @@ class App extends Component {
             this.setBalanceAllowance();
         }
         this.showOrders();
-        this.updateOrderBook()
-        let myadd = '0x891c53A37d672783eD43E7b1f39ef360F62BA0D6'.toLowerCase();
-        const indexFilterValues = {
-            maker: myadd,
-        };
-        this.props.zeroEx.exchange.subscribe('LogCancel',indexFilterValues, (e,l)=>{
-            console.log('here in subscribe');
-            console.log('err sub',e);
-            console.log('err sub',l);
-        })
+        this.updateOrderBook();
+        
+
+        // let myadd = '0x891c53A37d672783eD43E7b1f39ef360F62BA0D6'.toLowerCase();
+        // const indexFilterValues = {
+        //     maker: myadd,
+        // };
+        // this.props.zeroEx.exchange.subscribe('LogCancel',indexFilterValues, (e,l)=>{
+        //     console.log('here in subscribe');
+        //     console.log('err sub',e);
+        //     console.log('err sub',l);
+        // })
     }
 
     componentDidUpdate = async(prevProps, prevState) => {
@@ -292,9 +278,34 @@ class App extends Component {
             return value*others[0] <= others[1];
         })
         let activeOrders = [];
+        let userActiveOrders = [];
         const { activeItem } = this.state
         const panes = [
-            { menuItem: 'Open Orders', render: () => <Tab.Pane inverted padded="very" attached={false}>You have no open orders for this market.</Tab.Pane> },
+            { menuItem: 'Open Orders', render: () => <Tab.Pane inverted attached={false}>
+                {
+                    this.state.userActiveOrders.forEach((order,i) => {
+                        userActiveOrders.push({
+                                amount: order.fromTokenValue,
+                                price: <Label color={(order.orderType === 'buy')?'green':'red'} basic>
+                                            {order.toTokenValue}
+                                        </Label>,
+                                sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
+                            })
+                        })
+                }
+                    <DataTable
+                        data={userActiveOrders}
+                        header
+                        mainHeader={`${this.state.tradingCoin}:${this.state.exchangeCoin} ORDER BOOK`}
+                        columns={[
+                                    {key:"amount", display:"AMOUNT"},
+                                    {key:"price", display:"PRICE"},
+                                    {key:"sum", display:"SUM IN USD"}
+                                ]}
+                        pageLimit={4}
+                    />
+                </Tab.Pane> 
+            },
             { menuItem: 'Filled Orders', render: () => <Tab.Pane inverted padded="very" attached={false}>You have no filled orders for this market.</Tab.Pane> },
         ]
         const errorLabel = <Label color="red" pointing/>

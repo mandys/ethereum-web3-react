@@ -7,6 +7,7 @@ import capitalize from 'lodash/capitalize'
 import flatten from 'lodash/flatten'
 import orderBy from 'lodash/orderBy'
 import debounce from 'lodash/debounce'
+import Pagination from 'semantic-ui-react-button-pagination';
 
 const dataParser = (obj) => {
 	if(!obj) return [{}]
@@ -252,16 +253,14 @@ class DataTable extends Component {
 					</Segment>
 				}
 				<Table className='sortable' compact inverted unstackable striped >
-				<Table.Header>
-					{
-						(this.mainHeader !== "") &&
-							
+					<Table.Header>
+						{
+							(this.mainHeader !== "") &&
 								<Table.Row>
 									<Table.HeaderCell colSpan={this.columns.length}>{this.mainHeader}</Table.HeaderCell>
 								</Table.Row>
-							
 						}
-						{this.columns && this.renderHeader(this.columns, this.onSort, this.headerClass)}
+							{this.columns && this.renderHeader(this.columns, this.onSort, this.headerClass)}
 					</Table.Header>
 					<Table.Body>
 						{this.state.data && this.state.data.map((item, idx) => this.renderRow(item, idx))}
@@ -277,12 +276,14 @@ class DataTable extends Component {
 									</Menu.Item>
 									}
 									{this.pagedData.map((dataSet, index) => {
-										const active = index === this.state.index
-										return (
-											<Menu.Item key={index} active={active} onClick={() => this.pageChange(index)} as='a'>
-												{index + 1}
-											</Menu.Item>
-										)
+										if(index > this.state.index-2 &&  index < this.state.index+2) {
+											const active = index === this.state.index
+											return (
+												<Menu.Item key={index} active={active} onClick={() => this.pageChange(index)} as='a'>
+													{index + 1}
+												</Menu.Item>
+											)
+										}
 									})}
 									{this.state.index + 1 < this.pagedData.length &&
 									<Menu.Item onClick={() => this.pageChange('next')} as='a' icon>
@@ -292,6 +293,7 @@ class DataTable extends Component {
 								</Menu>
 							</Table.HeaderCell>
 						</Table.Row>
+						
 					</Table.Footer>
 					}
 				</Table>
