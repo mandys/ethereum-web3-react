@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
-import io from 'socket.io-client';
 //import 'semantic-ui-css/semantic.min.css';
 import { Icon, Image, Grid, Table,  Button, Divider, Tab, Label, Transition, Checkbox } from 'semantic-ui-react'
 import {Input,Form } from 'formsy-semantic-ui-react';
 import {addValidationRule} from 'formsy-react';
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
-import BdexUtil from '../util/bdex-utils'
 import DataTable from '../util/Datatable'
 import WrapUnWrapEther from './components/WrapUnWrapEther'
 
@@ -14,7 +12,6 @@ import WrapUnWrapEther from './components/WrapUnWrapEther'
 class App extends Component {
     constructor(props) {
         super(props);
-        console.log(props);
     }
     socket;
     tradingCoin = 0; 
@@ -43,6 +40,7 @@ class App extends Component {
         activeOrders: [],
         filledOrders:[],
         userActiveOrders:[],
+        userFilledOrders:[],
         canSubmit: false,
         lastTradedPrice:0,
         hideOrderForm: false,
@@ -94,9 +92,8 @@ class App extends Component {
                 ...order,
                 ecSignature,
             };   
-        
             console.log('signedOrder', signedOrder);
-            this.socket.emit('addorder', {
+            this.props.bdexUtil.socketUtil.addOrder({
                 "hash": orderHash,
                 "fromToken": this.state.tradingCoin,
                 "fromTokenValue": this.tradingCoin,
@@ -104,8 +101,6 @@ class App extends Component {
                 "toTokenValue": this.exchangeCoin,
                 "signedOrder": signedOrder,
                 "orderType": this.state.orderType
-            }, (err) => {
-                console.log(err);
             });
             
             const isOrderValid = await this.props.zeroEx.exchange.validateOrderFillableOrThrowAsync(signedOrder);
@@ -120,8 +115,6 @@ class App extends Component {
             })
         }
     }
-
-
 
     handleBuySellToggle = (e, data) => {
         console.log(data.children)
@@ -158,8 +151,8 @@ class App extends Component {
         }
     }
     showOrders = async() => {
-        let activeOrders = await this.bdexUtil.getActiveOrders();
-        let filledOrders = await this.bdexUtil.getFilledOrders();
+        let activeOrders = await this.props.bdexUtil.getActiveOrders();
+        let filledOrders = await this.props.bdexUtil.getFilledOrders();
         this.setState({
             activeOrders: activeOrders,
             filledOrders: filledOrders
@@ -167,16 +160,23 @@ class App extends Component {
     }
 
     socketListner = () => {
-        this.socket.on('neworder', (order) => {
+        this.props.bdexUtil.socketUtil.socket.on('neworder', (order) => {
             console.log("NEW ORDER LOGGED")
             let activeOrders = this.state.activeOrders;
             activeOrders.push(order)
+            if(order.signedOrder.maker === this.props.ownerAddress) {
+                let userActiveOrders = this.state.userActiveOrders;
+                userActiveOrders.push(order)
+                this.setState({
+                    userActiveOrders: userActiveOrders 
+                })
+            }
             this.setState({
                 activeOrders: activeOrders 
             }) 
         })
         
-        this.socket.on('fillorder', (orderhash) => {
+        this.props.bdexUtil.socketUtil.socket.on('fillorder', (orderhash) => {
             console.log("fillorder LOGGED")
             let filledOrders = this.state.filledOrders;
             let filledOrder;
@@ -193,17 +193,38 @@ class App extends Component {
                 filledOrders: filledOrders
             }) 
         })
+
+        this.props.bdexUtil.socketUtil.socket.on('cancelorder', (orderhash) => {
+            console.log("cancelorder LOGGED")
+            let userActiveOrders = this.state.userActiveOrders.filter((order) => {
+                if(order.hash !== orderhash) {
+                    return true
+                }
+                return false;
+            })
+            let activeOrders = this.state.activeOrders.filter((order) => {
+                if(order.hash !== orderhash) {
+                    return true
+                }
+                return false;
+            })
+            this.setState({
+                activeOrders: activeOrders,
+                userActiveOrders: userActiveOrders
+            }) 
+        })
     }
 
     componentDidMount = async() => {
-        this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
-        this.socket = io(`${this.bdexUtil.socketend}`);
-        let prices = await this.bdexUtil.getMarketPrices();
-        let userActiveOrders = await this.bdexUtil.getUserActiveOrders(this.props.ownerAddress);
+        console.log(this.props);
+        let prices = await this.props.bdexUtil.getMarketPrices();
+        let userActiveOrders = await this.props.bdexUtil.getUserOrders(this.props.ownerAddress, 'active');
+        let userFilledOrders = await this.props.bdexUtil.getUserOrders(this.props.ownerAddress, 'filled');
         this.setState({
             prices: prices,
             lastTradedPrice:(prices['ZRX'] / prices['WETH']).toFixed(8),
-            userActiveOrders: userActiveOrders
+            userActiveOrders: userActiveOrders,
+            userFilledOrders: userFilledOrders
         }, () => {
             this.exchangeCoin = this.state.lastTradedPrice
         })
@@ -235,8 +256,8 @@ class App extends Component {
     }
 
     setBalanceAllowance = async() => {
-        let balances = await this.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
-        let allowance = await this.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
+        let balances = await this.props.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
+        let allowance = await this.props.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
         this.setState({
             balances: balances,
             allowance: allowance
@@ -267,18 +288,13 @@ class App extends Component {
             // const signedOrder = this.convertPortalOrder(signedOrder);
             
             const txHash = await this.props.zeroEx.exchange.fillOrderAsync(
-                this.bdexUtil.convertPortalOrder(signedOrder),
+                this.props.bdexUtil.convertPortalOrder(signedOrder),
                 fillTakerTokenAmount,
                 shouldThrowOnInsufficientBalanceOrAllowance,
                 this.props.ownerAddress
             );
             console.log('txHash', txHash);
-            console.log('txHash', txHash);
-            this.socket.emit('fillorder', {
-                "hash": orderHash
-            }, (err) => {
-                console.log(err);
-            });
+            this.props.bdexUtil.socketUtil.fillOrder(orderHash);
             const txReceipt = await this.props.zeroEx.awaitTransactionMinedAsync(txHash);
             console.log('FillOrder transaction receipt: ', txReceipt);
         } catch(e) {
@@ -306,7 +322,7 @@ class App extends Component {
         let userActiveOrders = [];
         const { activeItem } = this.state
         const panes = [
-            { menuItem: 'Open Orders', render: () => <Tab.Pane inverted attached={false}>
+            { menuItem: 'Open Orders', render: () => ( <Tab.Pane inverted attached={false}>
                 {
                     this.state.userActiveOrders.forEach((order,i) => {
                         userActiveOrders.push({
@@ -316,7 +332,7 @@ class App extends Component {
                                         </Label>,
                                 sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
                                 action: <Button 
-                                        onClick={() => this.bdexUtil.cancelOrder(order.signedOrder, order.toTokenValue) } 
+                                        onClick={() => this.props.bdexUtil.cancelOrder(order.signedOrder, order.toTokenValue, order.hash) } 
                                         negative
                                         >
                                             Cancel
@@ -337,7 +353,7 @@ class App extends Component {
                         pageLimit={4}
                     />
                 </Tab.Pane> 
-            },
+            )},
             { menuItem: 'Filled Orders', render: () => <Tab.Pane inverted padded="very" attached={false}>You have no filled orders for this market.</Tab.Pane> },
         ]
         const errorLabel = <Label color="red" pointing/>

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Header, Grid, Icon, Button, Table, Segment } from 'semantic-ui-react'
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
-import BdexUtil from '../../../util/bdex-utils'
+
 class Account extends Component {
     bdexUtil = null;
     state = { 
@@ -25,42 +25,25 @@ class Account extends Component {
         filledOrders: [],
     }
     DECIMALS = 18
+    
     componentDidMount = async() => {
-        this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
-        let activeOders = await this.bdexUtil.getActiveOrders();
+        let activeOders = await this.props.bdexUtil.getActiveOrders();
         this.setState({
             activeOders: activeOders
         })
         
-        let filledOders = await this.bdexUtil.getFilledOrders();
+        let filledOders = await this.props.bdexUtil.getFilledOrders();
         this.setState({
             filledOders: filledOders
         })
-        let balances = await this.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
-        let allowance = await this.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
-        let prices = await this.bdexUtil.getMarketPrices();
+        let balances = await this.props.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
+        let allowance = await this.props.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
+        let prices = await this.props.bdexUtil.getMarketPrices();
         this.setState({
             balances: balances,
             allowance: allowance,
             prices: prices
         })
-    }
-
-    cancelOrder = async(signedOrder, toAmountValue) => {
-        console.log('signedOrder',signedOrder)
-        console.log('toAmount',toAmountValue)
-        try {
-            const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(toAmountValue), this.DECIMALS);
-            // const signedOrder = this.convertPortalOrder(signedOrder);
-            const txHash = await this.props.zeroEx.exchange.cancelOrderAsync(
-                this.bdexUtil.convertPortalOrder(signedOrder),
-                fillTakerTokenAmount
-            );
-            console.log('txHash', txHash);
-        } catch (e) {
-            console.log(e)
-        }
-        
     }
     
     render() {
@@ -140,7 +123,12 @@ class Account extends Component {
                                                 <Table.Cell>{order.toTokenValue}</Table.Cell>
                                                 <Table.Cell>{order.toTokenValue*this.state.prices['WETH']}</Table.Cell>
                                                 <Table.Cell>
-                                                    <Button onClick={() => this.bdexUtil.cancelOrder(order.signedOrder, order.toTokenValue) } negative>Cancel</Button> 
+                                                    <Button 
+                                                        onClick={() => this.props.bdexUtil.cancelOrder(order.signedOrder, order.toTokenValue, order.hash) } 
+                                                        negative
+                                                    >
+                                                        Cancel
+                                                    </Button> 
                                                 </Table.Cell>
                                             </Table.Row>
                                         )

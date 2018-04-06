@@ -1,50 +1,29 @@
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
+import socketUtil from './socket-utils'
 
 var store = require('store')
 var expirePlugin = require('store/plugins/expire')
 var axios = require('axios');
 var url = require('url');
+
+
 store.addPlugin(expirePlugin)
-class BdexAction {
-    constructor(web3, zeroEx) {
+class BdexUtil {
+    constructor(web3, zeroEx, socket) {
         var host = url.parse(window.location.href, true).host;
         if(host === 'localhost:3000') {
             this.baseUrl = 'http://localhost:3001'
-            this.socketend = 'http://localhost:3001'
             // this.baseUrl = 'http://www-qaapi.binkd.com'
         } else {
             this.baseUrl = 'http://www-qaapi.binkd.com'
-            this.socketend = 'http://www-qaapi.binkd.com:80'
         }
         this.web3 = web3;
         this.zeroEx = zeroEx;
-        this.DECIMALS = 18
+        this.socketUtil = new socketUtil();
+        this.DECIMALS = 18;
+        
     }
-    // saveOrder = (order) => {
-    //     let orders = [];
-    //     if(store.get("orders")) {
-    //         orders = store.get("orders");
-    //     }
-    //     orders.push(order);
-    //     store.set("orders", orders)
-    //     try{
-    //         axios.post(`${this.baseUrl}/orders/create`, order, {
-    //             "Access-Control-Allow-Origin" : "*"
-    //         })
-    //         .then((orders) => {
-    //             console.log('savedOrder',orders)
-    //             return true;
-    //         })
-    //         .catch((e) => {
-    //             console.log(e);
-    //             return false;
-    //         })
-    //     } catch(e) {
-    //         console.log(e);
-    //         return;
-    //     }
-    // }
 
     getOrders = async(status) => {
         try{
@@ -59,14 +38,24 @@ class BdexAction {
             console.log(e);
             return [];
         }
-        
-        // let orders =[]
-        // if(store.get("orders")) {
-        //     orders = store.get("orders");
-        // }
-        // console.log('all orders',orders);
-        // return orders
     }
+
+    getUserOrders = async(ownerAddress, status) => {
+        try{
+            let response = await axios.get(`${this.baseUrl}/users/orders/${ownerAddress}/${status}`);
+            let orders = response.data;
+            if(orders) {
+                return orders;
+            } else {
+                return [];
+            }
+        } catch(e) {
+            console.log(e);
+            return [];
+        }
+    }
+
+
     isBigEnough(value) {
         return value > 0;
     }
@@ -88,26 +77,10 @@ class BdexAction {
             }
             console.log('all orders', orders)
             console.log('active orders', activeOrders)
-        }catch(e)  {
+        } catch(e)  {
             console.log('balerr',e)
         }
         return activeOrders;
-    }
-
-    getUserActiveOrders = async(ownerAddress) => {
-        try{
-            let response = await axios.get(`${this.baseUrl}/users/orders/${ownerAddress}`);
-            let userActiveOrders = response.data
-            console.log('userActiveOrders', userActiveOrders)
-            if(userActiveOrders) {
-                return userActiveOrders;
-            } else {
-                return [];
-            }
-        } catch(e) {
-            console.log(e);
-            return [];
-        }
     }
 
     getFilledOrders = async() => {
@@ -177,7 +150,7 @@ class BdexAction {
         }
     }
 
-    cancelOrder = async(signedOrder, toAmountValue) => {
+    cancelOrder = async(signedOrder, toAmountValue, orderHash) => {
         console.log('signedOrder',signedOrder)
         console.log('toAmount',toAmountValue)
         try {
@@ -187,16 +160,13 @@ class BdexAction {
                 this.convertPortalOrder(signedOrder),
                 fillTakerTokenAmount
             );
+            this.socketUtil.cancelOrder(orderHash);
             console.log('txHash', txHash);
         } catch (e) {
             console.log(e)
         }
         
     }
-
-    
-
-
 }
 
-export default BdexAction;
+export default BdexUtil;

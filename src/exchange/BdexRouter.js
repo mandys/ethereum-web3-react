@@ -8,13 +8,22 @@ import Account from './components/bdex2/Account'
 import Support from './components/bdex2/Support'
 import './css/App.css'
 
+import BdexUtil from '../util/bdex-utils'
+
 class BdexRouter extends Component {
+    socketUtil= null;
     constructor(props) {
         super(props);
         this.state = { 
-            activeItem: '/'
-         };
+            activeItem: '/',
+        };
+        this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
     }
+
+    componentDidMount = () => {
+        
+    }
+
     handleItemClick = (e, data) => {
         this.setState({
             activeItem: data.name
@@ -71,9 +80,11 @@ class BdexRouter extends Component {
                 
                         <Switch>
                             <Route path="/" exact component={WelcomeIntro} />
-                            <Route path="/account" render={props => <Account {...this.props} />}  />
+                            <Route path="/account" render={props => <Account {...props} {...this.props} 
+                                    bdexUtil={this.bdexUtil}/>}  />
                             <Route path="/support" component={Support} />
-                            <Route render={props => <App {...props} {...this.props} />} />
+                            <Route render={props => <App {...props} {...this.props} socket={this.socket} 
+                                    bdexUtil={this.bdexUtil}/>} />
                         </Switch>
                     </Segment>
                 </Container>
