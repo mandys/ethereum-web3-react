@@ -5,7 +5,8 @@ class socketUtil {
     constructor() {
         var host = url.parse(window.location.href, true).host;
         if(host === 'localhost:3000') {
-            this.socketend = 'http://localhost:3001'
+            // this.socketend = 'http://localhost:3001'
+            this.socketend = 'http://www-qaapi.binkd.com:80'
         } else {
             this.socketend = 'http://www-qaapi.binkd.com:80'
         }
