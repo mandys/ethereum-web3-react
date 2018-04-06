@@ -179,6 +179,7 @@ class App extends Component {
         this.props.bdexUtil.socketUtil.socket.on('fillorder', (orderhash) => {
             console.log("fillorder LOGGED")
             let filledOrders = this.state.filledOrders;
+            let userFilledOrders = this.state.userFilledOrders;
             let filledOrder;
             let activeOrders = this.state.activeOrders.filter((order) => {
                 if(order.hash !== orderhash) {
@@ -188,9 +189,11 @@ class App extends Component {
                 return false;
             })
             filledOrders.push(filledOrder)
+            userFilledOrders.push(filledOrder)
             this.setState({
                 activeOrders: activeOrders,
-                filledOrders: filledOrders
+                filledOrders: filledOrders,
+                userFilledOrders: userFilledOrders
             }) 
         })
 
@@ -319,42 +322,72 @@ class App extends Component {
             return value*others[0] <= others[1];
         })
         let activeOrders = [];
-        let userActiveOrders = [];
         const { activeItem } = this.state
         const panes = [
-            { menuItem: 'Open Orders', render: () => ( <Tab.Pane inverted attached={false}>
-                {
-                    this.state.userActiveOrders.forEach((order,i) => {
-                        userActiveOrders.push({
-                                amount: order.fromTokenValue,
-                                price: <Label color={(order.orderType === 'buy')?'green':'red'} basic>
-                                            {order.toTokenValue}
-                                        </Label>,
-                                sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
-                                action: <Button 
-                                        onClick={() => this.props.bdexUtil.cancelOrder(order.signedOrder, order.toTokenValue, order.hash) } 
-                                        negative
-                                        >
-                                            Cancel
-                                        </Button> 
+            { menuItem: 'Open Orders', 
+                render: () => { let userActiveOrders = []; return ( <Tab.Pane inverted attached={false}>
+                    {
+                        this.state.userActiveOrders.forEach((order,i) => {
+                            userActiveOrders.push({
+                                    amount: order.fromTokenValue,
+                                    price: <Label color={(order.orderType === 'buy')?'green':'red'} basic>
+                                                {order.toTokenValue}
+                                            </Label>,
+                                    sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
+                                    action: <Button 
+                                            onClick={() => this.props.bdexUtil.cancelOrder(order.signedOrder, order.toTokenValue, order.hash) } 
+                                            negative
+                                            >
+                                                Cancel
+                                            </Button> 
+                                })
                             })
-                        })
+                    }
+                        <DataTable
+                            data={userActiveOrders}
+                            header
+                            mainHeader={`${this.state.tradingCoin}:${this.state.exchangeCoin} ORDER BOOK`}
+                            columns={[
+                                        {key:"amount", display:"AMOUNT"},
+                                        {key:"price", display:"PRICE"},
+                                        {key:"sum", display:"SUM IN USD",colSpan:2},
+                                        {key:"action"}
+                                    ]}
+                            pageLimit={4}
+                        />
+                    </Tab.Pane> 
+                )
+                }   
+            },
+            { 
+                menuItem: 'Filled Orders', 
+                render: () => {   let userFilledOrders = [];  return ( <Tab.Pane inverted attached={false}>
+                    {
+                        this.state.userFilledOrders.forEach((order,i) => {
+                            userFilledOrders.push({
+                                    amount: order.fromTokenValue,
+                                    price: <Label color={(order.orderType === 'buy')?'green':'red'} basic>
+                                                {order.toTokenValue}
+                                            </Label>,
+                                    sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
+                                })
+                            })
+                    }
+                        <DataTable
+                            data={userFilledOrders}
+                            header
+                            mainHeader={`${this.state.tradingCoin}:${this.state.exchangeCoin} ORDER BOOK`}
+                            columns={[
+                                        {key:"amount", display:"AMOUNT"},
+                                        {key:"price", display:"PRICE"},
+                                        {key:"sum", display:"SUM IN USD"},
+                                    ]}
+                            pageLimit={4}
+                        />
+                    </Tab.Pane> 
+                    )
                 }
-                    <DataTable
-                        data={userActiveOrders}
-                        header
-                        mainHeader={`${this.state.tradingCoin}:${this.state.exchangeCoin} ORDER BOOK`}
-                        columns={[
-                                    {key:"amount", display:"AMOUNT"},
-                                    {key:"price", display:"PRICE"},
-                                    {key:"sum", display:"SUM IN USD",colSpan:2},
-                                    {key:"action"}
-                                ]}
-                        pageLimit={4}
-                    />
-                </Tab.Pane> 
-            )},
-            { menuItem: 'Filled Orders', render: () => <Tab.Pane inverted padded="very" attached={false}>You have no filled orders for this market.</Tab.Pane> },
+            }
         ]
         const errorLabel = <Label color="red" pointing/>
         return (
