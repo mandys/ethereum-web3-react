@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Header, Grid, Icon, Button, Table, Segment } from 'semantic-ui-react'
+import { Header, Grid, Icon, Button, Table, Segment, Label, Divider } from 'semantic-ui-react'
+import DataTable from '../../../util/Datatable'
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
 
@@ -21,20 +22,20 @@ class Account extends Component {
         prices:{
             "WETH":0
         },
-        activeOders: [],
-        filledOrders: [],
+        userActiveOrders: [],
+        userFilledOrders: [],
     }
     DECIMALS = 18
     
     componentDidMount = async() => {
-        let activeOders = await this.props.bdexUtil.getActiveOrders();
+        let activeOders = await this.props.bdexUtil.getUserOrders(this.props.ownerAddress, 'active');
         this.setState({
-            activeOders: activeOders
+            userActiveOrders: activeOders
         })
         
-        let filledOders = await this.props.bdexUtil.getFilledOrders();
+        let filledOders = await this.props.bdexUtil.getUserOrders(this.props.ownerAddress, 'filled');
         this.setState({
-            filledOders: filledOders
+            userFilledOrders: filledOders
         })
         let balances = await this.props.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
         let allowance = await this.props.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
@@ -44,9 +45,25 @@ class Account extends Component {
             allowance: allowance,
             prices: prices
         })
+
+        this.props.bdexUtil.socketUtil.socket.on('cancelorder', (orderhash) => {
+            console.log("cancelorder LOGGED")
+            let userActiveOrders = this.state.userActiveOrders.filter((order) => {
+                if(order.hash !== orderhash) {
+                    return true
+                }
+                return false;
+            })
+           
+            this.setState({
+                userActiveOrders: userActiveOrders
+            }) 
+        })
     }
     
     render() {
+        let userActiveOrders = [];
+        let userFilledOrders = [];
         return (
             <div>
                 <Segment padded inverted>
@@ -102,60 +119,59 @@ class Account extends Component {
                             </Table>
                         </Grid.Column>
                         <Grid.Column>
-                            <Table inverted striped columns='4'>
-                                <Table.Header>
-                                    <Table.Row>
-                                        <Table.HeaderCell colSpan="4">Open Orders</Table.HeaderCell>
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell>AMOUNT ZRX</Table.Cell>
-                                        <Table.Cell>PRICE</Table.Cell>
-                                        <Table.Cell>SUM IN USD</Table.Cell>
-                                        <Table.Cell>ACTION</Table.Cell>
-                                    </Table.Row>
-                                </Table.Header>
-                                <Table.Body>
-                                {
-                                    this.state.activeOders.map((order,i) => {
-                                        return (
-                                            <Table.Row key={i}>
-                                                <Table.Cell>{order.fromTokenValue}</Table.Cell>
-                                                <Table.Cell>{order.toTokenValue}</Table.Cell>
-                                                <Table.Cell>{order.toTokenValue*this.state.prices['WETH']}</Table.Cell>
-                                                <Table.Cell>
-                                                    <Button 
-                                                        onClick={() => this.props.bdexUtil.cancelOrder(order.signedOrder, order.toTokenValue, order.hash) } 
-                                                        negative
-                                                    >
-                                                        Cancel
-                                                    </Button> 
-                                                </Table.Cell>
-                                            </Table.Row>
-                                        )
+                        
+                        {
+                            this.state.userActiveOrders.forEach((order,i) => {
+                                userActiveOrders.push({
+                                        amount: order.fromTokenValue,
+                                        price: <Label color={(order.orderType === 'buy')?'green':'red'} basic>
+                                                    {order.toTokenValue}
+                                                </Label>,
+                                        sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
+                                        action: <Button 
+                                                onClick={() => this.props.bdexUtil.cancelOrder(order.signedOrder, order.toTokenValue, order.hash) } 
+                                                negative
+                                                >
+                                                    Cancel
+                                                </Button> 
                                     })
-                                }
-                                </Table.Body>
-                            </Table>
-                            <Table inverted striped>
-                                <Table.Header>
-                                    <Table.Row>
-                                        <Table.HeaderCell colSpan="4">Filled Orders</Table.HeaderCell>
-                                    </Table.Row>
-                                </Table.Header>
-                                <Table.Body>
-                                    {
-                                        this.state.filledOrders.map((order,i) => {
-                                            return (
-                                                <Table.Row key={i}>
-                                                    <Table.Cell>{order.fromToken}</Table.Cell>
-                                                    <Table.Cell>{order.toToken}</Table.Cell>
-                                                    <Table.Cell>{order.hash*this.state.wethPrice}</Table.Cell>
-                                                </Table.Row>
-                                            )
+                                })
+                        }
+                            <DataTable
+                                data={userActiveOrders}
+                                header
+                                mainHeader={`Open Orders`}
+                                columns={[
+                                            {key:"amount", display:"AMOUNT"},
+                                            {key:"price", display:"PRICE"},
+                                            {key:"sum", display:"SUM IN USD",colSpan:2},
+                                            {key:"action"}
+                                        ]}
+                                pageLimit={4}
+                            />
+                            <Divider />
+                            {
+                                this.state.userFilledOrders.forEach((order,i) => {
+                                    userFilledOrders.push({
+                                            amount: order.fromTokenValue,
+                                            price: <Label color={(order.orderType === 'buy')?'green':'red'} basic>
+                                                        {order.toTokenValue}
+                                                    </Label>,
+                                            sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
                                         })
-                                    }
-                                </Table.Body>
-                            </Table>
+                                    })
+                            }
+                                <DataTable
+                                    data={userFilledOrders}
+                                    header
+                                    mainHeader='Filled Orders'
+                                    columns={[
+                                                {key:"amount", display:"AMOUNT"},
+                                                {key:"price", display:"PRICE"},
+                                                {key:"sum", display:"SUM IN USD"},
+                                            ]}
+                                    pageLimit={4}
+                                />
                         </Grid.Column>
 
                     </Grid.Row>

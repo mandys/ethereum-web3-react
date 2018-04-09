@@ -79,14 +79,6 @@ class OrderBook extends Component {
             '0xb1f13818094091343c127945e2B894CeB2d3fd27'.toLowerCase()
         );
         console.log('txHash', txHash);
-        // let transactions = {};
-        // if(store.get("transactions")) {
-        //     transactions = store.get("orders");
-        // }
-        // if(!transactions) {
-        //     transactions = {}
-        // }
-        // transactions.push(txHash);
         console.log('txHash', txHash);
         const txReceipt = await this.props.zeroEx.awaitTransactionMinedAsync(txHash);
         console.log('FillOrder transaction receipt: ', txReceipt);

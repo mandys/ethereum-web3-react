@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 //import 'semantic-ui-css/semantic.min.css';
-import { Icon, Image, Grid, Table,  Button, Divider, Tab, Label, Transition, Checkbox } from 'semantic-ui-react'
+import { Icon, Image, Grid, Table,  Button, Divider, Tab, Label, Transition, Checkbox, Loader } from 'semantic-ui-react'
 import {Input,Form } from 'formsy-semantic-ui-react';
 import {addValidationRule} from 'formsy-react';
 import { BigNumber } from '@0xproject/utils';
@@ -44,7 +44,8 @@ class App extends Component {
         canSubmit: false,
         lastTradedPrice:0,
         hideOrderForm: false,
-        duration:24*60*60
+        duration:24*60*60,
+        showLoading: false
     }
     DECIMALS = 18
 
@@ -284,6 +285,9 @@ class App extends Component {
 
     fillOrder = async(signedOrder, toAmountValue, orderHash) => {
         try{
+            this.setState({
+                showLoading: true
+            })
             console.log('signedOrder',signedOrder)
             console.log('toAmount',toAmountValue)
             const shouldThrowOnInsufficientBalanceOrAllowance = false;
@@ -298,9 +302,16 @@ class App extends Component {
             );
             console.log('txHash', txHash);
             this.props.bdexUtil.socketUtil.fillOrder(orderHash);
+            
             const txReceipt = await this.props.zeroEx.awaitTransactionMinedAsync(txHash);
+            this.setState({
+                showLoading: false
+            })
             console.log('FillOrder transaction receipt: ', txReceipt);
         } catch(e) {
+            this.setState({
+                showLoading: false
+            })
             console.log('fillorder error', e);
         }
     }
@@ -562,7 +573,7 @@ class App extends Component {
                                                         {order.toTokenValue}
                                                     </Label>,
                                             sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
-                                            action: <Button size='mini' 
+                                            action: this.state.showLoading? <Loader active inline />:<Button size='mini' 
                                                         onClick={
                                                             () =>this.fillOrder(order.signedOrder, order.toTokenValue, order.hash)
                                                         }
