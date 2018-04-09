@@ -262,7 +262,15 @@ class DataTable extends Component {
 							{this.columns && this.renderHeader(this.columns, this.onSort, this.headerClass)}
 					</Table.Header>
 					<Table.Body>
-						{this.state.data && this.state.data.map((item, idx) => this.renderRow(item, idx))}
+						{(this.data.length > 0) ? 
+							this.state.data.map((item, idx) => this.renderRow(item, idx))
+							:
+							<Table.Row>
+								<Table.Cell colSpan={this.columns.length} textAlign='center'>
+									<b>No records found</b>
+								</Table.Cell>
+							</Table.Row>
+						}
 					</Table.Body>
 					{this.pagedData.length > 1 &&
 					<Table.Footer>
