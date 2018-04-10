@@ -255,6 +255,7 @@ class App extends Component {
         if ( prevProps.ownerAddress !== this.props.ownerAddress) {
             if ( this.props.ownerAddress ) {
                 this.setBalanceAllowance();
+                this.showOrders();
             }
         }
     }
@@ -301,9 +302,8 @@ class App extends Component {
                 this.props.ownerAddress
             );
             console.log('txHash', txHash);
-            this.props.bdexUtil.socketUtil.fillOrder(orderHash);
-            
             const txReceipt = await this.props.zeroEx.awaitTransactionMinedAsync(txHash);
+            this.props.bdexUtil.socketUtil.fillOrder(orderHash);
             this.setState({
                 showLoading: false
             })
