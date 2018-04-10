@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "0x.js": "^0.33.6",
-    "@0xproject/subproviders": "^0.7.0",
+    "0x.js": "^0.35.0",
+    "@0xproject/subproviders": "^0.8.4",
     "axios": "^0.18.0",
     "bignumber.js": "^6.0.0",
     "blockies-identicon": "^0.1.0",
@@ -26,7 +26,7 @@
     "store": "^2.0.12",
     "truffle-wallet-provider": "^0.0.5",
     "web3": "0.20.4",
-    "web3-provider-engine": "^13.8.0"
+    "web3-provider-engine": "^14.0.2"
   },
   "scripts": {
     "start": "react-scripts start",

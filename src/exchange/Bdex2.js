@@ -595,7 +595,8 @@ class App extends Component {
                                                 {key:"sum", display:"SUM IN USD",colSpan:2},
                                                 {key:"action"}
                                             ]}
-                                    pageLimit={4}
+                                    pageLimit={99999}
+                                    tableScrollHeight={260}
                                 />
                             </Grid.Column>
                         </Grid.Row>
@@ -683,7 +684,8 @@ class App extends Component {
                                                 {key:"price", display:"PRICE"},
                                                 {key:"sum", display:"SUM IN USD"},
                                             ]}
-                                    pageLimit={4}
+                                    pageLimit={99999}
+                                    tableScrollHeight={260}
                                 />        
                             </Grid.Column>
                         </Grid.Row>

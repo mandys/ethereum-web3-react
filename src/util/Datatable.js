@@ -69,6 +69,7 @@ class DataTable extends Component {
 	defaultPageLimit = 15
 	defaultShowSearch = false;
 	defaultMainHeader = "";
+	defaultableScrollHeight = 0
 	constructor(props) {
 		super(props)
 		this.data = props.data
@@ -78,8 +79,9 @@ class DataTable extends Component {
 		this.paginationLimit = props.pageLimit || this.defaultPageLimit
 		this.showSearch = props.showSearch || this.defaultShowSearch
 		this.mainHeader = props.mainHeader || this.defaultMainHeader
+		this.tableScrollHeight = props.tableScrollHeight || this.defaultableScrollHeight
 		const data = this.paginate(this.data)
-
+		
 		this.orignalPagedData = data
 		this.pagedData = data
 
@@ -98,8 +100,9 @@ class DataTable extends Component {
 		this.paginationLimit = newProps.pageLimit || this.defaultPageLimit
 		this.showSearch = newProps.showSearch || this.defaultShowSearch
 		this.mainHeader = newProps.mainHeader || this.defaultMainHeader
+		this.tableScrollHeight = newProps.tableScrollHeight || this.defaultableScrollHeight
 		const data = this.paginate(this.data)
-
+		
 		this.orignalPagedData = data
 		this.pagedData = data
 
@@ -251,7 +254,7 @@ class DataTable extends Component {
 						<Input icon='search' value={this.state.query || ''} onChange={this.onSearch} placeholder='Search...' />
 					</Segment>
 				}
-				<Table /*className='sortable'*/ compact inverted unstackable striped >
+				<Table /*className='sortable'*/ compact inverted unstackable striped  style={{marginBottom:1}}>
 					<Table.Header>
 						{
 							(this.mainHeader !== "") &&
@@ -261,7 +264,10 @@ class DataTable extends Component {
 						}
 							{this.columns && this.renderHeader(this.columns, this.onSort, this.headerClass)}
 					</Table.Header>
-					<Table.Body>
+				</Table>
+				<div  style={this.tableScrollHeight > 100?{display:'block',maxHeight:this.tableScrollHeight,overflowY:'auto'}:{}}>
+				<Table /*className='sortable'*/ compact inverted unstackable striped >
+					<Table.Body >
 						{(this.data.length > 0) ? 
 							this.state.data.map((item, idx) => this.renderRow(item, idx))
 							:
@@ -275,8 +281,8 @@ class DataTable extends Component {
 					{this.pagedData.length > 1 &&
 					<Table.Footer>
 						<Table.Row>
-							<Table.HeaderCell colSpan={this.columns.length}>
-								<Menu floated='right' pagination>
+							<Table.Cell colSpan={this.columns.length}>
+								<Menu floated='right' pagination size='mini'>
 									{this.state.index !== 0 && this.pagedData.length > 1 &&
 									<Menu.Item onClick={() => this.pageChange('back')} as='a' icon>
 										<Icon name='left chevron' />
@@ -298,12 +304,13 @@ class DataTable extends Component {
 									</Menu.Item>
 									}
 								</Menu>
-							</Table.HeaderCell>
+							</Table.Cell>
 						</Table.Row>
 						
 					</Table.Footer>
 					}
 				</Table>
+				</div>
 			</div>
 		)
 	}
