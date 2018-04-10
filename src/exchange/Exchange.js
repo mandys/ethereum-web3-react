@@ -20,15 +20,15 @@ const Exchange = (PassedComponent) => class extends Component {
         this.providerEngine = new Web3ProviderEngine();
         if ( typeof window.web3 !== 'undefined' ) {
             this.providerEngine.addProvider(new InjectedWeb3Subprovider(window.web3.currentProvider));
+            window.web3.version.getNetwork((err, networkId)=>{
+                console.log('gettype(networkId)',typeof networkId);
+                console.log('gettype(networkId)',networkId);
+                if(networkId !== '42'){
+                  this.setState({ showKovanPopup: true })
+                }
+            })
         }
-        window.web3.version.getNetwork((err, networkId)=>{
-            console.log('gettype(networkId)',typeof networkId);
-            console.log('gettype(networkId)',networkId);
-            if(networkId !== '42'){
-              this.setState({ showKovanPopup: true })
-            }
-        })
-        console.log(window.web3.currentProvider);
+    
         this.providerEngine.addProvider(new RpcSubprovider({
             rpcUrl: 'http://54.219.243.226:8545/',
             // rpcUrl: 'https://kovan.infura.io/SNWrFm1CMX7BfYqvkFXf',
