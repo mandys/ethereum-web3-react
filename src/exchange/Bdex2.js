@@ -333,6 +333,7 @@ class App extends Component {
             return value*others[0] <= others[1];
         })
         let activeOrders = [];
+        let filledOrders = [];
         const { activeItem } = this.state
         const panes = [
             { menuItem: 'Open Orders', 
@@ -662,37 +663,28 @@ class App extends Component {
                                 </Table>
                             </Grid.Column>
                             <Grid.Column computer={4} mobile={16}>
-                                <Table inverted striped unstackable>
-                                    <Table.Header>
-                                        <Table.Row>
-                                            <Table.HeaderCell colSpan="3">TRADE HISTORY</Table.HeaderCell>
-                                        </Table.Row>
-                                    </Table.Header>
-                                    <Table.Body>
-                                        <Table.Row>
-                                            <Table.Cell width="4">AMOUNT</Table.Cell>
-                                            <Table.Cell textAlign="right">PRICE</Table.Cell>
-                                            <Table.Cell textAlign="right">SUM IN USD</Table.Cell>
-                                        </Table.Row>
-                                    {
-                                        this.state.filledOrders.map((order,i) => {
-                                            let rowColor = (order.orderType === 'buy')?'green':'red'
-                                            return (
-                                                <Table.Row key={i}>
-                                                    <Table.Cell>{order.fromTokenValue}</Table.Cell>
-                                                    <Table.Cell textAlign="right">
-                                                        <Label color={rowColor}>{order.toTokenValue}</Label>
-                                                    </Table.Cell>
-                                                    <Table.Cell textAlign="right">
-                                                        {(order.toTokenValue*this.state.prices['WETH']).toFixed(2)}
-                                                    </Table.Cell>
-                                                </Table.Row>
-                                            )
+                                {
+                                    this.state.filledOrders.forEach((order,i) => {
+                                        filledOrders.push({
+                                            amount: order.fromTokenValue,
+                                            price: <Label color={(order.orderType === 'buy')?'green':'red'} basic>
+                                                        {order.toTokenValue}
+                                                    </Label>,
+                                            sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
                                         })
-                                    }
-                                    </Table.Body>
-                                </Table>
-                                
+                                    })
+                                }
+                                <DataTable
+                                    data={filledOrders}
+                                    header
+                                    mainHeader={`TRADE HISTORY`}
+                                    columns={[
+                                                {key:"amount", display:"AMOUNT"},
+                                                {key:"price", display:"PRICE"},
+                                                {key:"sum", display:"SUM IN USD"},
+                                            ]}
+                                    pageLimit={4}
+                                />        
                             </Grid.Column>
                         </Grid.Row>
 

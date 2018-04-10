@@ -251,7 +251,7 @@ class DataTable extends Component {
 						<Input icon='search' value={this.state.query || ''} onChange={this.onSearch} placeholder='Search...' />
 					</Segment>
 				}
-				<Table className='sortable' compact inverted unstackable striped >
+				<Table /*className='sortable'*/ compact inverted unstackable striped >
 					<Table.Header>
 						{
 							(this.mainHeader !== "") &&

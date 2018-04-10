@@ -13,8 +13,8 @@ class BdexUtil {
     constructor(web3, zeroEx, socket) {
         var host = url.parse(window.location.href, true).host;
         if(host === 'localhost:3000') {
-            // this.baseUrl = 'http://localhost:3001'
-            this.baseUrl = 'http://www-qaapi.binkd.com'
+            this.baseUrl = 'http://localhost:3001'
+            // this.baseUrl = 'http://www-qaapi.binkd.com'
         } else {
             this.baseUrl = 'http://www-qaapi.binkd.com'
         }
