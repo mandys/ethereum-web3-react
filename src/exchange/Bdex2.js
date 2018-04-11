@@ -7,7 +7,7 @@ import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
 import DataTable from '../util/Datatable'
 import WrapUnWrapEther from './components/WrapUnWrapEther'
-
+var moment = require('moment')
 
 class App extends Component {
     constructor(props) {
@@ -355,11 +355,11 @@ class App extends Component {
                                                     <b>ADDRESS</b>
                                                     <div>{order.signedOrder.maker}</div>
                                                     <b>SELLING</b>
-                                                    <div>{`${order.toTokenValue} ${this.toToken}`}</div>
+                                                    <div>{`${order.toTokenValue} ${order.toToken}`}</div>
                                                     <b>BUYING</b>
-                                                    <div>{`${order.fromTokenValue} ${this.fromToken}`}</div>
+                                                    <div>{`${order.fromTokenValue} ${order.fromToken}`}</div>
                                                     <b>Expires</b>
-                                                    <div>{order.signedOrder.expirationUnixTimestampSec}</div>
+                                                    <div>{moment(order.signedOrder.expirationUnixTimestampSec).format('MMMM Do YYYY, h:mm:ss a')}</div>
                                                 </div>
                                 })
                             })
@@ -601,11 +601,11 @@ class App extends Component {
                                                             <b>ADDRESS</b>
                                                             <div>{order.signedOrder.maker}</div>
                                                             <b>SELLING</b>
-                                                            <div>{`${order.toTokenValue} ${this.toToken}`}</div>
+                                                            <div>{`${order.toTokenValue} ${order.toToken}`}</div>
                                                             <b>BUYING</b>
-                                                            <div>{`${order.fromTokenValue} ${this.fromToken}`}</div>
+                                                            <div>{`${order.fromTokenValue} ${order.fromToken}`}</div>
                                                             <b>Expires</b>
-                                                            <div>{order.signedOrder.expirationUnixTimestampSec}</div>
+                                                            <div>{moment(order.signedOrder.expirationUnixTimestampSec).format('MMMM Do YYYY, h:mm:ss a')}</div>
                                                         </div>
                                         })
                                     })

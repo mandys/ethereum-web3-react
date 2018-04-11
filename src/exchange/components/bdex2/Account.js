@@ -3,6 +3,7 @@ import { Header, Grid, Icon, Button, Table, Segment, Label, Divider } from 'sema
 import DataTable from '../../../util/Datatable'
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
+var moment = require('moment')
 
 class Account extends Component {
     bdexUtil = null;
@@ -140,9 +141,9 @@ class Account extends Component {
                                                 <b>SELLING</b>
                                                 <div>{`${order.toTokenValue} ${order.toToken}`}</div>
                                                 <b>BUYING</b>
-                                                <div>{`${order.fromTokenValue} ${this.fromToken}`}</div>
+                                                <div>{`${order.fromTokenValue} ${order.fromToken}`}</div>
                                                 <b>Expires</b>
-                                                <div>{order.signedOrder.expirationUnixTimestampSec}</div>
+                                                <div>{moment(order.signedOrder.expirationUnixTimestampSec).format('MMMM Do YYYY, h:mm:ss a')}</div>
                                             </div>
                                     })
                                 })
