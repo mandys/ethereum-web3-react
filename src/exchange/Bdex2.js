@@ -13,7 +13,6 @@ class App extends Component {
     constructor(props) {
         super(props);
     }
-    socket;
     tradingCoin = 0; 
     exchangeCoin = 0;
     bdexUtil = null;
@@ -303,7 +302,7 @@ class App extends Component {
             );
             console.log('txHash', txHash);
             const txReceipt = await this.props.zeroEx.awaitTransactionMinedAsync(txHash);
-            this.props.bdexUtil.socketUtil.fillOrder(orderHash);
+            this.props.bdexUtil.socketUtil.fillOrder(orderHash, txHash);
             this.setState({
                 showLoading: false
             })
@@ -392,6 +391,11 @@ class App extends Component {
                                                 {order.toTokenValue}
                                             </Label>,
                                     sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
+                                    action: ((order.txHash) && 
+                                            <a target='_blank' href={`https://kovan.etherscan.io/tx/${order.txHash}`}>
+                                                <Label color='blue'>VIEW</Label>
+                                            </a>
+                                            )
                                 })
                             })
                     }
@@ -402,7 +406,8 @@ class App extends Component {
                             columns={[
                                         {key:"amount", display:"AMOUNT"},
                                         {key:"price", display:"PRICE"},
-                                        {key:"sum", display:"SUM IN USD"},
+                                        {key:"sum", display:"SUM IN USD", colSpan:2},
+                                        {key:"action"},
                                     ]}
                             pageLimit={4}
                         />
@@ -692,6 +697,11 @@ class App extends Component {
                                                         {order.toTokenValue}
                                                     </Label>,
                                             sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
+                                            action: ((order.txHash) && 
+                                                    <a target='_blank' href={`https://kovan.etherscan.io/tx/${order.txHash}`}>
+                                                        <Label color='blue'>VIEW</Label>
+                                                    </a>
+                                                    )
                                         })
                                     })
                                 }
@@ -702,7 +712,8 @@ class App extends Component {
                                     columns={[
                                                 {key:"amount", display:"AMOUNT"},
                                                 {key:"price", display:"PRICE"},
-                                                {key:"sum", display:"SUM IN USD"},
+                                                {key:"sum", display:"SUM IN USD", colSpan:2},
+                                                {key:"action"},
                                             ]}
                                     pageLimit={99999}
                                     tableScrollHeight={260}

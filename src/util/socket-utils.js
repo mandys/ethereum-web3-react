@@ -19,9 +19,10 @@ class socketUtil {
         });
     }
 
-    fillOrder = (orderHash) => {
+    fillOrder = (orderHash, txHash) => {
         this.socket.emit('fillorder', {
-            "hash": orderHash
+            "hash": orderHash,
+            'txHash': txHash
         }, (err) => {
             console.log('fillorder error', err);
         });

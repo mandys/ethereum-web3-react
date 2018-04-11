@@ -168,6 +168,11 @@ class Account extends Component {
                                                         {order.toTokenValue}
                                                     </Label>,
                                             sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
+                                            action: ((order.txHash) && 
+                                                    <a target='_blank' href={`https://kovan.etherscan.io/tx/${order.txHash}`}>
+                                                        <Label color='blue'>VIEW</Label>
+                                                    </a>
+                                                    )
                                         })
                                     })
                             }
@@ -178,7 +183,8 @@ class Account extends Component {
                                     columns={[
                                                 {key:"amount", display:"AMOUNT"},
                                                 {key:"price", display:"PRICE"},
-                                                {key:"sum", display:"SUM IN USD"},
+                                                {key:"sum", display:"SUM IN USD", colSpan: 2},
+                                                {key:'action'}
                                             ]}
                                     pageLimit={4}
                                 />
