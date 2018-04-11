@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Table, Menu, Icon, Segment, Input } from 'semantic-ui-react'
+import { Table, Menu, Icon, Segment, Input, Popup } from 'semantic-ui-react'
 import capitalize from 'lodash/capitalize'
 import flatten from 'lodash/flatten'
 import orderBy from 'lodash/orderBy'
@@ -144,15 +144,23 @@ class DataTable extends Component {
 		)
 	}
 
-	defaultRenderBodyRow = (data, index) =>
-		(<Table.Row key={index}>
-			{this.columns.map(({ key, defaults, accessor, decorator }, idx) => {
-				if(!data) return <Table.Cell key={idx} />
-				let value = (accessor) ? accessor(data, key) : (data[key] || defaults)
-				if(decorator) value = decorator(value)
-				return (<Table.Cell key={idx}>{value}</Table.Cell>)
-			})}
-		</Table.Row>)
+	defaultRenderBodyRow = (data, index) => {
+		
+		let tableRow = <Table.Row key={index}>
+				{this.columns.map(({ key, defaults, accessor, decorator }, idx) => {
+					if(!data) return <Table.Cell key={idx} />
+					let value = (accessor) ? accessor(data, key) : (data[key] || defaults)
+					if(decorator) value = decorator(value)
+					return (<Table.Cell key={idx}>{value}</Table.Cell>)
+				})}
+			</Table.Row>
+			if(data['popupContent']) {
+				tableRow = <Popup trigger={tableRow} key={index}>
+					{data['popupContent']}
+				</Popup>
+			}
+			return tableRow;
+	}
 
 	pageChange = index => {
 		let newIndex = this.state.index

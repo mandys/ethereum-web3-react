@@ -133,7 +133,17 @@ class Account extends Component {
                                                 negative
                                                 >
                                                     Cancel
-                                                </Button> 
+                                                </Button>,
+                                        popupContent: <div>
+                                                <b>ADDRESS</b>
+                                                <div>{order.signedOrder.maker}</div>
+                                                <b>SELLING</b>
+                                                <div>{`${order.toTokenValue} ${order.toToken}`}</div>
+                                                <b>BUYING</b>
+                                                <div>{`${order.fromTokenValue} ${this.fromToken}`}</div>
+                                                <b>Expires</b>
+                                                <div>{order.signedOrder.expirationUnixTimestampSec}</div>
+                                            </div>
                                     })
                                 })
                         }
