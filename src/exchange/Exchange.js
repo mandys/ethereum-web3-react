@@ -6,6 +6,8 @@ import { Dimmer, Loader } from 'semantic-ui-react'
 import KovanPopup from './components/bdex2/KovanPopup'
 const Web3ProviderEngine = require('web3-provider-engine');
 const RpcSubprovider = require('web3-provider-engine/subproviders/rpc.js')
+const Promise = require('bluebird');
+
 
 const Exchange = (PassedComponent) => class extends Component {
     constructor(props) {
@@ -21,8 +23,6 @@ const Exchange = (PassedComponent) => class extends Component {
         if ( typeof window.web3 !== 'undefined' ) {
             this.providerEngine.addProvider(new InjectedWeb3Subprovider(window.web3.currentProvider));
             window.web3.version.getNetwork((err, networkId)=>{
-                console.log('gettype(networkId)',typeof networkId);
-                console.log('gettype(networkId)',networkId);
                 if(networkId !== '42'){
                   this.setState({ showKovanPopup: true })
                 }
@@ -36,6 +36,9 @@ const Exchange = (PassedComponent) => class extends Component {
           
         this.providerEngine.start();
         this.web3 = new Web3(this.providerEngine);
+        if (typeof this.web3.eth.getAccountsPromise === 'undefined') {
+            Promise.promisifyAll(this.web3.eth, { suffix: 'Async' });
+        }
         console.log(this.web3);
     }
     componentDidMount = async() => {

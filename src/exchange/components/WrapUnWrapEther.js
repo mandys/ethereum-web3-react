@@ -74,6 +74,7 @@ class WrapUnWrapEther extends Component {
             console.log('convertWEthTxHash', convertWethTxHash);
             let transactionMined = await this.props.zeroEx.awaitTransactionMinedAsync(convertWethTxHash);
             console.log('transactionMined',transactionMined);
+            this.props.setBalanceAllowance();
             this.setState({
                 disabled:false
             });
@@ -100,12 +101,12 @@ class WrapUnWrapEther extends Component {
                             <Grid.Row>
                                 <Grid.Column width={8}>
                                     {this.state.labels[this.props.from].name}
-                                    <Image src='/src/icons/eth.png' size='mini' />
+                                    <Image src={`/src/icons/${this.props.from.toLowerCase()}.png`} size='mini' />
                                     ({this.props.from})
                                 </Grid.Column>
                                 <Grid.Column  width={8}>
                                     {this.state.labels[this.props.to].name}
-                                    <Image src='/src/icons/eth.png' size='mini' />
+                                    <Image src={`/src/icons/${this.props.to.toLowerCase()}.png`} size='mini' />
                                     ({this.props.to})
                                 </Grid.Column>
                             </Grid.Row>

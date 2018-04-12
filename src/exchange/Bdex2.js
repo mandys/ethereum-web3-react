@@ -328,8 +328,8 @@ class App extends Component {
     }
 
     render() {
-        addValidationRule('isInsufficientBalance', function (values, value, others) {
-            return value*others[0] <= others[1];
+        addValidationRule('isInsufficientBalance', (values, value, others) => {
+            return this.state.allowance['WETH'] && (value*others[0] <= others[1]);
         })
         let activeOrders = [];
         let filledOrders = [];

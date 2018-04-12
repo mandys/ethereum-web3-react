@@ -3,8 +3,11 @@ import { Header, Grid, Icon, Button, Table, Segment, Label, Divider } from 'sema
 import DataTable from '../../../util/Datatable'
 import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
-var moment = require('moment')
+import { Web3Wrapper } from '@0xproject/web3-wrapper';
+import WrapUnWrapEther from '../../components/WrapUnWrapEther'
 
+var moment = require('moment')
+const parseEtherFromBalance = (web3, balance) => web3.fromWei(balance.toNumber(), 'ether')
 class Account extends Component {
     bdexUtil = null;
     state = { 
@@ -13,7 +16,8 @@ class Account extends Component {
         balances: {
             'WETH': 'NIL',
             'ZRX': 'NIL',
-            'BINK': 'NIL'
+            'BINK': 'NIL',
+            'ETH': 'NIL'
         },
         allowance: {
             'WETH': 0,
@@ -35,15 +39,12 @@ class Account extends Component {
         })
         
         let filledOders = await this.props.bdexUtil.getUserOrders(this.props.ownerAddress, 'filled');
+        this.setBalanceAllowance();
         this.setState({
             userFilledOrders: filledOders
         })
-        let balances = await this.props.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
-        let allowance = await this.props.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
         let prices = await this.props.bdexUtil.getMarketPrices();
         this.setState({
-            balances: balances,
-            allowance: allowance,
             prices: prices
         })
 
@@ -59,6 +60,17 @@ class Account extends Component {
             this.setState({
                 userActiveOrders: userActiveOrders
             }) 
+        })
+    }
+
+    setBalanceAllowance = async() => {
+        let balances = await this.props.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
+        balances['ETH'] = ((await this.props.web3.eth.getBalanceAsync(this.props.ownerAddress))/Math.pow(10, 18))
+                                        .toFixed(8)
+        let allowance = await this.props.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
+        this.setState({
+            balances: balances,
+            allowance: allowance
         })
     }
     
@@ -87,6 +99,45 @@ class Account extends Component {
                                         <Table.Cell textAlign="right">Unlocked</Table.Cell>
                                     </Table.Row>
                                     <Table.Row>
+                                        <Table.Cell width="4">ETH
+                                            <WrapUnWrapEther 
+                                                from="ETH" 
+                                                to="WETH" 
+                                                {...this.props}
+                                                setBalanceAllowance={this.setBalanceAllowance} 
+                                            />
+                                        </Table.Cell>
+                                        <Table.Cell width="4">Ether</Table.Cell>
+                                        <Table.Cell textAlign="right">{this.state.balances.ETH === 'NIL' ? (
+                                            <div><Icon name="spinner" /> Fetching Balanace</div>
+                                        ) : this.state.balances.ETH}</Table.Cell>
+                                        <Table.Cell textAlign="right">
+                                            
+                                        </Table.Cell>
+                                    </Table.Row>
+                                    <Table.Row>
+                                        <Table.Cell width="4">WETH
+                                            <WrapUnWrapEther 
+                                                from="WETH" 
+                                                to="ETH" 
+                                                {...this.props}
+                                                setBalanceAllowance={this.setBalanceAllowance} 
+                                            />
+                                        </Table.Cell>
+                                        <Table.Cell width="4">Wrapped Ether</Table.Cell>
+                                        <Table.Cell textAlign="right">{this.state.balances.WETH === 'NIL' ? (
+                                            <div><Icon name="spinner" /> Fetching Balanace</div>
+                                        ) : this.state.balances.WETH}</Table.Cell>
+                                        <Table.Cell textAlign="right">
+                                            {
+                                                this.state.allowance.WETH !== 0 ? <Icon name="unlock" /> :
+                                                    (
+                                                        <Button name="WETH" icon onClick={this.takeAllowance}><Icon name="lock" /></Button>
+                                                    )
+                                            }
+                                        </Table.Cell>
+                                    </Table.Row>
+                                    <Table.Row>
                                         <Table.Cell width="4">ZRX</Table.Cell>
                                         <Table.Cell width="4">0x</Table.Cell>
                                         <Table.Cell textAlign="right">{this.state.balances.ZRX === 'NIL' ? (
@@ -97,21 +148,6 @@ class Account extends Component {
                                                 this.state.allowance.ZRX !== 0 ? <Icon name="unlock" /> :
                                                     (
                                                         <Button name="ZRX" icon onClick={this.takeAllowance}><Icon name="lock" /></Button>
-                                                    )
-                                            }
-                                        </Table.Cell>
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell width="4">WETH</Table.Cell>
-                                        <Table.Cell width="4">Wrapped Ether</Table.Cell>
-                                        <Table.Cell textAlign="right">{this.state.balances.WETH === 'NIL' ? (
-                                            <div><Icon name="spinner" /> Fetching Balanace</div>
-                                        ) : this.state.balances.WETH}</Table.Cell>
-                                        <Table.Cell textAlign="right">
-                                            {
-                                                this.state.allowance.WETH !== 0 ? <Icon name="unlock" /> :
-                                                    (
-                                                        <Button name="WETH" icon onClick={this.takeAllowance}><Icon name="lock" /></Button>
                                                     )
                                             }
                                         </Table.Cell>
