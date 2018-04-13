@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
 import { Header, Grid, Icon, Button, Table, Segment, Label, Divider } from 'semantic-ui-react'
 import DataTable from '../../../util/Datatable'
-import { BigNumber } from '@0xproject/utils';
-import { ZeroEx } from '0x.js';
-import { Web3Wrapper } from '@0xproject/web3-wrapper';
 import WrapUnWrapEther from '../../components/WrapUnWrapEther'
 
 var moment = require('moment')
-const parseEtherFromBalance = (web3, balance) => web3.fromWei(balance.toNumber(), 'ether')
 class Account extends Component {
     bdexUtil = null;
     state = { 

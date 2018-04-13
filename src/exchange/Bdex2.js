@@ -102,14 +102,16 @@ class App extends Component {
                 "signedOrder": signedOrder,
                 "orderType": this.state.orderType
             });
-            
+            this.props.showMessage('green', 'Your order created successfully!')
             const isOrderValid = await this.props.zeroEx.exchange.validateOrderFillableOrThrowAsync(signedOrder);
             console.log('isOrderValid', isOrderValid);
             this.setState({
                 hideOrderForm:false
             })
         } catch(e) {
-            console.log(e); 
+            console.log(e);
+            let message = e.message.split(/[\n\r]/);
+            this.props.showMessage('red', message[0]) 
             this.setState({
                 hideOrderForm:false
             })
@@ -146,8 +148,14 @@ class App extends Component {
                 prevState.allowance[`${token}`] = 1
                 return prevState
             })
+            this.props.showMessage('green', "Token allowance action successful!");
         } catch(e) {
             console.log(e)
+            let message = e.message.split(/[\n\r]/);
+            this.props.showMessage('red', message[0]) 
+            this.setState({
+                hideOrderForm:false
+            })
         }
     }
     showOrders = async() => {
@@ -306,10 +314,16 @@ class App extends Component {
             this.setState({
                 showLoading: false
             })
+            this.props.showMessage('green', "Order filled successfully!");
             console.log('FillOrder transaction receipt: ', txReceipt);
         } catch(e) {
             this.setState({
                 showLoading: false
+            })
+            let message = e.message.split(/[\n\r]/);
+            this.props.showMessage('red', message[0]) 
+            this.setState({
+                hideOrderForm:false
             })
             console.log('fillorder error', e);
         }

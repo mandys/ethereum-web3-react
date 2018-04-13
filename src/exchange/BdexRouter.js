@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
-import { Container, Segment, Menu, Icon, Image, Popup, Dropdown } from 'semantic-ui-react'
+import { Container, Segment, Menu, Icon, Image, Popup, Dropdown, Rail, Message } from 'semantic-ui-react'
 import Exchange from './Exchange'
 import App from './Bdex2'
 import WelcomeIntro from '../util/WelcomeIntro'
@@ -16,6 +16,8 @@ class BdexRouter extends Component {
         super(props);
         this.state = { 
             activeItem: '/',
+            message:'',
+            messageClass:''
         };
         this.bdexUtil = new BdexUtil(this.props.web3, this.props.zeroEx);
     }
@@ -23,7 +25,17 @@ class BdexRouter extends Component {
     componentDidMount = () => {
         
     }
-
+    handleMessageDismiss = () => {
+        this.setState({
+            message: ''
+        })
+    }
+    showMessage = (messageClass, message) => {
+        this.setState({
+            messageClass: messageClass,
+            message: message
+        })
+    }
     handleItemClick = (e, data) => {
         this.setState({
             activeItem: data.name
@@ -81,12 +93,22 @@ class BdexRouter extends Component {
                         <Switch>
                             <Route path="/" exact component={WelcomeIntro} />
                             <Route path="/account" render={props => <Account {...props} {...this.props} 
-                                    bdexUtil={this.bdexUtil}/>}  />
+                                    bdexUtil={this.bdexUtil} showMessage={this.showMessage}/>}  />
                             <Route path="/support" component={Support} />
                             <Route render={props => <App {...props} {...this.props} socket={this.socket} 
-                                    bdexUtil={this.bdexUtil}/>} />
+                                    bdexUtil={this.bdexUtil}  showMessage={this.showMessage}/>} />
                         </Switch>
                     </Segment>
+                    {
+                        (this.state.message !== '') && 
+                        <Rail attached internal position='right' style={{marginTop:60, marginRight:20}}>
+                            <Message color={this.state.messageClass} 
+                                content={this.state.message}
+                                onDismiss={this.handleMessageDismiss}
+                            />
+                        </Rail>
+                    }
+                    
                 </Container>
             </BrowserRouter>
         );
