@@ -150,9 +150,10 @@ class BdexUtil {
         }
     }
 
-    cancelOrder = async(signedOrder, toAmountValue, orderHash) => {
+    cancelOrder = async(signedOrder, toAmountValue, orderHash, func) => {
         console.log('signedOrder',signedOrder)
         console.log('toAmount',toAmountValue)
+        console.log(func);
         try {
             const fillTakerTokenAmount = ZeroEx.toBaseUnitAmount(new BigNumber(toAmountValue), this.DECIMALS);
             // const signedOrder = this.convertPortalOrder(signedOrder);
@@ -161,8 +162,11 @@ class BdexUtil {
                 fillTakerTokenAmount
             );
             this.socketUtil.cancelOrder(orderHash);
+            func('green', "Order cancelled successfully!");
             console.log('txHash', txHash);
         } catch (e) {
+            let message = e.message.split(/[\n\r]/);
+            func('red', message[0]) 
             console.log(e)
         }
         

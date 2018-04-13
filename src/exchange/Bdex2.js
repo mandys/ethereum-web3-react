@@ -360,7 +360,7 @@ class App extends Component {
                                             </Label>,
                                     sum:  (order.toTokenValue*this.state.prices['WETH']).toFixed(2),
                                     action: <Button 
-                                            onClick={() => this.props.bdexUtil.cancelOrder(order.signedOrder, order.toTokenValue, order.hash) } 
+                                            onClick={() => this.props.bdexUtil.cancelOrder(order.signedOrder, order.toTokenValue, order.hash, this.props.showMessage) } 
                                             negative
                                             >
                                                 Cancel
