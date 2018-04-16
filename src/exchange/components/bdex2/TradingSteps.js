@@ -62,8 +62,8 @@ class TradingSteps extends Component {
                     }, 
                     active: {
                         eth: false,
-                        weth: true,
-                        allowance: false
+                        weth: false,
+                        allowance: true
                     }
                 })
                 }
