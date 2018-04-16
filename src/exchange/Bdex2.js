@@ -747,9 +747,13 @@ class App extends Component {
                         </Grid.Row>
 
                     </Grid>
-                    <TradingSteps {...this.state} {...this.props} 
+                    {
+                        (this.state.balances['ETH'] !== 'NIL') && 
+                        <TradingSteps {...this.state} {...this.props} 
                         setBalanceAllowance={this.setBalanceAllowance}
                         takeAllowance = {this.takeAllowance}/>
+                    }
+                    
                 </div>
                 
         );

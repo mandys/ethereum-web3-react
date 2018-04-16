@@ -60,6 +60,8 @@ class Account extends Component {
     }
 
     setBalanceAllowance = async() => {
+        var sync = await this.props.web3.eth.isSyncingAsync();
+        console.log('sync',sync);
         let balances = await this.props.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
         balances['ETH'] = ((await this.props.web3.eth.getBalanceAsync(this.props.ownerAddress))/Math.pow(10, 18))
                                         .toFixed(8)

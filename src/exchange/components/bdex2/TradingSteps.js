@@ -54,7 +54,18 @@ class TradingSteps extends Component {
                         open: false
                     })
                 } else {
-
+                    this.setState({
+                    complete: {
+                        eth: true,
+                        weth: true,
+                        allowance: false,
+                    }, 
+                    active: {
+                        eth: false,
+                        weth: true,
+                        allowance: false
+                    }
+                })
                 }
             }
         }
@@ -63,7 +74,7 @@ class TradingSteps extends Component {
         return (
             <div>
         <Modal  open={this.state.open} closeOnDimmerClick={false}>
-            <Modal.Header>Please follow these steps</Modal.Header>
+            <Modal.Header>Please follow these steps to get started</Modal.Header>
             <Modal.Content image>
                 <Modal.Description>
                 <div>
