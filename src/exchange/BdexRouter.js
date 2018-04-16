@@ -101,12 +101,12 @@ class BdexRouter extends Component {
                     </Segment>
                     {
                         (this.state.message !== '') && 
-                        <Rail attached internal position='right' style={{marginTop:60, marginRight:20}}>
+                        <Rail attached internal position='right' style={{marginTop:60, marginRight:20,height:60}}>
                             <Message color={this.state.messageClass} 
                                 content={this.state.message}
                                 onDismiss={this.handleMessageDismiss}
                             />
-                        </Rail>
+                        </Rail> 
                     }
                     
                 </Container>

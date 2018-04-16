@@ -52,7 +52,8 @@ class WrapUnWrapEther extends Component {
             });
         } catch (e) {
             this.setState({
-                showOverlay: false
+                showOverlay: false,
+                disabled:false
             });
             console.log(e);
         }
@@ -80,7 +81,8 @@ class WrapUnWrapEther extends Component {
             });
         } catch (e) {
             this.setState({
-                showOverlay: false
+                showOverlay: false,
+                disabled:false
             });
             console.log(e);
         }

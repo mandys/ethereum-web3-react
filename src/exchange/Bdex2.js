@@ -7,6 +7,7 @@ import { BigNumber } from '@0xproject/utils';
 import { ZeroEx } from '0x.js';
 import DataTable from '../util/Datatable'
 import WrapUnWrapEther from './components/WrapUnWrapEther'
+import TradingSteps from './components/bdex2/TradingSteps'
 var moment = require('moment')
 
 class App extends Component {
@@ -21,7 +22,8 @@ class App extends Component {
         balances: {
             'WETH': 'NIL',
             'ZRX': 'NIL',
-            'BINK': 'NIL'
+            'BINK': 'NIL',
+            'ETH': 'NIL'
         },
         allowance: {
             'WETH': 0,
@@ -169,9 +171,10 @@ class App extends Component {
 
     socketListner = () => {
         this.props.bdexUtil.socketUtil.socket.on('neworder', (order) => {
-            console.log("NEW ORDER LOGGED")
+            console.log("NEW ORDER LOGGED", order)
             let activeOrders = this.state.activeOrders;
             activeOrders.push(order)
+            console.log(this.state.userActiveOrders)
             if(order.signedOrder.maker === this.props.ownerAddress) {
                 let userActiveOrders = this.state.userActiveOrders;
                 userActiveOrders.push(order)
@@ -245,7 +248,7 @@ class App extends Component {
         }
         this.showOrders();
         this.socketListner();
-        
+
 
         // let myadd = '0x891c53A37d672783eD43E7b1f39ef360F62BA0D6'.toLowerCase();
         // const indexFilterValues = {
@@ -262,13 +265,20 @@ class App extends Component {
         if ( prevProps.ownerAddress !== this.props.ownerAddress) {
             if ( this.props.ownerAddress ) {
                 this.setBalanceAllowance();
-                this.showOrders();
+                let userActiveOrders = await this.props.bdexUtil.getUserOrders(this.props.ownerAddress, 'active');
+                let userFilledOrders = await this.props.bdexUtil.getUserOrders(this.props.ownerAddress, 'filled');
+                this.setState({
+                    userActiveOrders: userActiveOrders,
+                    userFilledOrders: userFilledOrders
+                })
             }
         }
     }
 
     setBalanceAllowance = async() => {
         let balances = await this.props.bdexUtil.getBalances(this.props.ownerAddress, this.props.tokenContractAddresses);
+        balances['ETH'] = ((await this.props.web3.eth.getBalanceAsync(this.props.ownerAddress))/Math.pow(10, 18))
+        .toFixed(8)
         let allowance = await this.props.bdexUtil.getAllowances(this.props.ownerAddress, this.props.tokenContractAddresses);
         this.setState({
             balances: balances,
@@ -373,8 +383,9 @@ class App extends Component {
                                                     <b>BUYING</b>
                                                     <div>{`${order.fromTokenValue} ${order.fromToken}`}</div>
                                                     <b>Expires</b>
-                                                    <div>{moment(order.signedOrder.expirationUnixTimestampSec).format('MMMM Do YYYY, h:mm:ss a')}</div>
+                                                    <div>{moment(parseInt(order.signedOrder.expirationUnixTimestampSec)).format('MMMM Do YYYY, h:mm:ss a')}</div>
                                                 </div>
+                                                
                                 })
                             })
                     }
@@ -619,7 +630,7 @@ class App extends Component {
                                                             <b>BUYING</b>
                                                             <div>{`${order.fromTokenValue} ${order.fromToken}`}</div>
                                                             <b>Expires</b>
-                                                            <div>{moment(order.signedOrder.expirationUnixTimestampSec).format('MMMM Do YYYY, h:mm:ss a')}</div>
+                                                            <div>{moment(parseInt(order.signedOrder.expirationUnixTimestampSec)).format('MMMM Do YYYY, h:mm:ss a')}</div>
                                                         </div>
                                         })
                                     })
@@ -736,7 +747,9 @@ class App extends Component {
                         </Grid.Row>
 
                     </Grid>
-                    
+                    <TradingSteps {...this.state} {...this.props} 
+                        setBalanceAllowance={this.setBalanceAllowance}
+                        takeAllowance = {this.takeAllowance}/>
                 </div>
                 
         );
